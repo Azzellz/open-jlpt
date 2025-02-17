@@ -1,0 +1,26 @@
+{
+  "name": "open-jlpt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@root/shared": "workspace:^",
+    "axios": "^1.7.9",
+    "radash": "^12.1.0"
+  },
+  "devDependencies": {
+    "@root/models": "workspace:^"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "vue-demi"
+    ]
+  }
+}
