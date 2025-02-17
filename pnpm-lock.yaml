@@ -99,6 +99,9 @@ importers:
 
   packages/server:
     dependencies:
+      '@elysiajs/cors':
+        specifier: ^1.2.0
+        version: 1.2.0(elysia@1.2.13(@sinclair/typebox@0.34.25)(typescript@5.7.3))
       elysia:
         specifier: latest
         version: 1.2.13(@sinclair/typebox@0.34.25)(typescript@5.7.3)
@@ -275,6 +278,11 @@ packages:
     resolution: {integrity: sha512-//8027GSbxE9n3QlD73xFY6z4ZbHbvrOVB7AO6hsmrEzGbg+h2A09HboUyDgu+xsmj7JnvJD39Irt+2D0+iV8g==}
     peerDependencies:
       vue: ^3.0.11
+
+  '@elysiajs/cors@1.2.0':
+    resolution: {integrity: sha512-qsJwDAg6WfdQRMfj6uSMcDPSpXvm/zQFeAX1uuJXhIgazH8itSfcDxcH9pMuXVRX1yQNi2pPwNQLJmAcw5mzvw==}
+    peerDependencies:
+      elysia: '>= 1.2.0'
 
   '@emotion/hash@0.8.0':
     resolution: {integrity: sha512-kBJtf7PH6aWwZ6fka3zQ0p6SBYzx4fl1LoZXE2RrnYST9Xljm7WfKJrU4g/Xr3Beg72MLrp1AWNUmuYJTL7Cow==}
@@ -2529,6 +2537,10 @@ snapshots:
   '@css-render/vue3-ssr@0.15.14(vue@3.5.13(typescript@5.7.3))':
     dependencies:
       vue: 3.5.13(typescript@5.7.3)
+
+  '@elysiajs/cors@1.2.0(elysia@1.2.13(@sinclair/typebox@0.34.25)(typescript@5.7.3))':
+    dependencies:
+      elysia: 1.2.13(@sinclair/typebox@0.34.25)(typescript@5.7.3)
 
   '@emotion/hash@0.8.0': {}
 

@@ -3,10 +3,12 @@ export interface DeepSeekStreamChatChunk {
     content: string
 }
 
+export interface DeepSeekChatMessage {
+    role: 'user' | 'system'
+    content: string
+}
+
 export interface DeepSeekChatParams {
     isStream: boolean
-    messages: {
-        role: 'user' | 'system'
-        content: string
-    }[]
+    messages: DeepSeekChatMessage[]
 }
