@@ -1,7 +1,7 @@
 export interface JLPT_Article {
     article: {
         title: string
-        content: string[]
+        contents: string[]
     }
     questions: {
         number: number

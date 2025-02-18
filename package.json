@@ -12,10 +12,13 @@
   "dependencies": {
     "@root/shared": "workspace:^",
     "axios": "^1.7.9",
+    "clarinet": "^0.12.6",
+    "json-brook": "^0.0.4",
     "radash": "^12.1.0"
   },
   "devDependencies": {
-    "@root/models": "workspace:^"
+    "@root/models": "workspace:^",
+    "@types/clarinet": "^0.12.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

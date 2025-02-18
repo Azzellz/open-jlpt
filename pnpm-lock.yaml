@@ -14,6 +14,12 @@ importers:
       axios:
         specifier: ^1.7.9
         version: 1.7.9
+      clarinet:
+        specifier: ^0.12.6
+        version: 0.12.6
+      json-brook:
+        specifier: ^0.0.4
+        version: 0.0.4
       radash:
         specifier: ^12.1.0
         version: 12.1.0
@@ -21,6 +27,9 @@ importers:
       '@root/models':
         specifier: workspace:^
         version: link:packages/models
+      '@types/clarinet':
+        specifier: ^0.12.3
+        version: 0.12.3
 
   packages/client:
     dependencies:
@@ -101,10 +110,10 @@ importers:
     dependencies:
       '@elysiajs/cors':
         specifier: ^1.2.0
-        version: 1.2.0(elysia@1.2.13(@sinclair/typebox@0.34.25)(typescript@5.7.3))
+        version: 1.2.0(elysia@1.2.14(@sinclair/typebox@0.34.25)(typescript@5.7.3))
       elysia:
         specifier: latest
-        version: 1.2.13(@sinclair/typebox@0.34.25)(typescript@5.7.3)
+        version: 1.2.14(@sinclair/typebox@0.34.25)(typescript@5.7.3)
       mongoose:
         specifier: ^8.10.1
         version: 8.10.1
@@ -701,6 +710,9 @@ packages:
   '@tsconfig/node22@22.0.0':
     resolution: {integrity: sha512-twLQ77zevtxobBOD4ToAtVmuYrpeYUh3qh+TEp+08IWhpsrIflVHqQ1F1CiPxQGL7doCdBIOOCF+1Tm833faNg==}
 
+  '@types/clarinet@0.12.3':
+    resolution: {integrity: sha512-7Fwiv6RNH6JW86U7Vvae7sFHrNmNWxMIx9iAH49F+5d9Kizew5GMYz6rixupn3PK4t+oqP7GZMqOQR77QbcrAQ==}
+
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
 
@@ -1092,6 +1104,10 @@ packages:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
 
+  clarinet@0.12.6:
+    resolution: {integrity: sha512-0FR+TrvLbYHLjhzs9oeIbd3yfZmd4u2DzYQEjUTm2dNfh4Y/9RIRWPjsm3aBtrVEpjKI7+lWa4ouqEXoml84mQ==}
+    engines: {chrome: '>=16.0.912', firefox: '>=0.8.0', node: '>=0.3.6'}
+
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
     engines: {node: '>=7.0.0'}
@@ -1204,8 +1220,8 @@ packages:
   electron-to-chromium@1.5.101:
     resolution: {integrity: sha512-L0ISiQrP/56Acgu4/i/kfPwWSgrzYZUnQrC0+QPFuhqlLP1Ir7qzPPDVS9BcKIyWTRU8+o6CC8dKw38tSWhYIA==}
 
-  elysia@1.2.13:
-    resolution: {integrity: sha512-dNoPX9/1us+yYGX0igznlFTEG9jmEo8YaReD2EkoLL7IwvdZeMnC83GACxhk4ycv7I27192bsDatxWZSsOPQcA==}
+  elysia@1.2.14:
+    resolution: {integrity: sha512-xcbFs4Y709njvkELa90IXXWxERJLFw/p5NmtPIs/gKfcp5pGWJ2y4/HhlTYF0qb6Rr27mgr8Y1IU2c2pL5yHUw==}
     peerDependencies:
       '@sinclair/typebox': '>= 0.34.0'
       openapi-types: '>= 12.0.0'
@@ -1599,6 +1615,9 @@ packages:
     resolution: {integrity: sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA==}
     engines: {node: '>=6'}
     hasBin: true
+
+  json-brook@0.0.4:
+    resolution: {integrity: sha512-8cVR0CSxXCQLCVtEwYTlGSchNFwB757PQbUQUxThR0Eet1OftGLvWehQVwZadELMC8a1j9IFcZZDp9tJLRflVA==}
 
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
@@ -2538,9 +2557,9 @@ snapshots:
     dependencies:
       vue: 3.5.13(typescript@5.7.3)
 
-  '@elysiajs/cors@1.2.0(elysia@1.2.13(@sinclair/typebox@0.34.25)(typescript@5.7.3))':
+  '@elysiajs/cors@1.2.0(elysia@1.2.14(@sinclair/typebox@0.34.25)(typescript@5.7.3))':
     dependencies:
-      elysia: 1.2.13(@sinclair/typebox@0.34.25)(typescript@5.7.3)
+      elysia: 1.2.14(@sinclair/typebox@0.34.25)(typescript@5.7.3)
 
   '@emotion/hash@0.8.0': {}
 
@@ -2828,6 +2847,10 @@ snapshots:
   '@sindresorhus/merge-streams@4.0.0': {}
 
   '@tsconfig/node22@22.0.0': {}
+
+  '@types/clarinet@0.12.3':
+    dependencies:
+      '@types/node': 22.13.4
 
   '@types/estree@1.0.6': {}
 
@@ -3382,6 +3405,8 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
+  clarinet@0.12.6: {}
+
   color-convert@2.0.1:
     dependencies:
       color-name: 1.1.4
@@ -3469,7 +3494,7 @@ snapshots:
 
   electron-to-chromium@1.5.101: {}
 
-  elysia@1.2.13(@sinclair/typebox@0.34.25)(typescript@5.7.3):
+  elysia@1.2.14(@sinclair/typebox@0.34.25)(typescript@5.7.3):
     dependencies:
       '@sinclair/typebox': 0.34.25
       cookie: 1.0.2
@@ -3865,6 +3890,8 @@ snapshots:
       argparse: 2.0.1
 
   jsesc@3.1.0: {}
+
+  json-brook@0.0.4: {}
 
   json-buffer@3.0.1: {}
 
