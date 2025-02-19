@@ -17,6 +17,16 @@ ConfigService.post('/init', async () => {
     }
 })
 
+// 获取配置
+ConfigService.get('/', async () => {
+    const config = await DB_ConfigModel.findOne()
+    if (!config?.toJSON()) {
+        return createErrorResponse(400, '未初始化配置')
+    } else {
+        return createSuccessResponse(200, '获取配置成功', config.toJSON())
+    }
+})
+
 // 添加 AI 配置
 ConfigService.post(
     '/ai',
