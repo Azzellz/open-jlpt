@@ -6,5 +6,6 @@ export interface OpenJLPT_AI {
 }
 
 export interface OpenJLPT_Config {
+    id: string
     ai: OpenJLPT_AI[]
 }
