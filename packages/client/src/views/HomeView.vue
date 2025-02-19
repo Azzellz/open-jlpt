@@ -1,15 +1,28 @@
 <script setup lang="ts">
 import API from '@/api'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { createJsonBrook } from 'json-brook'
 import type { JLPT_Article } from '@root/models'
 import { NCard, NDivider, NButton, NInput, NSelect } from 'naive-ui'
+import { isSuccessResponse, Log } from '@root/shared'
+import { useConfigStore } from '@/stores/config'
 
 const jsonBrook = createJsonBrook()
+const configStore = useConfigStore()
 
 const content = ref('')
 const reasoning = ref('')
 const isReasoning = ref(true)
+const currentLLMID = ref('')
+const llmOptions = computed(() => {
+    if (configStore.config) {
+        return configStore.config.llms.map((llm) => {
+            return { label: llm.name, value: llm.id }
+        })
+    } else {
+        return []
+    }
+})
 const level = ref<'N5' | 'N4' | 'N3' | 'N2' | 'N1'>('N1')
 const levelOptions = [
     {
@@ -68,7 +81,8 @@ function isValidJsonFragment(fragment: string) {
 }
 
 async function generateArticle() {
-    await API.AI.deepseek.chatByStream(
+    await API.LLM.chatByStream(
+        currentLLMID.value,
         [
             {
                 role: 'system',
@@ -91,6 +105,15 @@ async function generateArticle() {
     )
     jsonBrook.end()
 }
+
+onMounted(async () => {
+    const result = await API.Config.getConfig()
+    if (isSuccessResponse(result)) {
+        configStore.config = result.data
+        console.log(result.data)
+        Log.success(result.message)
+    }
+})
 </script>
 
 <template>
@@ -98,6 +121,7 @@ async function generateArticle() {
         <div class="flex gap-5">
             <n-input v-model:value="theme" type="text" placeholder="请输入主题" />
             <n-select v-model:value="level" :options="levelOptions" />
+            <n-select v-model:value="currentLLMID" :options="llmOptions" />
             <n-button @click="generateArticle">开始生成</n-button>
         </div>
         <div class="flex flex-col">

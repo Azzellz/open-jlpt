@@ -1,12 +1,14 @@
 import axios from 'axios'
-import * as AI from './ai'
+import * as LLM from './llm'
+import * as Config from './config'
 
 export const API_INSTANCE = axios.create({
     baseURL: 'http://localhost:3000',
 })
 
 export const API = {
-    AI,
+    LLM,
+    Config,
 }
 
 export default API

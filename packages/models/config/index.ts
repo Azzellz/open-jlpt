@@ -1,4 +1,5 @@
-export interface OpenJLPT_AI {
+export interface OpenJLPT_LLM {
+    id: string
     name: string
     apiKey: string
     baseURL: string
@@ -7,5 +8,5 @@ export interface OpenJLPT_AI {
 
 export interface OpenJLPT_Config {
     id: string
-    ai: OpenJLPT_AI[]
+    llms: OpenJLPT_LLM[]
 }

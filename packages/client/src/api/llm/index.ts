@@ -1,12 +1,13 @@
-import type { DeepSeekChatParams, DeepSeekStreamChatChunk, SuccessResponse } from '@root/models'
+import type { LLM_ChatParams, LLM_StreamChatChunk, SuccessResponse } from '@root/models'
 import { API_INSTANCE } from '..'
 
 export async function chatByStream(
-    messages: DeepSeekChatParams['messages'],
-    onChunk: (chunk: SuccessResponse<DeepSeekStreamChatChunk>) => void,
+    id: string,
+    messages: LLM_ChatParams['messages'],
+    onChunk: (chunk: SuccessResponse<LLM_StreamChatChunk>) => void,
 ) {
     const response = await API_INSTANCE.post(
-        '/ai/deepseek/chat',
+        `/llm/${id}/chat`,
         {
             isStream: true,
             messages,

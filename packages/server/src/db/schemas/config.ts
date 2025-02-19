@@ -1,7 +1,7 @@
-import { OpenJLPT_AI, OpenJLPT_Config } from '@root/models'
+import { OpenJLPT_LLM, OpenJLPT_Config } from '@root/models'
 import { Schema } from 'mongoose'
 
-const DB_AI_Schema = new Schema<OpenJLPT_AI>(
+const DB_LLM_Schema = new Schema<OpenJLPT_LLM>(
     {
         name: { type: String, required: true },
         apiKey: { type: String, required: true },
@@ -27,7 +27,7 @@ const DB_AI_Schema = new Schema<OpenJLPT_AI>(
 
 export const DB_ConfigSchema = new Schema<OpenJLPT_Config>(
     {
-        ai: [DB_AI_Schema],
+        llms: [DB_LLM_Schema],
     },
     {
         versionKey: false,
