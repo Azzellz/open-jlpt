@@ -97,7 +97,6 @@ LLM_Service.post(
     },
     {
         body: t.Object({
-            // id: t.String(),
             isStream: t.Boolean(),
             messages: t.Array(
                 t.Object({

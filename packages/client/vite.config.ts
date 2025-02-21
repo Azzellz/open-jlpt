@@ -7,6 +7,10 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
+    server: {
+        host: '0.0.0.0', // 配置项目可以局域网访问
+        cors: true, // 默认启用并允许任何源
+    },
     plugins: [vue(), vueJsx(), vueDevTools(), UnoCSS()],
     resolve: {
         alias: {

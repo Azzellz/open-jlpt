@@ -1,4 +1,4 @@
-export interface JLPT_Article {
+export interface JLPT_Read {
     article: {
         title: string
         contents: string[]
