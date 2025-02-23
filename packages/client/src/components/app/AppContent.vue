@@ -1,5 +1,5 @@
 <template>
-    <main class="flex-1 mt-5 p-10">
+    <main class="flex-1 p-10 overflow-auto">
         <slot />
     </main>
 </template>
