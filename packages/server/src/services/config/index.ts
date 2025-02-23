@@ -29,19 +29,19 @@ ConfigService.get('/', async () => {
 
 // 添加 AI 配置
 ConfigService.post(
-    '/ai',
+    '/llms',
     async ({ body }) => {
         const config = await DB_ConfigModel.findOne()
         if (!config?.toJSON()) {
             return createErrorResponse(400, '未初始化配置')
         }
 
-        const same = config.ai.find((item) => item.name === body.name)
+        const same = config.llms.find((item) => item.name === body.name)
         if (same) {
             return createErrorResponse(400, '已经存在相同的 AI 配置项')
         }
 
-        config.ai.push(body)
+        config.llms.push(body as any)
         await config.save()
         return createSuccessResponse(200, '创建 AI 配置项成功', config.toJSON())
     },

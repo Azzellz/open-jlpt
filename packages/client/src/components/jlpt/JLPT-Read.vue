@@ -7,7 +7,6 @@ import { NCard, NDivider, NButton, NInput, NSelect } from 'naive-ui'
 import { isSuccessResponse, Log } from '@root/shared'
 import { useConfigStore } from '@/stores/config'
 
-const jsonBrook = createJsonBrook()
 const configStore = useConfigStore()
 
 const content = ref('')
@@ -71,16 +70,16 @@ const template = `
 `
 
 const jlpt_article = ref<Partial<JLPT_Read> | null>(null)
-
-function mergeFragment(fragment: Partial<JLPT_Read>) {
-    jlpt_article.value = fragment
-}
-
-function isValidJsonFragment(fragment: string) {
-    return fragment && fragment !== '```' && fragment !== 'json'
-}
+const isGenerating = ref(false)
 
 async function generateArticle() {
+    const jsonBrook = createJsonBrook()
+    isGenerating.value = true
+    let flag = ''
+    let isJsoning = false
+    reasoning.value = ''
+    content.value = ''
+    jlpt_article.value = null
     await API.LLM.chatByStream(
         currentLLMID.value,
         [
@@ -93,25 +92,54 @@ async function generateArticle() {
                 content: theme.value,
             },
         ],
-        (result) => {
-            if (result.data.type === 'content' && isValidJsonFragment(result.data.content)) {
-                content.value += result.data.content
-                jsonBrook.write(result.data.content)
-                mergeFragment(jsonBrook.getCurrent() || {})
-            } else if (result.data.type === 'reasoning') {
-                reasoning.value += result.data.content
+        (chunk) => {
+            if (flag === '```' && chunk === 'json') {
+                isJsoning = true
+                isReasoning.value = false
+                return
+            }
+            flag = chunk
+
+            if (chunk === '```') {
+                return
+            }
+            if (isJsoning) {
+                // JSON部分
+                content.value += chunk
+                jsonBrook.write(chunk)
+                jlpt_article.value = jsonBrook.getCurrent()
+            } else {
+                // 思考部分
+                reasoning.value += chunk
             }
         },
     )
     jsonBrook.end()
+    isGenerating.value = false
 }
 
+const reasoningCardTitle = computed(() => {
+    if (!reasoning.value) {
+        return '输入相关信息后开始生成'
+    }
+    if (isReasoning.value) {
+        return '思考中...'
+    } else {
+        return '思考过程'
+    }
+})
+
+// 初始化
 onMounted(async () => {
     const result = await API.Config.getConfig()
     if (isSuccessResponse(result)) {
         configStore.config = result.data
-        console.log(result.data)
         Log.success(result.message)
+
+        // 默认选择第一个模型
+        if (configStore.config.llms.length) {
+            currentLLMID.value = configStore.config.llms[0].id
+        }
     }
 })
 </script>
@@ -122,41 +150,56 @@ onMounted(async () => {
             <n-input v-model:value="theme" type="text" placeholder="请输入主题" />
             <n-select v-model:value="level" :options="levelOptions" />
             <n-select v-model:value="currentLLMID" :options="llmOptions" />
-            <n-button @click="generateArticle">开始生成</n-button>
+            <n-button
+                type="primary"
+                @click="generateArticle"
+                :loading="isGenerating"
+                :disabled="isGenerating"
+            >
+                {{ isGenerating ? '生成中' : '开始生成' }}
+            </n-button>
         </div>
         <div class="flex flex-col">
-            <n-card :title="isReasoning ? '思考中...' : '思考过程'" class="text-gray">
-                {{ reasoning }}
+            <n-card :title="reasoningCardTitle" class="text-gray overflow-auto w-100%">
+                <div>{{ reasoning }}</div>
             </n-card>
-            <n-divider />
-            <!-- 阅读题卡片 -->
-            <n-card v-if="jlpt_article?.article?.title" :title="jlpt_article?.article?.title">
-                <!-- 内容部分 -->
-                <div v-if="jlpt_article?.article?.contents" class="flex flex-col gap-5">
-                    <div v-for="content in jlpt_article?.article.contents">
-                        {{ content }}
-                    </div>
-                </div>
+            <template v-if="content">
                 <n-divider />
-                <!-- 问题部分 -->
-                <div v-if="jlpt_article?.questions" class="flex flex-col gap-5">
-                    <div
-                        v-for="question in jlpt_article?.questions"
-                        class="flex flex-col gap-5 items-center"
-                    >
-                        <!-- 题干 -->
-                        <div class="flex gap-5 items-center">
-                            <div>{{ question.number }}</div>
-                            <div>{{ question.type }}</div>
-                            <div>{{ question.question }}</div>
+                <n-card title="JSON" class="text-gray overflow-auto w-100%">
+                    <pre>{{ content }}</pre>
+                </n-card>
+            </template>
+            <template v-if="jlpt_article?.article?.title">
+                <n-divider />
+                <!-- 阅读题卡片 -->
+                <n-card :title="jlpt_article?.article?.title">
+                    <!-- 内容部分 -->
+                    <div v-if="jlpt_article?.article?.contents" class="flex flex-col gap-5">
+                        <div v-for="content in jlpt_article?.article.contents">
+                            {{ content }}
                         </div>
-                        <!-- 选项 -->
-                        <n-button v-for="option in question.options" class="flex gap-5">
-                            {{ option }}
-                        </n-button>
                     </div>
-                </div>
-            </n-card>
+                    <n-divider />
+                    <!-- 问题部分 -->
+                    <div v-if="jlpt_article?.questions" class="flex flex-col gap-5">
+                        <div
+                            v-for="question in jlpt_article?.questions"
+                            class="flex flex-col gap-5 items-center"
+                        >
+                            <!-- 题干 -->
+                            <div class="flex gap-5 items-center">
+                                <div>{{ question.number }}</div>
+                                <div>{{ question.type }}</div>
+                                <div>{{ question.question }}</div>
+                            </div>
+                            <!-- 选项 -->
+                            <n-button v-for="option in question.options" class="flex gap-5">
+                                {{ option }}
+                            </n-button>
+                        </div>
+                    </div>
+                </n-card>
+            </template>
         </div>
     </div>
 </template>

@@ -77,19 +77,7 @@ LLM_Service.post(
                 const delta = chunk.choices[0]?.delta
                 const reasoning = (delta as any)?.reasoning_content
                 const content = delta?.content
-                let data: any
-                if (reasoning) {
-                    data = {
-                        type: 'reasoning',
-                        content: reasoning,
-                    }
-                } else {
-                    data = {
-                        type: 'content',
-                        content,
-                    }
-                }
-                yield createSuccessResponse(200, 'OK', data)
+                yield reasoning || content
             }
         } catch (error) {
             return createErrorResponse(500, error)
