@@ -1,6 +1,10 @@
 <template>
     <div class="h-16 px-8 shadow-md z-10 flex items-center gap-10">
-        <RouterLink to="/" class="text-lg cursor-pointer transition hover:scale-120">
+        <RouterLink
+            to="/"
+            class="text-lg cursor-pointer transition flex items-center hover:scale-120"
+        >
+            <SakuraIcon class="mb-1.5 mr-2" />
             <span class="text-gray">OPEN</span>
             <span class="text-red-300">·</span>
             <span class="text-red">JLPT</span>
@@ -55,5 +59,6 @@
 </template>
 
 <script setup lang="ts">
-import { NAvatar, NDivider } from 'naive-ui'
+import { NAvatar } from 'naive-ui'
+import SakuraIcon from '@/components/icon/SakuraIcon.vue'
 </script>
