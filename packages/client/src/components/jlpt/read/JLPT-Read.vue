@@ -6,6 +6,7 @@ import type { JLPT_Read } from '@root/models'
 import { NCard, NDivider, NButton, NInput, NSelect, NCollapse, NCollapseItem } from 'naive-ui'
 import { isSuccessResponse, Log } from '@root/shared'
 import { useConfigStore } from '@/stores/config'
+import JLPT_ReadCard from './JLPT-ReadCard.vue'
 
 const configStore = useConfigStore()
 
@@ -69,7 +70,7 @@ const template = `
 }
 `
 
-const jlpt_article = ref<Partial<JLPT_Read> | null>(null)
+const jlpt_read = ref<Partial<JLPT_Read> | null>(null)
 const isGenerating = ref(false)
 
 async function generateArticle() {
@@ -79,7 +80,7 @@ async function generateArticle() {
     let isJsoning = false
     reasoningString.value = ''
     jsonString.value = ''
-    jlpt_article.value = null
+    jlpt_read.value = null
     await API.LLM.chatByStream(
         currentLLMID.value,
         [
@@ -107,7 +108,7 @@ async function generateArticle() {
                 // JSON部分
                 jsonString.value += chunk
                 jsonBrook.write(chunk)
-                jlpt_article.value = jsonBrook.getCurrent()
+                jlpt_read.value = jsonBrook.getCurrent()
             } else {
                 // 思考部分
                 reasoningString.value += chunk
@@ -151,6 +152,7 @@ onMounted(async () => {
             <n-select v-model:value="level" :options="levelOptions" />
             <n-select v-model:value="currentLLMID" :options="llmOptions" />
             <n-button
+                v-if="!jlpt_read || isGenerating"
                 type="primary"
                 @click="generateArticle"
                 :loading="isGenerating"
@@ -158,6 +160,7 @@ onMounted(async () => {
             >
                 {{ isGenerating ? '生成中' : '开始生成' }}
             </n-button>
+            <n-button v-else type="warning" @click="generateArticle"> 重新生成 </n-button>
         </div>
         <div class="flex flex-col">
             <n-collapse>
@@ -171,36 +174,9 @@ onMounted(async () => {
                         <pre>{{ jsonString }}</pre>
                     </n-card>
                 </n-collapse-item>
-                <n-collapse-item v-if="jlpt_article?.article?.title" title="阅读" name="3">
+                <n-collapse-item v-if="jlpt_read?.article?.title" title="阅读" name="3">
                     <n-divider />
-                    <!-- 阅读题卡片 -->
-                    <n-card :title="jlpt_article?.article?.title">
-                        <!-- 内容部分 -->
-                        <div v-if="jlpt_article?.article?.contents" class="flex flex-col gap-5">
-                            <div v-for="content in jlpt_article?.article.contents">
-                                {{ content }}
-                            </div>
-                        </div>
-                        <n-divider />
-                        <!-- 问题部分 -->
-                        <div v-if="jlpt_article?.questions" class="flex flex-col gap-5">
-                            <div
-                                v-for="question in jlpt_article?.questions"
-                                class="flex flex-col gap-5 items-center"
-                            >
-                                <!-- 题干 -->
-                                <div class="flex gap-5 items-center">
-                                    <div>{{ question.number }}</div>
-                                    <div>{{ question.type }}</div>
-                                    <div>{{ question.question }}</div>
-                                </div>
-                                <!-- 选项 -->
-                                <n-button v-for="option in question.options" class="flex gap-5">
-                                    {{ option }}
-                                </n-button>
-                            </div>
-                        </div>
-                    </n-card>
+                    <JLPT_ReadCard :read="jlpt_read" />
                 </n-collapse-item>
             </n-collapse>
         </div>

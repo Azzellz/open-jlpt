@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import JLPT_Read from '@/components/jlpt/JLPT-Read.vue'
+import JLPT_Read from '@/components/jlpt/read/JLPT-Read.vue'
 </script>
