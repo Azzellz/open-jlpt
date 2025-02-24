@@ -4,7 +4,7 @@
             to="/"
             class="text-lg cursor-pointer transition flex items-center hover:scale-120"
         >
-            <SakuraIcon class="mb-1.5 mr-2" />
+            <SakuraIcon class="mb-1.5 mr-2" size="24" />
             <span class="text-gray">OPEN</span>
             <span class="text-red-300">·</span>
             <span class="text-red">JLPT</span>

@@ -8,8 +8,21 @@
             </div>
         </div>
         <n-divider />
+        <!-- 词汇表 -->
+        <div class="flex flex-col gap-5" v-if="read.vocabList?.length">
+            <div class="text-lg">词汇表</div>
+            <div class="flex gap-5">
+                <JLPT_ReadVocabCard
+                    class="min-w-75 max-w-100"
+                    v-for="vocab in read.vocabList"
+                    :vocab="vocab"
+                />
+            </div>
+        </div>
+        <n-divider />
         <!-- 问题部分 -->
         <div v-if="read.questions" class="flex flex-col gap-5">
+            <!-- <div class="text-lg">问题</div> -->
             <div v-for="(question, questionIndex) in read.questions" class="flex flex-col gap-5">
                 <!-- 题干 -->
                 <div class="flex items-center font-bold gap-2">
@@ -38,6 +51,8 @@
 import type { JLPT_Read } from '@root/models'
 import { NCard, NDivider, NRadio, NTag } from 'naive-ui'
 import { ref } from 'vue'
+import JLPT_ReadVocabCard from './JLPT-ReadVocabCard.vue'
+
 const { read } = defineProps<{
     read: Partial<JLPT_Read>
 }>()
