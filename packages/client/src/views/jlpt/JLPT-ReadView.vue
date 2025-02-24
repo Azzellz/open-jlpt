@@ -1,6 +1,6 @@
 <template>
-    <div class="h-full">
-        <JLPT_Read></JLPT_Read>
+    <div>
+        <JLPT_Read />
     </div>
 </template>
 

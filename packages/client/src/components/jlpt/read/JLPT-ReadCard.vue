@@ -11,9 +11,9 @@
         <!-- 词汇表 -->
         <div class="flex flex-col gap-5" v-if="read.vocabList?.length">
             <div class="text-lg">词汇表</div>
-            <div class="flex gap-5">
+            <div class="flex flex-wrap gap-5">
                 <JLPT_ReadVocabCard
-                    class="min-w-75 max-w-100"
+                    class="min-w-50 max-w-75 flex-1"
                     v-for="vocab in read.vocabList"
                     :vocab="vocab"
                 />
