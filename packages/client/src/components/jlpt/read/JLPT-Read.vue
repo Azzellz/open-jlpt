@@ -3,7 +3,7 @@ import API from '@/api'
 import { computed, onMounted, ref } from 'vue'
 import { createJsonBrook } from 'json-brook'
 import type { JLPT_Read } from '@root/models'
-import { NCard, NDivider, NButton, NInput, NSelect, NCollapse, NCollapseItem } from 'naive-ui'
+import { NCard, NButton, NInput, NSelect, NCollapse, NCollapseItem } from 'naive-ui'
 import { isSuccessResponse, Log } from '@root/shared'
 import { useConfigStore } from '@/stores/config'
 import JLPT_ReadCard from './JLPT-ReadCard.vue'
@@ -23,7 +23,7 @@ const llmOptions = computed(() => {
         return []
     }
 })
-const level = ref<'N5' | 'N4' | 'N3' | 'N2' | 'N1'>('N1')
+const level = ref<JLPT_Read['difficulty']>('N1')
 const levelOptions = [
     {
         label: 'N1',
@@ -49,6 +49,7 @@ const levelOptions = [
 const theme = ref('')
 const _testDemo = `
 {
+  "difficulty":"N1",
   "article": {
     "title": "超自然現象と現代社会の心理的相関",
     "contents": [
@@ -182,12 +183,12 @@ export interface JLPT_ReadStructure {
 }
 
 export interface JLPT_Read {
+    difficulty: 'N1' | 'N2' | 'N3' | 'N4' | 'N5' // 难度
     article: JLPT_ReadArticle // 文章
     questions: JLPT_ReadQuestion[] // 问题
     vocabList: JLPT_ReadVocab[] // 词汇表
     structure: JLPT_ReadStructure // 文章结构
 }
-
 `
 
 const jlpt_read = ref<Partial<JLPT_Read> | null>(null)
@@ -289,7 +290,7 @@ onMounted(async () => {
             <n-collapse>
                 <n-collapse-item :title="reasoningCardTitle" name="1">
                     <n-card class="text-gray overflow-auto w-100%">
-                        <div>{{ reasoningString }}</div>
+                        <div class="italic">{{ reasoningString }}</div>
                     </n-card>
                 </n-collapse-item>
                 <n-collapse-item v-if="jsonString" title="JSON" name="2">

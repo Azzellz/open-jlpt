@@ -1,6 +1,14 @@
 <template>
     <!-- 阅读题卡片 -->
-    <n-card :title="read.article?.title">
+    <n-card>
+        <template #header>
+            <div class="flex gap-3 items-center">
+                <n-tag size="small" :type="difficultyColorMap[read.difficulty || 'N5']">{{
+                    read.difficulty
+                }}</n-tag>
+                <span v-text="read.article?.title" />
+            </div>
+        </template>
         <!-- 交互栏 -->
         <template #header-extra>
             <div class="flex gap-5">
@@ -105,5 +113,17 @@ async function handleReAnswer() {
     isSubmitted.value = false
     selects.value = []
     answerCount.value = 0
+}
+
+// 映射难度标签的颜色
+const difficultyColorMap: Record<
+    JLPT_Read['difficulty'],
+    'error' | 'warning' | 'info' | 'success' | 'default' | 'primary' | undefined
+> = {
+    N1: 'error',
+    N2: 'warning',
+    N3: 'info',
+    N4: 'success',
+    N5: 'success',
 }
 </script>

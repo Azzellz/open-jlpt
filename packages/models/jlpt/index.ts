@@ -22,8 +22,9 @@ export interface JLPT_ReadStructure {
 }
 
 export interface JLPT_Read {
+    difficulty: 'N1' | 'N2' | 'N3' | 'N4' | 'N5' // 难度
     article: JLPT_ReadArticle // 文章
-    questions: JLPT_ReadQuestion[] // 问题
     vocabList: JLPT_ReadVocab[] // 词汇表
     structure: JLPT_ReadStructure // 文章结构
+    questions: JLPT_ReadQuestion[] // 问题
 }
