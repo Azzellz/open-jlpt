@@ -2,13 +2,14 @@
 import { RouterView } from 'vue-router'
 import AppHeader from './components/app/AppHeader.vue'
 import AppContent from './components/app/AppContent.vue'
+import AppProvider from './components/app/AppProvider.vue'
 </script>
 
 <template>
-    <AppHeader></AppHeader>
-    <AppContent>
-        <RouterView></RouterView>
-    </AppContent>
+    <AppProvider>
+        <AppHeader />
+        <AppContent>
+            <RouterView />
+        </AppContent>
+    </AppProvider>
 </template>
-
-<style scoped></style>

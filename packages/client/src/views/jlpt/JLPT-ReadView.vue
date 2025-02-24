@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="lg:px-35 xl:px-70">
         <JLPT_Read />
     </div>
 </template>

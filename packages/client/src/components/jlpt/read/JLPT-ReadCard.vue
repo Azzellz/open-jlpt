@@ -1,6 +1,16 @@
 <template>
     <!-- 阅读题卡片 -->
     <n-card :title="read.article?.title">
+        <template #header-extra>
+            <div class="flex gap-5">
+                <n-button ghost type="primary">
+                    <span class="font-bold">提交答案</span>
+                </n-button>
+                <n-button ghost type="warning">
+                    <span class="font-bold"> 收藏 </span>
+                </n-button>
+            </div>
+        </template>
         <!-- 内容部分 -->
         <div v-if="read.article?.contents" class="flex flex-col gap-5">
             <div v-for="content in read.article.contents">
@@ -22,7 +32,6 @@
         <n-divider />
         <!-- 问题部分 -->
         <div v-if="read.questions" class="flex flex-col gap-5">
-            <!-- <div class="text-lg">问题</div> -->
             <div v-for="(question, questionIndex) in read.questions" class="flex flex-col gap-5">
                 <!-- 题干 -->
                 <div class="flex items-center font-bold gap-2">
@@ -32,6 +41,7 @@
                 <!-- 选项 -->
                 <n-radio
                     v-for="(option, optionIndex) in question.options"
+                    class="ml-2.5"
                     :checked="selects[questionIndex] === optionIndex + 1"
                     :value="optionIndex + 1"
                     @change="
@@ -49,7 +59,7 @@
 
 <script setup lang="ts">
 import type { JLPT_Read } from '@root/models'
-import { NCard, NDivider, NRadio, NTag } from 'naive-ui'
+import { NCard, NDivider, NRadio, NTag, NButton } from 'naive-ui'
 import { ref } from 'vue'
 import JLPT_ReadVocabCard from './JLPT-ReadVocabCard.vue'
 

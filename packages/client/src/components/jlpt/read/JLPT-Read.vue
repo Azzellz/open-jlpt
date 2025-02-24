@@ -269,7 +269,6 @@ onMounted(async () => {
                     </n-card>
                 </n-collapse-item>
                 <n-collapse-item v-if="jlpt_read?.article?.title" title="阅读" name="3">
-                    <n-divider />
                     <JLPT_ReadCard :read="jlpt_read" />
                 </n-collapse-item>
             </n-collapse>
