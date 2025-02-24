@@ -3,16 +3,15 @@ import API from '@/api'
 import { computed, onMounted, ref } from 'vue'
 import { createJsonBrook } from 'json-brook'
 import type { JLPT_Read } from '@root/models'
-import { NCard, NButton, NInput, NSelect, NCollapse, NCollapseItem } from 'naive-ui'
+import { NCard, NButton, NInput, NSelect, NCollapse, NCollapseItem, NInputNumber } from 'naive-ui'
 import { isSuccessResponse, Log } from '@root/shared'
 import { useConfigStore } from '@/stores/config'
 import JLPT_ReadCard from './JLPT-ReadCard.vue'
 
 const configStore = useConfigStore()
 
-const jsonString = ref('')
-const reasoningString = ref('')
-const isReasoning = ref(true)
+//#region 配置栏
+const wordCount = ref()
 const currentLLMID = ref('')
 const llmOptions = computed(() => {
     if (configStore.config) {
@@ -47,7 +46,23 @@ const levelOptions = [
     },
 ]
 const theme = ref('')
-const _testDemo = `
+//#endregion
+
+const isReasoning = ref(true)
+const jsonString = ref('')
+const reasoningString = ref('')
+const reasoningCardTitle = computed(() => {
+    if (!reasoningString.value) {
+        return '输入相关信息后开始生成'
+    }
+    if (isReasoning.value) {
+        return '思考中...'
+    } else {
+        return '思考过程'
+    }
+})
+
+const __testReadString = `
 {
   "difficulty":"N1",
   "article": {
@@ -191,10 +206,11 @@ export interface JLPT_Read {
 }
 `
 
+//#region 生成阅读
+
 const jlpt_read = ref<Partial<JLPT_Read> | null>(null)
 const isGenerating = ref(false)
-
-async function generateArticle() {
+async function generateRead() {
     const jsonBrook = createJsonBrook()
     isGenerating.value = true
     let flag = ''
@@ -206,8 +222,9 @@ async function generateArticle() {
         currentLLMID.value,
         [
             {
+                // prompt
                 role: 'system',
-                content: `根据用户给出的主题，生成一篇 JLPT ${level.value} 难度的阅读题，只回复 JSON 格式的数据，JSON 格式为${template}`,
+                content: `根据用户给出的主题，生成一篇字数在 ${wordCount.value || '任意'} 字左右的 JLPT ${level.value} 难度的阅读题，只回复 JSON 格式的数据，JSON 格式为 ${template}`,
             },
             {
                 role: 'user',
@@ -240,16 +257,7 @@ async function generateArticle() {
     isGenerating.value = false
 }
 
-const reasoningCardTitle = computed(() => {
-    if (!reasoningString.value) {
-        return '输入相关信息后开始生成'
-    }
-    if (isReasoning.value) {
-        return '思考中...'
-    } else {
-        return '思考过程'
-    }
-})
+//#endregion
 
 // 初始化
 onMounted(async () => {
@@ -265,36 +273,61 @@ onMounted(async () => {
     }
 
     // 测试用
-    jlpt_read.value = JSON.parse(_testDemo)
+    jlpt_read.value = JSON.parse(__testReadString)
+    jsonString.value = __testReadString.toString()
 })
 </script>
 
 <template>
     <div class="flex flex-col gap-5">
         <div class="flex gap-5">
-            <n-input v-model:value="theme" type="text" placeholder="请输入主题" />
+            <n-input
+                class="min-w-75 flex-1"
+                v-model:value="theme"
+                type="text"
+                placeholder="不能是敏感内容哦."
+                clearable
+                maxlength="30"
+                show-count
+            >
+                <template #prefix>
+                    <span>主题：</span>
+                </template>
+            </n-input>
+            <n-input-number
+                class="min-w-40 flex-1"
+                v-model:value="wordCount"
+                type="text"
+                placeholder="任意"
+                :min="100"
+                :max="2000"
+            >
+                <template #prefix>
+                    <span>字数：</span>
+                </template>
+            </n-input-number>
             <n-select v-model:value="level" :options="levelOptions" />
             <n-select v-model:value="currentLLMID" :options="llmOptions" />
             <n-button
                 v-if="!jlpt_read || isGenerating"
                 type="primary"
-                @click="generateArticle"
+                @click="generateRead"
                 :loading="isGenerating"
                 :disabled="isGenerating"
             >
                 {{ isGenerating ? '生成中' : '开始生成' }}
             </n-button>
-            <n-button v-else type="warning" @click="generateArticle"> 重新生成 </n-button>
+            <n-button v-else type="warning" @click="generateRead"> 重新生成 </n-button>
         </div>
         <div class="flex flex-col">
             <n-collapse>
                 <n-collapse-item :title="reasoningCardTitle" name="1">
-                    <n-card class="text-gray overflow-auto w-100%">
+                    <n-card class="text-gray overflow-auto">
                         <div class="italic">{{ reasoningString }}</div>
                     </n-card>
                 </n-collapse-item>
                 <n-collapse-item v-if="jsonString" title="JSON" name="2">
-                    <n-card class="text-gray overflow-auto w-100%">
+                    <n-card class="text-gray overflow-auto">
                         <pre>{{ jsonString }}</pre>
                     </n-card>
                 </n-collapse-item>
