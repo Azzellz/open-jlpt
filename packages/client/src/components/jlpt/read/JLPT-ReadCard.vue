@@ -1,10 +1,16 @@
 <template>
     <!-- 阅读题卡片 -->
     <n-card :title="read.article?.title">
+        <!-- 交互栏 -->
         <template #header-extra>
             <div class="flex gap-5">
-                <n-button ghost type="primary">
-                    <span class="font-bold">提交答案</span>
+                <n-button ghost type="info" @click="handleSubmitAnswers" :disabled="!isAllowSubmit">
+                    <span class="font-bold">{{
+                        isAllowSubmit ? '提交答案' : '请完成所有问题'
+                    }}</span>
+                </n-button>
+                <n-button v-if="isSubmitted" ghost type="success" @click="handleReAnswer">
+                    <span class="font-bold">重新答题</span>
                 </n-button>
                 <n-button ghost type="warning">
                     <span class="font-bold"> 收藏 </span>
@@ -39,19 +45,29 @@
                     <div>{{ question.question }}</div>
                 </div>
                 <!-- 选项 -->
-                <n-radio
+                <div
+                    class="ml-2.5 flex gap-2 items-center"
                     v-for="(option, optionIndex) in question.options"
-                    class="ml-2.5"
-                    :checked="selects[questionIndex] === optionIndex + 1"
-                    :value="optionIndex + 1"
-                    @change="
-                        () => {
-                            selects[questionIndex] = optionIndex + 1
-                        }
-                    "
                 >
-                    {{ option }}
-                </n-radio>
+                    <n-radio
+                        :checked="selects[questionIndex] === optionIndex + 1"
+                        :value="optionIndex + 1"
+                        :disabled="isSubmitted"
+                        @change="
+                            () => {
+                                selects[questionIndex] = optionIndex + 1
+                                answerCount++
+                            }
+                        "
+                    >
+                        {{ option }}
+                    </n-radio>
+                    <!-- 正确与错误 -->
+                    <template v-if="isSubmitted">
+                        <SuccessIcon v-if="optionIndex + 1 === question.answer" size="16" />
+                        <ErrorIcon v-else size="16" />
+                    </template>
+                </div>
             </div>
         </div>
     </n-card>
@@ -59,13 +75,31 @@
 
 <script setup lang="ts">
 import type { JLPT_Read } from '@root/models'
-import { NCard, NDivider, NRadio, NTag, NButton } from 'naive-ui'
-import { ref } from 'vue'
+import { NCard, NDivider, NRadio, NTag, NButton, NIcon } from 'naive-ui'
+import { CheckmarkCircle } from '@vicons/ionicons5'
+import { computed, ref } from 'vue'
 import JLPT_ReadVocabCard from './JLPT-ReadVocabCard.vue'
+import ErrorIcon from '@/components/icon/ErrorIcon.vue'
+import SuccessIcon from '@/components/icon/SuccessIcon.vue'
 
 const { read } = defineProps<{
     read: Partial<JLPT_Read>
 }>()
 
 const selects = ref<number[]>([])
+// 记录已经回答的题数
+const answerCount = ref(0)
+const isAllowSubmit = computed(() => {
+    return answerCount.value === read.questions?.length
+})
+
+const isSubmitted = ref(false)
+async function handleSubmitAnswers() {
+    isSubmitted.value = true
+}
+async function handleReAnswer() {
+    isSubmitted.value = false
+    selects.value = []
+    answerCount.value = 0
+}
 </script>
