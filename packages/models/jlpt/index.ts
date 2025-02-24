@@ -9,6 +9,7 @@ export interface JLPT_ReadQuestion {
     question: string
     options: string[]
     answer: number
+    analysis: string // 答案解析（完整一点）
 }
 
 export interface JLPT_ReadArticle {
@@ -21,8 +22,8 @@ export interface JLPT_ReadStructure {
 }
 
 export interface JLPT_Read {
-    article: JLPT_ReadArticle
-    questions: JLPT_ReadQuestion[]
-    vocabList: JLPT_ReadVocab[] //词汇表
-    structure: JLPT_ReadStructure
+    article: JLPT_ReadArticle // 文章
+    questions: JLPT_ReadQuestion[] // 问题
+    vocabList: JLPT_ReadVocab[] // 词汇表
+    structure: JLPT_ReadStructure // 文章结构
 }

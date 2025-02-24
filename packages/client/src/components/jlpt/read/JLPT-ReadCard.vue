@@ -64,10 +64,15 @@
                     </n-radio>
                     <!-- 正确与错误 -->
                     <template v-if="isSubmitted">
-                        <SuccessIcon v-if="optionIndex + 1 === question.answer" size="16" />
+                        <SuccessIcon v-if="optionIndex === question.answer" size="16" />
                         <ErrorIcon v-else size="16" />
                     </template>
                 </div>
+                <!-- 解析 -->
+                <div v-if="isSubmitted" class="text-gray ml-2.5 italic">
+                    {{ question.analysis }}
+                </div>
+                <n-divider />
             </div>
         </div>
     </n-card>
@@ -75,8 +80,7 @@
 
 <script setup lang="ts">
 import type { JLPT_Read } from '@root/models'
-import { NCard, NDivider, NRadio, NTag, NButton, NIcon } from 'naive-ui'
-import { CheckmarkCircle } from '@vicons/ionicons5'
+import { NCard, NDivider, NRadio, NTag, NButton } from 'naive-ui'
 import { computed, ref } from 'vue'
 import JLPT_ReadVocabCard from './JLPT-ReadVocabCard.vue'
 import ErrorIcon from '@/components/icon/ErrorIcon.vue'
