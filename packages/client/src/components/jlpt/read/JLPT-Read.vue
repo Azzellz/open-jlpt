@@ -2,7 +2,7 @@
 import API from '@/api'
 import { computed, onMounted, ref } from 'vue'
 import { createJsonBrook } from 'json-brook'
-import type { JLPT_Read } from '@root/models'
+import type { JLPT_ReadOrigin } from '@root/models'
 import { NCard, NButton, NInput, NSelect, NCollapse, NCollapseItem, NInputNumber } from 'naive-ui'
 import { isSuccessResponse, Log } from '@root/shared'
 import { useConfigStore } from '@/stores/config'
@@ -22,7 +22,7 @@ const llmOptions = computed(() => {
         return []
     }
 })
-const level = ref<JLPT_Read['difficulty']>('N1')
+const level = ref<JLPT_ReadOrigin['difficulty']>('N1')
 const levelOptions = [
     {
         label: 'N1',
@@ -197,18 +197,18 @@ export interface JLPT_ReadStructure {
     paragraph_focus: string[]
 }
 
-export interface JLPT_Read {
+export interface JLPT_ReadOrigin {
     difficulty: 'N1' | 'N2' | 'N3' | 'N4' | 'N5' // 难度
     article: JLPT_ReadArticle // 文章
-    questions: JLPT_ReadQuestion[] // 问题
     vocabList: JLPT_ReadVocab[] // 词汇表
+    questions: JLPT_ReadQuestion[] // 问题
     structure: JLPT_ReadStructure // 文章结构
 }
 `
 
 //#region 生成阅读
 
-const jlpt_read = ref<Partial<JLPT_Read> | null>(null)
+const jlpt_read = ref<Partial<JLPT_ReadOrigin> | null>(null)
 const isGenerating = ref(false)
 async function generateRead() {
     const jsonBrook = createJsonBrook()

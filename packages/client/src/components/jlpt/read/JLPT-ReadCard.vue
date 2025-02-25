@@ -101,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import type { JLPT_Read } from '@root/models'
+import type { JLPT_ReadOrigin } from '@root/models'
 import { NCard, NDivider, NRadio, NTag, NButton, NSelect, NInputGroup } from 'naive-ui'
 import { computed, ref } from 'vue'
 import JLPT_ReadVocabCard from './JLPT-ReadVocabCard.vue'
@@ -111,7 +111,7 @@ import TextSelectMenu from '@/components/tools/TextSelectMenu.vue'
 import AppTextSelectMenu from '@/components/app/AppTextSelectMenu.vue'
 
 const { read } = defineProps<{
-    read: Partial<JLPT_Read>
+    read: Partial<JLPT_ReadOrigin>
 }>()
 
 const selects = ref<number[]>([])
@@ -133,7 +133,7 @@ async function handleReAnswer() {
 
 // 映射难度标签的颜色
 const difficultyColorMap: Record<
-    JLPT_Read['difficulty'],
+    JLPT_ReadOrigin['difficulty'],
     'error' | 'warning' | 'info' | 'success' | 'default' | 'primary' | undefined
 > = {
     N1: 'error',
