@@ -13,6 +13,7 @@
     "@root/shared": "workspace:^",
     "axios": "^1.7.9",
     "clarinet": "^0.12.6",
+    "dayjs": "^1.11.13",
     "json-brook": "^0.0.4",
     "radash": "^12.1.0"
   },

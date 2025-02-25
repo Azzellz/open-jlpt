@@ -17,6 +17,9 @@ importers:
       clarinet:
         specifier: ^0.12.6
         version: 0.12.6
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
       json-brook:
         specifier: ^0.0.4
         version: 0.0.4
@@ -113,10 +116,10 @@ importers:
     dependencies:
       '@elysiajs/cors':
         specifier: ^1.2.0
-        version: 1.2.0(elysia@1.2.21(@sinclair/typebox@0.34.28)(typescript@5.7.3))
+        version: 1.2.0(elysia@1.2.22(@sinclair/typebox@0.34.28)(typescript@5.7.3))
       elysia:
         specifier: latest
-        version: 1.2.21(@sinclair/typebox@0.34.28)(typescript@5.7.3)
+        version: 1.2.22(@sinclair/typebox@0.34.28)(typescript@5.7.3)
       mongoose:
         specifier: ^8.10.1
         version: 8.10.1
@@ -1175,6 +1178,9 @@ packages:
   date-fns@3.6.0:
     resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
 
+  dayjs@1.11.13:
+    resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
+
   de-indent@1.0.2:
     resolution: {integrity: sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==}
 
@@ -1222,8 +1228,8 @@ packages:
   electron-to-chromium@1.5.103:
     resolution: {integrity: sha512-P6+XzIkfndgsrjROJWfSvVEgNHtPgbhVyTkwLjUM2HU/h7pZRORgaTlHqfAikqxKmdJMLW8fftrdGWbd/Ds0FA==}
 
-  elysia@1.2.21:
-    resolution: {integrity: sha512-E9b1JcB7fiQ2ptk24W8OnBrMYUoKzffIXob9uTVUKhqOKxaXAd9UyWBeyr7JCDa/VD/b/9S8aIey9/YJsK5sLg==}
+  elysia@1.2.22:
+    resolution: {integrity: sha512-Cj6PTpdLqzq2xbzdWffMyH6eEBe6NY06SS0Qdq48jU5Qtw/TG2rhiw0UHqxbTkYVAyNbR4EmVeQvNcNgNdE9xg==}
     peerDependencies:
       '@sinclair/typebox': '>= 0.34.0'
       openapi-types: '>= 12.0.0'
@@ -2559,9 +2565,9 @@ snapshots:
     dependencies:
       vue: 3.5.13(typescript@5.7.3)
 
-  '@elysiajs/cors@1.2.0(elysia@1.2.21(@sinclair/typebox@0.34.28)(typescript@5.7.3))':
+  '@elysiajs/cors@1.2.0(elysia@1.2.22(@sinclair/typebox@0.34.28)(typescript@5.7.3))':
     dependencies:
-      elysia: 1.2.21(@sinclair/typebox@0.34.28)(typescript@5.7.3)
+      elysia: 1.2.22(@sinclair/typebox@0.34.28)(typescript@5.7.3)
 
   '@emotion/hash@0.8.0': {}
 
@@ -3461,6 +3467,8 @@ snapshots:
 
   date-fns@3.6.0: {}
 
+  dayjs@1.11.13: {}
+
   de-indent@1.0.2: {}
 
   debug@4.4.0:
@@ -3494,7 +3502,7 @@ snapshots:
 
   electron-to-chromium@1.5.103: {}
 
-  elysia@1.2.21(@sinclair/typebox@0.34.28)(typescript@5.7.3):
+  elysia@1.2.22(@sinclair/typebox@0.34.28)(typescript@5.7.3):
     dependencies:
       '@sinclair/typebox': 0.34.28
       cookie: 1.0.2

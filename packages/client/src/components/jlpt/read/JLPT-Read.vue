@@ -280,7 +280,7 @@ onMounted(async () => {
 
 <template>
     <div class="flex flex-col gap-5">
-        <div class="flex gap-5">
+        <div class="flex gap-5 overflow-auto">
             <n-input
                 class="min-w-75 flex-1"
                 v-model:value="theme"

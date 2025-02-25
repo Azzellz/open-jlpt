@@ -85,13 +85,13 @@ const shareText = () => {
 
 // 事件监听
 onMounted(() => {
-    containerRef.value?.addEventListener('mouseup', handleMouseUp)
-    containerRef.value?.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mouseup', handleMouseUp)
+    document.addEventListener('mousedown', handleClickOutside)
 })
 
 onUnmounted(() => {
-    containerRef.value?.removeEventListener('mouseup', handleMouseUp)
-    containerRef.value?.removeEventListener('mousedown', handleClickOutside)
+    document.removeEventListener('mouseup', handleMouseUp)
+    document.removeEventListener('mousedown', handleClickOutside)
 })
 </script>
 
@@ -103,14 +103,15 @@ onUnmounted(() => {
 
 .floating-menu {
     position: absolute;
-    min-width: 100px;
-    max-width: 200px;
+    overflow: auto;
+    /* min-width: 100px;
+    max-width: 200px; */
     background: white;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transform: translateX(-50%);
-    z-index: 9999;
+    z-index: 1;
 }
 
 .menu-item {

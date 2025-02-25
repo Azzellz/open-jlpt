@@ -25,7 +25,7 @@
                 </n-button>
             </div>
         </template>
-        
+
         <!-- 内容部分 -->
         <TextSelectMenu>
             <!-- 默认插槽内容 -->
@@ -92,22 +92,23 @@
                 </div>
             </template>
 
-            <!-- 自定义菜单
+            <!-- 自定义菜单 -->
             <template #menu="{ selectedText }">
-                <button @click="console.log(selectedText)">自定义操作</button>
-            </template> -->
+                <AppTextSelectMenu :selected-text="selectedText" />
+            </template>
         </TextSelectMenu>
     </n-card>
 </template>
 
 <script setup lang="ts">
 import type { JLPT_Read } from '@root/models'
-import { NCard, NDivider, NRadio, NTag, NButton } from 'naive-ui'
+import { NCard, NDivider, NRadio, NTag, NButton, NSelect, NInputGroup } from 'naive-ui'
 import { computed, ref } from 'vue'
 import JLPT_ReadVocabCard from './JLPT-ReadVocabCard.vue'
 import ErrorIcon from '@/components/icon/ErrorIcon.vue'
 import SuccessIcon from '@/components/icon/SuccessIcon.vue'
 import TextSelectMenu from '@/components/tools/TextSelectMenu.vue'
+import AppTextSelectMenu from '@/components/app/AppTextSelectMenu.vue'
 
 const { read } = defineProps<{
     read: Partial<JLPT_Read>

@@ -1,5 +1,5 @@
-import { defineConfig } from 'unocss'
+import { defineConfig, transformerDirectives } from 'unocss'
 
 export default defineConfig({
-    // ...UnoCSS 选项
+    transformers: [transformerDirectives()],
 })
