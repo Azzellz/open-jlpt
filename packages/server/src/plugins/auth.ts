@@ -49,7 +49,7 @@ export const verifyPluginReference = new Elysia()
 export function verifyBearerPlugin(app: Elysia) {
     return app.use(bearerPlugin).onBeforeHandle(async ({ bearer }) => {
         if (!bearer) {
-            return createErrorResponse(400, '需要token')
+            return createErrorResponse(1000, '需要token')
         }
     })
 }
@@ -73,13 +73,13 @@ export function verifyBasePlugin(app: Elysia) {
 export function verifyCommonUserPlugin(app: Elysia) {
     return app.use(verifyBasePlugin).onBeforeHandle(async ({ bearer, accessJwt, store }) => {
         if (!bearer) {
-            return createErrorResponse(400, '需要token')
+            return createErrorResponse(1000, '需要token')
         }
 
         // 校验token
         const payload = await accessJwt.verify(bearer)
         if (!payload) {
-            return createErrorResponse(401, '无效token')
+            return createErrorResponse(1001, '无效token')
         } else {
             store.user = payload
             store.token = bearer!
