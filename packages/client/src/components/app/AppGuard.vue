@@ -26,29 +26,80 @@
                         pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;"
                     >
                         <n-tab-pane name="signin" tab="登录">
-                            <n-form>
-                                <n-form-item-row label="用户名">
-                                    <n-input />
+                            <n-form
+                                ref="loginFormRef"
+                                :model="loginFormValue"
+                                :rules="loginFormRules"
+                            >
+                                <n-form-item-row label="账号" path="account">
+                                    <n-input
+                                        v-model:value="loginFormValue.account"
+                                        placeholder="请输入账号"
+                                    />
                                 </n-form-item-row>
-                                <n-form-item-row label="密码">
-                                    <n-input />
+                                <n-form-item-row label="密码" path="password">
+                                    <n-input
+                                        v-model:value="loginFormValue.password"
+                                        type="password"
+                                        show-password-on="click"
+                                        placeholder="请输入密码"
+                                    />
                                 </n-form-item-row>
                             </n-form>
-                            <n-button type="primary" block secondary strong> 登录 </n-button>
+                            <n-button
+                                type="primary"
+                                :loading="isLoading"
+                                block
+                                strong
+                                @click="handleLogin"
+                            >
+                                登录
+                            </n-button>
                         </n-tab-pane>
                         <n-tab-pane name="signup" tab="注册">
-                            <n-form>
-                                <n-form-item-row label="用户名">
-                                    <n-input />
+                            <n-form
+                                ref="registerFormRef"
+                                :model="registerFormValue"
+                                :rules="registerFormRules"
+                            >
+                                <n-form-item-row label="用户名" path="name">
+                                    <n-input
+                                        v-model:value="registerFormValue.name"
+                                        placeholder="请输入用户名"
+                                    />
                                 </n-form-item-row>
-                                <n-form-item-row label="密码">
-                                    <n-input />
+                                <n-form-item-row label="账号" path="account">
+                                    <n-input
+                                        v-model:value="registerFormValue.account"
+                                        placeholder="请输入账号"
+                                    />
                                 </n-form-item-row>
-                                <n-form-item-row label="重复密码">
-                                    <n-input />
+                                <n-form-item-row label="密码" path="password">
+                                    <n-input
+                                        v-model:value="registerFormValue.password"
+                                        type="password"
+                                        show-password-on="click"
+                                        placeholder="请输入密码"
+                                    />
+                                </n-form-item-row>
+                                <n-form-item-row label="重复密码" path="rePassword">
+                                    <n-input
+                                        v-model:value="registerFormValue.rePassword"
+                                        type="password"
+                                        show-password-on="click"
+                                        placeholder="请输入重复密码"
+                                    />
                                 </n-form-item-row>
                             </n-form>
-                            <n-button type="primary" block secondary strong> 注册 </n-button>
+                            <n-button
+                                type="primary"
+                                :loading="isLoading"
+                                block
+                                strong
+                                @click="handleRegister"
+                            >
+                                注册
+                            </n-button>
                         </n-tab-pane>
                     </n-tabs>
                 </n-card>
@@ -58,7 +109,124 @@
 </template>
 
 <script setup lang="ts">
-import { NCard, NInput, NFormItemRow, NForm, NTabs, NTabPane, NButton } from 'naive-ui'
+import {
+    NCard,
+    NInput,
+    NFormItemRow,
+    NForm,
+    NTabs,
+    NTabPane,
+    NButton,
+    useMessage,
+    type FormInst,
+    type FormRules,
+} from 'naive-ui'
 import SakuraIcon from '../icon/SakuraIcon.vue'
 import SakuraRain from '../tools/SakuraRain.vue'
+import { ref } from 'vue'
+import { useUserStore } from '@/stores/user'
+import API from '@/api'
+import { isSuccessResponse } from '@root/shared'
+
+const message = useMessage()
+const isLoading = ref(false)
+const userStore = useUserStore()
+
+//#region 登录表单
+const loginFormRef = ref<FormInst | null>(null)
+const loginFormValue = ref({
+    account: '',
+    password: '',
+})
+const loginFormRules: FormRules = {
+    account: {
+        required: true,
+        message: '请输入账号',
+        trigger: 'blur',
+    },
+    password: {
+        required: true,
+        message: '请输入密码',
+        trigger: 'blur',
+    },
+}
+async function handleLogin(e: MouseEvent) {
+    e.preventDefault()
+    loginFormRef.value?.validate(async (errors) => {
+        if (errors) {
+            return console.log(errors)
+        }
+
+        isLoading.value = true
+        const result = await API.Auth.createAuthSession(loginFormValue.value)
+        console.log(result)
+
+        if (isSuccessResponse(result)) {
+            message.success('登录成功！')
+            userStore.user = result.data.user
+            userStore.accessToken = result.data.accessToken
+            userStore.refreshToken = result.data.refreshToken
+        } else {
+            message.error('登录失败。')
+        }
+
+        isLoading.value = false
+    })
+}
+//#endregion
+
+//#region 注册表单
+const registerFormRef = ref<FormInst | null>(null)
+const registerFormValue = ref({
+    name: '',
+    account: '',
+    password: '',
+    rePassword: '',
+})
+const registerFormRules: FormRules = {
+    name: {
+        required: true,
+        message: '请输入用户名',
+        trigger: 'blur',
+    },
+    account: {
+        required: true,
+        message: '请输入账号',
+        trigger: 'blur',
+    },
+    password: {
+        required: true,
+        message: '请输入密码',
+        trigger: 'blur',
+    },
+    rePassword: {
+        required: true,
+        message: '请输入重复密码',
+        trigger: 'blur',
+    },
+}
+async function handleRegister(e: MouseEvent) {
+    e.preventDefault()
+    registerFormRef.value?.validate(async (errors) => {
+        if (errors) {
+            return console.log(errors)
+        }
+
+        isLoading.value = true
+        const result = await API.User.createUser(registerFormValue.value)
+        console.log(result)
+
+        if (isSuccessResponse(result)) {
+            message.success('注册成功！')
+            userStore.user = result.data.user
+            userStore.accessToken = result.data.accessToken
+            userStore.refreshToken = result.data.refreshToken
+        } else {
+            message.error('注册失败。')
+        }
+
+        isLoading.value = false
+    })
+}
+//#endregion
 </script>

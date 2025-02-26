@@ -3,10 +3,13 @@ import { createErrorResponse, createSuccessResponse } from '@root/shared'
 import Elysia, { t } from 'elysia'
 import { isValidObjectId } from 'mongoose'
 import bcrypt from 'bcryptjs'
-import { omit } from 'radash'
-import { verifyCommonUserPlugin } from '@/plugins'
+import { omit, pick } from 'radash'
+import { accessJwtPlugin, refreshJwtPlugin, verifyCommonUserPlugin } from '@/plugins'
+import { nanoid } from 'nanoid'
 
 export const UserService = new Elysia({ prefix: '/users' })
+    .use(accessJwtPlugin)
+    .use(refreshJwtPlugin)
 
 // 需要认证的部分
 const VerifyUserService = new Elysia().use(verifyCommonUserPlugin)
@@ -30,7 +33,11 @@ VerifyUserService.get(
                 }
             })
             const users = await DB_UserModel.find(filter)
-            return createSuccessResponse(200, 'OK', users)
+            return createSuccessResponse(
+                200,
+                'OK',
+                users.map((user) => omit(user.toJSON(), ['password', 'config'])) // 要隐藏一些隐私数据
+            )
         } catch (error) {
             return createErrorResponse(500, error)
         }
@@ -50,7 +57,7 @@ VerifyUserService.get(
 
 UserService.post(
     '/',
-    async ({ body }) => {
+    async ({ body, accessJwt, refreshJwt }) => {
         try {
             // 检查是否有重复用户
             if (await DB_UserModel.findOne({ name: body.name })) {
@@ -73,8 +80,20 @@ UserService.post(
                 },
             })
 
-            // 这里要排除密码再返回
-            return createSuccessResponse(200, 'OK', omit(newUser.toJSON(), ['password']))
+            const userJson = omit(newUser.toJSON(), ['password'])
+            const userPayload = pick(userJson, ['id', 'name', 'account'])
+            // 生成 tokens
+            const accessToken = await accessJwt.sign({
+                ...userPayload,
+                _random: nanoid(),
+            })
+            const refreshToken = await refreshJwt.sign({ _random: nanoid() })
+            return createSuccessResponse(200, '注册成功', {
+                user: userJson,
+                accessToken,
+                refreshToken,
+            })
+            
         } catch (error) {
             return createErrorResponse(500, error)
         }
