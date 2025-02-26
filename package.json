@@ -15,6 +15,7 @@
     "clarinet": "^0.12.6",
     "dayjs": "^1.11.13",
     "json-brook": "^0.0.4",
+    "nanoid": "^5.1.2",
     "radash": "^12.1.0"
   },
   "devDependencies": {

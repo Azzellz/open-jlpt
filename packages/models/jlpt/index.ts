@@ -1,6 +1,6 @@
-import type { JLPT_ReadOrigin } from './read'
+import type { JLPT_Read } from './read'
 
 export * from './read'
 export interface JLPT_PracticeMap {
-    read: JLPT_ReadOrigin[]
+    reads: JLPT_Read[]
 }

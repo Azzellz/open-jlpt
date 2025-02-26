@@ -1,5 +1,5 @@
 import { OpenJLPT_LLM, OpenJLPT_Config } from '@root/models'
-import { Schema } from 'mongoose'
+import { Schema, model } from 'mongoose'
 
 const DB_LLM_Schema = new Schema<OpenJLPT_LLM>(
     {
@@ -25,23 +25,14 @@ const DB_LLM_Schema = new Schema<OpenJLPT_LLM>(
     }
 )
 
-export const DB_ConfigSchema = new Schema<OpenJLPT_Config>(
+export const DB_UserConfigSchema = new Schema<OpenJLPT_Config>(
     {
         llms: [DB_LLM_Schema],
     },
     {
+        _id: false,
         versionKey: false,
-        toJSON: {
-            transform(_, ret) {
-                ret.id = ret._id
-                delete ret._id
-            },
-        },
-        toObject: {
-            transform(_, ret) {
-                ret.id = ret._id
-                delete ret._id
-            },
-        },
     }
 )
+
+export const DB_ConfigModel = model('config-model', DB_UserConfigSchema, 'config')
