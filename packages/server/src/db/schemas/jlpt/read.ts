@@ -1,12 +1,14 @@
 import { JLPT_Read } from '@root/models'
-import { Schema } from 'mongoose'
-import { DB_UserInfoSchema } from '../common'
+import { model, Schema } from 'mongoose'
 
 export const DB_JLPT_ReadSchema = new Schema<JLPT_Read>(
     {
-        time: { type: String, required: true },
+        timeStamp: { type: Number, required: true },
         star: { type: Number, required: true },
-        user: DB_UserInfoSchema,
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'user',
+        },
         difficulty: { type: String, enum: ['N1', 'N2', 'N3', 'N4', 'N5'] },
         article: {
             title: { type: String, required: true },
@@ -19,7 +21,7 @@ export const DB_JLPT_ReadSchema = new Schema<JLPT_Read>(
             },
         ],
         structure: {
-            paragraph_focus: [{ type: String, required: true }],
+            paragraphFocus: [{ type: String, required: true }],
         },
         questions: [
             {
@@ -48,3 +50,5 @@ export const DB_JLPT_ReadSchema = new Schema<JLPT_Read>(
         },
     }
 )
+
+export const DB_JLPT_ReadModel = model('read', DB_JLPT_ReadSchema, 'reads')

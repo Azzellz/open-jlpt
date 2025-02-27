@@ -20,7 +20,7 @@ export interface JLPT_ReadArticle {
 }
 
 export interface JLPT_ReadStructure {
-    paragraph_focus: string[]
+    paragraphFocus: string[]
 }
 
 // 由 LLM 生成的原始数据

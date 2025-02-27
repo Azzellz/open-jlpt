@@ -35,4 +35,4 @@ export const DB_UserConfigSchema = new Schema<OpenJLPT_Config>(
     }
 )
 
-export const DB_ConfigModel = model('config-model', DB_UserConfigSchema, 'config')
+export const DB_ConfigModel = model('config', DB_UserConfigSchema, 'config')

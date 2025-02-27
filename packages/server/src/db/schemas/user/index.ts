@@ -1,6 +1,5 @@
 import { User } from '@root/models/user'
 import { model, Schema } from 'mongoose'
-import { DB_JLPT_ReadSchema } from '../jlpt/read'
 import { DB_UserConfigSchema } from './config'
 
 export * from './config'
@@ -13,13 +12,28 @@ export const DB_UserSchema = new Schema<User>(
         password: { type: String, required: true },
         config: DB_UserConfigSchema,
         histories: {
-            reads: [DB_JLPT_ReadSchema],
+            reads: [
+                {
+                    type: Schema.Types.ObjectId,
+                    ref: 'read',
+                },
+            ],
         },
         favorites: {
-            reads: [DB_JLPT_ReadSchema],
+            reads: [
+                {
+                    type: Schema.Types.ObjectId,
+                    ref: 'read',
+                },
+            ],
         },
         publishes: {
-            reads: [DB_JLPT_ReadSchema],
+            reads: [
+                {
+                    type: Schema.Types.ObjectId,
+                    ref: 'read',
+                },
+            ],
         },
     },
     {
@@ -39,4 +53,4 @@ export const DB_UserSchema = new Schema<User>(
     }
 )
 
-export const DB_UserModel = model('user-model', DB_UserSchema, 'users')
+export const DB_UserModel = model('user', DB_UserSchema, 'users')

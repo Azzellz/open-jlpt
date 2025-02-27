@@ -164,7 +164,7 @@ const __testReadString = `
     }
   ],
   "structure": {
-    "paragraph_focus": [
+    "paragraphFocus": [
       "現代社会における超自然現象の存続の逆説性",
       "心理学的要因の理論的説明",
       "具体的な社会事例の分析",
@@ -194,7 +194,7 @@ export interface JLPT_ReadArticle {
 }
 
 export interface JLPT_ReadStructure {
-    paragraph_focus: string[]
+    paragraphFocus: string[]
 }
 
 export interface JLPT_ReadOrigin {

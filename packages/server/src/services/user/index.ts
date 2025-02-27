@@ -14,7 +14,7 @@ export const UserService = new Elysia({ prefix: '/users' })
 // 需要认证的部分
 const VerifyUserService = new Elysia().use(verifyCommonUserPlugin)
 
-//#region 查询用户
+//#region 查询
 
 VerifyUserService.get('/self', async ({ store: { user } }) => {
     try {
@@ -127,8 +127,9 @@ UserService.post(
 
 //#endregion
 
-//#region 更新用户基本信息
+//#region 更新
 
+// 更新基本信息
 VerifyUserService.put(
     '/:id',
     async ({ params: { id }, body }) => {
@@ -138,7 +139,7 @@ VerifyUserService.put(
         try {
             const user = await DB_UserModel.findByIdAndUpdate(id, body, { new: true })
             if (!user) {
-                return ERROR_RESPONSE.USER.NOT_FOUND
+                return ERROR_RESPONSE.SYSTEM.NOT_FOUND
             }
 
             return createSuccessResponse(200, '用户信息更新成功', omit(user.toJSON(), ['password']))
@@ -151,6 +152,18 @@ VerifyUserService.put(
             name: t.Optional(t.String()),
             avatar: t.Optional(t.String()),
             password: t.Optional(t.String()),
+            config: t.Optional(
+                t.Object({
+                    llms: t.Array(
+                        t.Object({
+                            name: t.String(),
+                            apiKey: t.String(),
+                            baseURL: t.String(),
+                            modelID: t.String(),
+                        })
+                    ),
+                })
+            ),
         }),
     }
 )
