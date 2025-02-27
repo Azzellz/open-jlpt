@@ -77,7 +77,7 @@ export function isValidHttpStatusCode(code: number): boolean {
  * 错误响应常量
  */
 export const ERROR_RESPONSE = {
-    COMMON: {
+    SYSTEM: {
         INTERNAL_ERROR: {
             code: 500,
             error: '内部错误',
@@ -99,6 +99,16 @@ export const ERROR_RESPONSE = {
         REFRESH_FAILED: {
             code: 1003,
             error: '刷新令牌失败',
+        },
+    },
+    USER: {
+        INVALID_USERID: {
+            code: 1010,
+            error: '非法用户ID',
+        },
+        NOT_FOUND: {
+            code: 404,
+            error: '用户不存在',
         },
     },
 }

@@ -26,7 +26,7 @@ VerifyUserService.get('/self', async ({ store: { user } }) => {
         }
     } catch (error) {
         Log.error(error)
-        return ERROR_RESPONSE.COMMON.INTERNAL_ERROR
+        return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR
     }
 })
 
@@ -54,7 +54,7 @@ VerifyUserService.get(
             )
         } catch (error) {
             Log.error(error)
-            return ERROR_RESPONSE.COMMON.INTERNAL_ERROR
+            return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR
         }
     },
     {
@@ -121,6 +121,36 @@ UserService.post(
             name: t.String(),
             account: t.String(),
             password: t.String(),
+        }),
+    }
+)
+
+//#endregion
+
+//#region 更新用户基本信息
+
+VerifyUserService.put(
+    '/:id',
+    async ({ params: { id }, body }) => {
+        if (!isValidObjectId(id)) {
+            return ERROR_RESPONSE.USER.INVALID_USERID
+        }
+        try {
+            const user = await DB_UserModel.findByIdAndUpdate(id, body, { new: true })
+            if (!user) {
+                return ERROR_RESPONSE.USER.NOT_FOUND
+            }
+
+            return createSuccessResponse(200, '用户信息更新成功', omit(user.toJSON(), ['password']))
+        } catch (error) {
+            return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR
+        }
+    },
+    {
+        body: t.Object({
+            name: t.Optional(t.String()),
+            avatar: t.Optional(t.String()),
+            password: t.Optional(t.String()),
         }),
     }
 )
