@@ -32,13 +32,13 @@ function getPrefix() {
 }
 
 export const Log = {
-    success(content: string) {
+    success(content: any) {
         console.log(getColoredText(`${getPrefix()}: ${content}`, 'GREEN'))
     },
-    error(content: string) {
+    error(content: any) {
         console.log(getColoredText(`${getPrefix()}: ${content}`, 'RED'))
     },
-    warn(content: string) {
+    warn(content: any) {
         console.log(getColoredText(`${getPrefix()}: ${content}`, 'YELLOW'))
     },
 }

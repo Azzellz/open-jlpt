@@ -13,3 +13,7 @@ export async function getUsers(params?: UserQueryParams) {
 export async function createUser(params: UserCreateParams) {
     return handleAxiosRequest<AuthVoucher>(() => API_INSTANCE.post('/users', params))
 }
+
+export async function getUser() {
+    return handleAxiosRequest<Omit<User, 'password'>>(() => API_INSTANCE.get(`/users/self`))
+}

@@ -1,6 +1,6 @@
 <template>
     <SakuraRain>
-        <div id="app-guard" class="flex max-md:flex-col h-full p-20">
+        <div v-if="!userStore.token" id="app-guard" class="flex max-md:flex-col h-full p-20">
             <div class="md:flex-2/3 flex">
                 <div class="m-auto flex flex-col gap-10">
                     <div class="flex text-8xl gap-2 items-center">
@@ -105,6 +105,9 @@
                 </n-card>
             </div>
         </div>
+        <div v-else class="h-full flex">
+            <AppLoader class="m-auto" />
+        </div>
     </SakuraRain>
 </template>
 
@@ -127,7 +130,7 @@ import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import API from '@/api'
 import { isSuccessResponse } from '@root/shared'
-
+import AppLoader from './AppLoader.vue'
 const message = useMessage()
 const isLoading = ref(false)
 const userStore = useUserStore()
@@ -229,5 +232,22 @@ async function handleRegister(e: MouseEvent) {
 }
 //#endregion
 
+//#region 自动登录
 
+onMounted(async () => {
+    if (!userStore.token) {
+        return
+    }
+
+    message.info('自动登录中...')
+    const result = await API.User.getUser()
+    if (isSuccessResponse(result)) {
+        userStore.user = result.data
+        message.success('自动登录成功！')
+    } else {
+        message.error('自动登录失败，请重新登录')
+    }
+})
+
+//#endregion
 </script>

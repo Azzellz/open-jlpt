@@ -1,5 +1,5 @@
-import { DB_UserModel } from '@/db'
-import { createErrorResponse, createSuccessResponse } from '@root/shared'
+import { DB_UserModel, RedisClient } from '@/db'
+import { createErrorResponse, createSuccessResponse, ERROR_RESPONSE, Log } from '@root/shared'
 import Elysia, { t } from 'elysia'
 import { isValidObjectId } from 'mongoose'
 import bcrypt from 'bcryptjs'
@@ -15,6 +15,20 @@ export const UserService = new Elysia({ prefix: '/users' })
 const VerifyUserService = new Elysia().use(verifyCommonUserPlugin)
 
 //#region 查询用户
+
+VerifyUserService.get('/self', async ({ store: { user } }) => {
+    try {
+        const result = await DB_UserModel.findById(user.id)
+        if (result) {
+            return createSuccessResponse(200, '查询用户成功', omit(result.toJSON(), ['password']))
+        } else {
+            return createErrorResponse(404, '未查询到用户')
+        }
+    } catch (error) {
+        Log.error(error)
+        return ERROR_RESPONSE.COMMON.INTERNAL_ERROR
+    }
+})
 
 VerifyUserService.get(
     '/',
@@ -39,7 +53,8 @@ VerifyUserService.get(
                 users.map((user) => omit(user.toJSON(), ['password', 'config'])) // 要隐藏一些隐私数据
             )
         } catch (error) {
-            return createErrorResponse(500, error)
+            Log.error(error)
+            return ERROR_RESPONSE.COMMON.INTERNAL_ERROR
         }
     },
     {
@@ -82,18 +97,21 @@ UserService.post(
 
             const userJson = omit(newUser.toJSON(), ['password'])
             const userPayload = pick(userJson, ['id', 'name', 'account'])
-            // 生成 tokens
+
+            // 生成访问令牌
             const accessToken = await accessJwt.sign({
                 ...userPayload,
                 _random: nanoid(),
             })
-            const refreshToken = await refreshJwt.sign({ _random: nanoid() })
+
+            // 记录 refreshToken(刷新令牌) 到 Redis，7天过期
+            const refreshToken = await refreshJwt.sign({ ...userPayload, _random: nanoid() })
+            RedisClient.setEx(`sessions:${userJson.id}`, 3600 * 24 * 7, refreshToken)
+
             return createSuccessResponse(200, '注册成功', {
                 user: userJson,
-                accessToken,
-                refreshToken,
+                token: accessToken,
             })
-            
         } catch (error) {
             return createErrorResponse(500, error)
         }

@@ -77,6 +77,12 @@ export function isValidHttpStatusCode(code: number): boolean {
  * 错误响应常量
  */
 export const ERROR_RESPONSE = {
+    COMMON: {
+        INTERNAL_ERROR: {
+            code: 500,
+            error: '内部错误',
+        },
+    },
     AUTH: {
         MISSING_TOKEN: {
             code: 1000,
