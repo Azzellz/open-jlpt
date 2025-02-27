@@ -1,12 +1,11 @@
 import type { AuthVoucher, User, UserCreateParams, UserQueryParams } from '@root/models'
-import { handleAxiosRequest, createAuthorizationHeaders } from '@root/shared'
+import { handleAxiosRequest } from '@root/shared'
 import { API_INSTANCE } from '..'
 
-export async function getUsers(token: string, params?: UserQueryParams) {
+export async function getUsers(params?: UserQueryParams) {
     return handleAxiosRequest<Omit<User, 'password' | 'config'>>(() =>
         API_INSTANCE.get('/users', {
             params,
-            ...createAuthorizationHeaders(token),
         }),
     )
 }

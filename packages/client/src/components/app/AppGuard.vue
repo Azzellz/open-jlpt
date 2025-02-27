@@ -123,7 +123,7 @@ import {
 } from 'naive-ui'
 import SakuraIcon from '../icon/SakuraIcon.vue'
 import SakuraRain from '../tools/SakuraRain.vue'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import API from '@/api'
 import { isSuccessResponse } from '@root/shared'
@@ -133,6 +133,7 @@ const isLoading = ref(false)
 const userStore = useUserStore()
 
 //#region 登录表单
+
 const loginFormRef = ref<FormInst | null>(null)
 const loginFormValue = ref({
     account: '',
@@ -159,12 +160,12 @@ async function handleLogin(e: MouseEvent) {
 
         isLoading.value = true
         const result = await API.Auth.createAuthSession(loginFormValue.value)
-        console.log(result)
 
         if (isSuccessResponse(result)) {
             message.success('登录成功！')
             userStore.user = result.data.user
             userStore.token = result.data.token
+            localStorage.setItem('token', userStore.token)
         } else {
             message.error('登录失败。')
         }
@@ -213,12 +214,12 @@ async function handleRegister(e: MouseEvent) {
 
         isLoading.value = true
         const result = await API.User.createUser(registerFormValue.value)
-        console.log(result)
 
         if (isSuccessResponse(result)) {
             message.success('注册成功！')
             userStore.user = result.data.user
             userStore.token = result.data.token
+            localStorage.setItem('token', userStore.token)
         } else {
             message.error('注册失败。')
         }
@@ -227,4 +228,6 @@ async function handleRegister(e: MouseEvent) {
     })
 }
 //#endregion
+
+
 </script>

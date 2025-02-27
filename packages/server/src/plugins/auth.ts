@@ -10,11 +10,12 @@ export interface AccessJwtPayload {
     account: string
     _random: string
 }
+
 export const accessJwtPlugin = jwt({
     name: 'accessJwt',
     secret: 'YuzuTea_Access',
     alg: 'HS256',
-    exp: '2h', // 两小时
+    exp: '2h',
     schema: t.Object({
         id: t.String(),
         name: t.String(),
@@ -27,7 +28,7 @@ export const refreshJwtPlugin = jwt({
     name: 'refreshJwt',
     secret: 'YuzuTea_Refresh',
     alg: 'HS256',
-    exp: '7d', // 七天
+    exp: '7d',
     schema: t.Object({
         id: t.String(),
         name: t.String(),
@@ -85,6 +86,7 @@ export function verifyCommonUserPlugin(app: Elysia) {
         if (!payload) {
             return ERROR_RESPONSE.AUTH.INVALID_TOKEN
         }
+
         // 检查会话是否有效
         if (!(await RedisClient.get(`sessions:${payload.id}`))) {
             return ERROR_RESPONSE.AUTH.INVALID_SESSION

@@ -59,24 +59,22 @@ AuthService.post(
 
 AuthService.put('/sessions/:id', async ({ params: { id }, refreshJwt, accessJwt }) => {
     const refreshToken = await RedisClient.get(`sessions:${id}`)
-    if (refreshToken) {
-        const payload = await refreshJwt.verify(refreshToken)
-        if (payload) {
-            // 生成新的 accessToken
-            const newAccessToken = await accessJwt.sign({
-                ...payload,
-                _random: nanoid(),
-            })
-            // 重置 redis 中的 refreshToken
-            const newRefreshToken = await refreshJwt.sign({
-                ...payload,
-                _random: nanoid(),
-            })
-            RedisClient.setEx(`sessions:${id}`, 3600 * 24 * 7, newRefreshToken)
-            return createSuccessResponse(200, '刷新成功', {
-                token: newAccessToken,
-            })
-        }
+    const payload = await refreshJwt.verify(refreshToken || '')
+    if (refreshToken && payload) {
+        // 生成新的 accessToken
+        const newAccessToken = await accessJwt.sign({
+            ...payload,
+            _random: nanoid(),
+        })
+        // 重置 redis 中的 refreshToken
+        const newRefreshToken = await refreshJwt.sign({
+            ...payload,
+            _random: nanoid(),
+        })
+        RedisClient.setEx(`sessions:${id}`, 3600 * 24 * 7, newRefreshToken)
+        return createSuccessResponse(200, '刷新成功', {
+            token: newAccessToken,
+        })
     } else {
         return ERROR_RESPONSE.AUTH.REFRESH_FAILED
     }
