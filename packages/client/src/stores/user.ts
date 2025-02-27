@@ -6,8 +6,7 @@ import { ref } from 'vue'
 
 export const useUserStore = defineStore('user-store', () => {
     const user = ref<Omit<User, 'password'> | null>(null)
-    const accessToken = ref('')
-    const refreshToken = ref('')
+    const token = ref('')
 
     API.use((response) => {
         // 无效Token，尝试刷新
@@ -17,7 +16,6 @@ export const useUserStore = defineStore('user-store', () => {
     })
     return {
         user,
-        accessToken,
-        refreshToken,
+        token,
     }
 })

@@ -1,4 +1,4 @@
-import { DB_UserModel } from '@/db'
+import { DB_UserModel, RedisClient } from '@/db'
 import { createErrorResponse, createSuccessResponse } from '@root/shared'
 import Elysia, { t } from 'elysia'
 import bcrypt from 'bcryptjs'
@@ -26,15 +26,16 @@ AuthService.post(
                 const userJson = omit(user.toJSON(), ['password'])
                 const userPayload = pick(userJson, ['id', 'name', 'account'])
                 // 生成 tokens
-                const accessToken = await accessJwt.sign({
+                const token = await accessJwt.sign({
                     ...userPayload,
                     _random: nanoid(),
                 })
                 const refreshToken = await refreshJwt.sign({ _random: nanoid() })
+                // 记录 refreshToken(刷新令牌) 到 Redis，7天过期
+                RedisClient.setEx(`sessions:${userJson.id}`, 3600 * 24 * 7, refreshToken)
                 return createSuccessResponse(200, '登陆成功', {
                     user: userJson,
-                    accessToken,
-                    refreshToken,
+                    token,
                 })
             } else {
                 return createErrorResponse(401, '密码错误')
@@ -50,3 +51,8 @@ AuthService.post(
         }),
     }
 )
+
+// 更新刷新令牌
+AuthService.put('/sessions', async () => {
+    
+})

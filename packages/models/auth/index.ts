@@ -7,6 +7,5 @@ export interface AuthParams {
 
 export interface AuthVoucher {
     user: Omit<User, 'password'>
-    accessToken: string
-    refreshToken: string
+    token: string
 }

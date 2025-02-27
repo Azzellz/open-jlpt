@@ -164,8 +164,7 @@ async function handleLogin(e: MouseEvent) {
         if (isSuccessResponse(result)) {
             message.success('登录成功！')
             userStore.user = result.data.user
-            userStore.accessToken = result.data.accessToken
-            userStore.refreshToken = result.data.refreshToken
+            userStore.token = result.data.token
         } else {
             message.error('登录失败。')
         }
@@ -219,8 +218,7 @@ async function handleRegister(e: MouseEvent) {
         if (isSuccessResponse(result)) {
             message.success('注册成功！')
             userStore.user = result.data.user
-            userStore.accessToken = result.data.accessToken
-            userStore.refreshToken = result.data.refreshToken
+            userStore.token = result.data.token
         } else {
             message.error('注册失败。')
         }
