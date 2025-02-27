@@ -42,7 +42,7 @@ export function isStandardResponse<T = any, U = any>(
         return false
     }
 
-    if (response['code'] && (response['error'] || response['data'])) {
+    if ((response as any)['code'] && ((response as any)['error'] || (response as any)['data'])) {
         return true
     } else {
         return false
@@ -71,4 +71,28 @@ export function isErrorResponse<U>(response: any): response is ErrorResponse<U> 
  */
 export function isValidHttpStatusCode(code: number): boolean {
     return code === 101 || (code >= 200 && code <= 599)
+}
+
+/**
+ * 错误响应常量
+ */
+export const ERROR_RESPONSE = {
+    AUTH: {
+        MISSING_TOKEN: {
+            code: 1000,
+            error: '缺少令牌',
+        },
+        INVALID_TOKEN: {
+            code: 1001,
+            error: '无效令牌',
+        },
+        INVALID_SESSION: {
+            code: 1002,
+            error: '无效会话记录',
+        },
+        REFRESH_FAILED: {
+            code: 1003,
+            error: '刷新令牌失败',
+        },
+    },
 }

@@ -1,6 +1,7 @@
+import { RedisClient } from '@/db'
 import bearer from '@elysiajs/bearer'
 import { jwt } from '@elysiajs/jwt'
-import { createErrorResponse } from '@root/shared'
+import { createErrorResponse, ERROR_RESPONSE } from '@root/shared'
 import Elysia, { t } from 'elysia'
 
 export interface AccessJwtPayload {
@@ -26,8 +27,11 @@ export const refreshJwtPlugin = jwt({
     name: 'refreshJwt',
     secret: 'YuzuTea_Refresh',
     alg: 'HS256',
-    exp: '1d', // 一天
+    exp: '7d', // 七天
     schema: t.Object({
+        id: t.String(),
+        name: t.String(),
+        account: t.String(),
         _random: t.String(),
     }),
 })
@@ -73,16 +77,20 @@ export function verifyBasePlugin(app: Elysia) {
 export function verifyCommonUserPlugin(app: Elysia) {
     return app.use(verifyBasePlugin).onBeforeHandle(async ({ bearer, accessJwt, store }) => {
         if (!bearer) {
-            return createErrorResponse(1000, '需要token')
+            return ERROR_RESPONSE.AUTH.MISSING_TOKEN
         }
 
-        // 校验token
+        // 校验 token 是否合法
         const payload = await accessJwt.verify(bearer)
         if (!payload) {
-            return createErrorResponse(1001, '无效token')
-        } else {
-            store.user = payload
-            store.token = bearer!
+            return ERROR_RESPONSE.AUTH.INVALID_TOKEN
         }
+        // 检查会话是否有效
+        if (!(await RedisClient.get(`sessions:${payload.id}`))) {
+            return ERROR_RESPONSE.AUTH.INVALID_SESSION
+        }
+
+        store.user = payload
+        store.token = bearer!
     })
 }
