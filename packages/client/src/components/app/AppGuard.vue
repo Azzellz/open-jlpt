@@ -246,6 +246,8 @@ onMounted(async () => {
         message.success('自动登录成功！')
     } else {
         message.error('自动登录失败，请重新登录')
+        userStore.token = ''
+        localStorage.removeItem('token')
     }
 })
 
