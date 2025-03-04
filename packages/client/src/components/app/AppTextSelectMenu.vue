@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { useConfigStore } from '@/stores/config'
+import { useUserStore } from '@/stores/user'
 import { NButton, NSelect, NInputGroup } from 'naive-ui'
 import { computed, ref } from 'vue'
 
@@ -17,10 +17,10 @@ defineProps<{
     selectedText: string
 }>()
 
-const configStore = useConfigStore()
+const userStore = useUserStore()
 const llmID = ref()
 const llmOptions = computed(() => {
-    return configStore.config?.llms.map((llm) => {
+    return userStore.user!.config.llm.items.map((llm) => {
         return {
             label: llm.name,
             value: llm.id,

@@ -1,14 +1,23 @@
-import { OpenJLPT_LLM, OpenJLPT_Config } from '@root/models'
+import { UserConfig } from '@root/models'
 import { Schema, model } from 'mongoose'
 
-const DB_LLM_Schema = new Schema<OpenJLPT_LLM>(
+const DB_LLM_Schema = new Schema<UserConfig['llm']>(
     {
-        name: { type: String, required: true },
-        apiKey: { type: String, required: true },
-        baseURL: { type: String, required: true },
-        modelID: { type: String, required: true },
+        items: [
+            {
+                id: { type: String, required: true },
+                name: { type: String, required: true },
+                apiKey: { type: String, required: true },
+                baseURL: { type: String, required: true },
+                modelID: { type: String, required: true },
+            },
+        ],
+        default: {
+            type: String,
+        },
     },
     {
+        _id: false,
         versionKey: false,
         toJSON: {
             transform(_, ret) {
@@ -25,9 +34,9 @@ const DB_LLM_Schema = new Schema<OpenJLPT_LLM>(
     }
 )
 
-export const DB_UserConfigSchema = new Schema<OpenJLPT_Config>(
+export const DB_UserConfigSchema = new Schema<UserConfig>(
     {
-        llms: [DB_LLM_Schema],
+        llm: DB_LLM_Schema,
     },
     {
         _id: false,

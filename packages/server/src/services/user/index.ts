@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs'
 import { omit, pick } from 'radash'
 import { accessJwtPlugin, refreshJwtPlugin, verifyCommonUserPlugin } from '@/plugins'
 import { nanoid } from 'nanoid'
+import OpenAI from 'openai'
 
 export const UserService = new Elysia({ prefix: '/users' })
     .use(accessJwtPlugin)
@@ -14,8 +15,90 @@ export const UserService = new Elysia({ prefix: '/users' })
 // 需要认证的部分
 const VerifyUserService = new Elysia().use(verifyCommonUserPlugin)
 
-//#region 查询
+//#region LLM服务
 
+interface StreamChatParams {
+    /**
+     * 是否包含推理过程
+     */
+    client: OpenAI
+    modelID: string
+    includeResponing?: boolean
+    messages: {
+        role: 'user' | 'system'
+        content: string
+    }[]
+}
+
+/**
+ * 流式对话
+ */
+async function streamChat({
+    client,
+    modelID,
+    messages,
+    includeResponing = true,
+}: StreamChatParams) {
+    return await client.chat.completions.create({
+        messages,
+        model: modelID,
+        stream: true,
+        stream_options: {
+            include_usage: includeResponing, // 是否包含推理过程
+        },
+    })
+}
+
+VerifyUserService.post(
+    '/:userID/llms/:llmID/chat',
+    async function* ({ params: { userID, llmID }, body: { messages } }) {
+        if (!isValidObjectId(userID)) {
+            return ERROR_RESPONSE.SYSTEM.INVALID_OBJECTID
+        }
+        try {
+            const user = await DB_UserModel.findById(userID)
+            if (!user) {
+                return ERROR_RESPONSE.SYSTEM.NOT_FOUND
+            }
+
+            const llm = user.config.llm.items.find((item) => item.id === llmID)
+            if (!llm) {
+                return ERROR_RESPONSE.SYSTEM.NOT_FOUND
+            }
+
+            const client = new OpenAI(llm)
+            const stream = await streamChat({
+                client,
+                modelID: llm.modelID,
+                messages,
+            })
+            for await (const chunk of stream) {
+                const delta = chunk.choices[0]?.delta
+                const reasoning = (delta as any)?.reasoning_content
+                const content = delta?.content
+                yield reasoning || content
+            }
+        } catch (error) {
+            Log.error(error)
+            return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR
+        }
+    },
+    {
+        body: t.Object({
+            isStream: t.Boolean(),
+            messages: t.Array(
+                t.Object({
+                    role: t.Union([t.Literal('user'), t.Literal('system')]),
+                    content: t.String(),
+                })
+            ),
+        }),
+    }
+)
+
+//#endregion
+
+//#region 查询
 VerifyUserService.get('/self', async ({ store: { user } }) => {
     try {
         const result = await DB_UserModel.findById(user.id)
@@ -134,7 +217,7 @@ VerifyUserService.put(
     '/:id',
     async ({ params: { id }, body }) => {
         if (!isValidObjectId(id)) {
-            return ERROR_RESPONSE.USER.INVALID_USERID
+            return ERROR_RESPONSE.SYSTEM.INVALID_OBJECTID
         }
         try {
             const user = await DB_UserModel.findByIdAndUpdate(id, body, { new: true })
@@ -142,7 +225,11 @@ VerifyUserService.put(
                 return ERROR_RESPONSE.SYSTEM.NOT_FOUND
             }
 
-            return createSuccessResponse(200, '用户信息更新成功', omit(user.toJSON(), ['password']))
+            return createSuccessResponse(
+                200,
+                '用户信息更新成功',
+                pick(user.toJSON(), ['name', 'avatar', 'config'])
+            )
         } catch (error) {
             return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR
         }
@@ -154,12 +241,20 @@ VerifyUserService.put(
             password: t.Optional(t.String()),
             config: t.Optional(
                 t.Object({
-                    llms: t.Array(
+                    llm: t.Optional(
                         t.Object({
-                            name: t.String(),
-                            apiKey: t.String(),
-                            baseURL: t.String(),
-                            modelID: t.String(),
+                            items: t.Optional(
+                                t.Array(
+                                    t.Object({
+                                        id: t.String(),
+                                        name: t.String(),
+                                        apiKey: t.String(),
+                                        baseURL: t.String(),
+                                        modelID: t.String(),
+                                    })
+                                )
+                            ),
+                            default: t.Optional(t.String()),
                         })
                     ),
                 })

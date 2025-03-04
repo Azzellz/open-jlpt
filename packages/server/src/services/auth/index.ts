@@ -1,5 +1,5 @@
 import { DB_UserModel, RedisClient } from '@/db'
-import { createErrorResponse, createSuccessResponse, ERROR_RESPONSE } from '@root/shared'
+import { createErrorResponse, createSuccessResponse, ERROR_RESPONSE, Log } from '@root/shared'
 import Elysia, { t } from 'elysia'
 import bcrypt from 'bcryptjs'
 import { omit, pick } from 'radash'
@@ -19,7 +19,7 @@ AuthService.post(
             // 查询用户
             const user = await DB_UserModel.findOne({ account: body.account })
             if (!user) {
-                return createErrorResponse(404, '用户不存在，账号错误')
+                return ERROR_RESPONSE.SYSTEM.NOT_FOUND
             }
             // 检查密码是否正确
             const isValidPassword = await bcrypt.compare(body.password, user.password)
@@ -42,7 +42,8 @@ AuthService.post(
                 return createErrorResponse(401, '密码错误')
             }
         } catch (error) {
-            return createErrorResponse(500, error)
+            Log.error(error)
+            return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR
         }
     },
     {

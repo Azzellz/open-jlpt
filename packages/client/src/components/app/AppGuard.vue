@@ -212,7 +212,7 @@ async function handleRegister(e: MouseEvent) {
     e.preventDefault()
     registerFormRef.value?.validate(async (errors) => {
         if (errors) {
-            return console.log(errors)
+            return
         }
 
         isLoading.value = true

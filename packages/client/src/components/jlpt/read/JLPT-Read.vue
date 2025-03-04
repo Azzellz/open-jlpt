@@ -3,19 +3,31 @@ import API from '@/api'
 import { computed, onMounted, ref } from 'vue'
 import { createJsonBrook } from 'json-brook'
 import type { JLPT_ReadOrigin } from '@root/models'
-import { NCard, NButton, NInput, NSelect, NCollapse, NCollapseItem, NInputNumber } from 'naive-ui'
-import { isSuccessResponse, Log } from '@root/shared'
-import { useConfigStore } from '@/stores/config'
+import {
+    NCard,
+    NButton,
+    NInput,
+    NSelect,
+    NCollapse,
+    NCollapseItem,
+    NInputNumber,
+    useMessage,
+} from 'naive-ui'
 import JLPT_ReadCard from './JLPT-ReadCard.vue'
+import { useUserStore } from '@/stores/user'
 
-const configStore = useConfigStore()
+const userStore = useUserStore()
+const message = useMessage()
 
 //#region 配置栏
 const wordCount = ref()
 const currentLLMID = ref('')
+const currentLLM = computed(() => {
+    return userStore.user!.config.llm.items.find((llm) => llm.id === currentLLMID.value)
+})
 const llmOptions = computed(() => {
-    if (configStore.config) {
-        return configStore.config.llms.map((llm) => {
+    if (userStore.user!.config) {
+        return userStore.user!.config.llm.items.map((llm) => {
             return { label: llm.name, value: llm.id }
         })
     } else {
@@ -218,7 +230,8 @@ async function generateRead() {
     reasoningString.value = ''
     jsonString.value = ''
     jlpt_read.value = null
-    await API.LLM.chatByStream(
+    await API.User.chatWithLLM(
+        userStore.user!.id,
         currentLLMID.value,
         [
             {
@@ -255,23 +268,13 @@ async function generateRead() {
     )
     jsonBrook.end()
     isGenerating.value = false
+    message.success('生成完毕')
 }
 
 //#endregion
 
 // 初始化
 onMounted(async () => {
-    const result = await API.Config.getConfig()
-    if (isSuccessResponse(result)) {
-        configStore.config = result.data
-        Log.success(result.message)
-
-        // 默认选择第一个模型
-        if (configStore.config.llms.length) {
-            currentLLMID.value = configStore.config.llms[0].id
-        }
-    }
-
     // 测试用
     jlpt_read.value = JSON.parse(__testReadString)
     jsonString.value = __testReadString.toString()

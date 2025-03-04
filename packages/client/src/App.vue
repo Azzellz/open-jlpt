@@ -5,7 +5,6 @@ import AppContent from './components/app/AppContent.vue'
 import AppProvider from './components/app/AppProvider.vue'
 import AppGuard from './components/app/AppGuard.vue'
 import { useUserStore } from './stores/user'
-
 const userStore = useUserStore()
 </script>
 

@@ -8,7 +8,10 @@ export interface LLM_Config {
 }
 
 export interface UserConfig {
-    llms: LLM_Config[]
+    llm: {
+        items: LLM_Config[]
+        default?: string
+    }
 }
 
 export interface User {
@@ -28,3 +31,4 @@ export interface UserInfo extends Pick<User, 'id' | 'account' | 'name' | 'avatar
 
 export interface UserCreateParams extends Pick<User, 'account' | 'name' | 'password'> {}
 export interface UserQueryParams extends Pick<User, 'account' | 'name' | 'id'> {}
+export interface UserUpdateParams extends Pick<User, 'name' | 'avatar' | 'config'> {}

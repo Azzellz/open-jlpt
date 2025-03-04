@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
 import type { JLPT_ReadOrigin } from '@root/models'
-import { NCard, NDivider, NRadio, NTag, NButton, NSelect, NInputGroup } from 'naive-ui'
+import { NCard, NDivider, NRadio, NTag, NButton} from 'naive-ui'
 import { computed, ref } from 'vue'
 import JLPT_ReadVocabCard from './JLPT-ReadVocabCard.vue'
 import ErrorIcon from '@/components/icon/ErrorIcon.vue'
