@@ -12,14 +12,24 @@ import {
     NCollapseItem,
     NInputNumber,
     useMessage,
+    NGrid,
+    NGi,
+    NFormItemGi,
+    NDivider,
+    NSwitch,
+    NSpin,
+    NIcon,
 } from 'naive-ui'
 import JLPT_ReadCard from './JLPT-ReadCard.vue'
 import { useUserStore } from '@/stores/user'
+import { Json as JsonIcon } from '@vicons/carbon'
 
 const userStore = useUserStore()
 const message = useMessage()
 
 //#region 配置栏
+
+//#region 阅读相关
 const wordCount = ref()
 const currentLLMID = ref('')
 const currentLLM = computed(() => {
@@ -27,9 +37,14 @@ const currentLLM = computed(() => {
 })
 const llmOptions = computed(() => {
     if (userStore.user!.config) {
-        return userStore.user!.config.llm.items.map((llm) => {
+        const options = userStore.user!.config.llm.items.map((llm) => {
             return { label: llm.name, value: llm.id }
         })
+        if (currentLLMID.value) {
+            return options
+        } else {
+            return [...options, { label: '请选择模型', value: '' }]
+        }
     } else {
         return []
     }
@@ -58,9 +73,22 @@ const levelOptions = [
     },
 ]
 const theme = ref('')
+
+//#endregion
+
+//#region 调试相关
+
+const isShowReasoning = ref(false)
+const isShowJSON = ref(false)
+
+//#endregion
+
 //#endregion
 
 const isReasoning = ref(true)
+const isAllowGenerate = computed(() => {
+    return theme.value && currentLLMID.value
+})
 const jsonString = ref('')
 const reasoningString = ref('')
 const reasoningCardTitle = computed(() => {
@@ -276,16 +304,16 @@ async function generateRead() {
 // 初始化
 onMounted(async () => {
     // 测试用
-    jlpt_read.value = JSON.parse(__testReadString)
-    jsonString.value = __testReadString.toString()
+    // jlpt_read.value = JSON.parse(__testReadString)
+    // jsonString.value = __testReadString.toString()
 })
 </script>
 
 <template>
-    <div class="flex flex-col gap-5">
-        <div class="flex gap-5 overflow-auto">
+    <!-- 配置栏 -->
+    <n-grid :cols="24" :x-gap="24">
+        <n-form-item-gi :span="8" label="主题" required>
             <n-input
-                class="min-w-75 flex-1"
                 v-model:value="theme"
                 type="text"
                 placeholder="不能是敏感内容哦."
@@ -293,51 +321,66 @@ onMounted(async () => {
                 maxlength="30"
                 show-count
             >
-                <template #prefix>
-                    <span>主题：</span>
-                </template>
             </n-input>
+        </n-form-item-gi>
+        <n-form-item-gi :span="4" label="词数">
             <n-input-number
-                class="min-w-40 flex-1"
                 v-model:value="wordCount"
                 type="text"
                 placeholder="任意"
                 :min="100"
                 :max="2000"
-            >
-                <template #prefix>
-                    <span>字数：</span>
-                </template>
-            </n-input-number>
+            />
+        </n-form-item-gi>
+        <n-form-item-gi :span="2" label="难度">
             <n-select v-model:value="level" :options="levelOptions" />
+        </n-form-item-gi>
+        <n-form-item-gi :span="6" label="模型" required>
             <n-select v-model:value="currentLLMID" :options="llmOptions" />
+        </n-form-item-gi>
+        <n-form-item-gi :span="4">
             <n-button
                 v-if="!jlpt_read || isGenerating"
                 type="primary"
                 @click="generateRead"
                 :loading="isGenerating"
-                :disabled="isGenerating"
+                :disabled="isGenerating || !isAllowGenerate"
             >
-                {{ isGenerating ? '生成中' : '开始生成' }}
+                {{ isGenerating ? '生成中' : isAllowGenerate ? '开始生成' : '请填写配置' }}
             </n-button>
             <n-button v-else type="warning" @click="generateRead"> 重新生成 </n-button>
-        </div>
-        <div class="flex flex-col">
-            <n-collapse>
-                <n-collapse-item :title="reasoningCardTitle" name="1">
-                    <n-card class="text-gray overflow-auto">
-                        <div class="italic">{{ reasoningString }}</div>
-                    </n-card>
-                </n-collapse-item>
-                <n-collapse-item v-if="jsonString" title="JSON" name="2">
-                    <n-card class="text-gray overflow-auto">
-                        <pre>{{ jsonString }}</pre>
-                    </n-card>
-                </n-collapse-item>
-                <n-collapse-item v-if="jlpt_read?.article?.title" title="阅读" name="3">
-                    <JLPT_ReadCard :read="jlpt_read" />
-                </n-collapse-item>
-            </n-collapse>
-        </div>
+        </n-form-item-gi>
+    </n-grid>
+    <div class="flex gap-4">
+        <n-switch v-model:value="isShowReasoning" :round="false" size="large">
+            <template #icon> 🤔 </template>
+        </n-switch>
+        <n-switch v-model:value="isShowJSON" :round="false" size="large">
+            <template #icon> <n-icon :component="JsonIcon" /> </template>
+        </n-switch>
     </div>
+    <n-divider v-if="isGenerating">
+        <n-spin size="small" />
+    </n-divider>
+    <n-divider v-else />
+    <!-- 折叠栏 -->
+    <n-collapse>
+        <n-collapse-item
+            v-if="reasoningString && isShowReasoning"
+            :title="reasoningCardTitle"
+            name="1"
+        >
+            <n-card class="text-gray overflow-auto">
+                <div class="italic">{{ reasoningString }}</div>
+            </n-card>
+        </n-collapse-item>
+        <n-collapse-item v-if="jsonString && isShowJSON" title="JSON" name="2">
+            <n-card class="text-gray overflow-auto">
+                <pre>{{ jsonString }}</pre>
+            </n-card>
+        </n-collapse-item>
+        <n-collapse-item v-if="jlpt_read?.article?.title" title="阅读" name="3">
+            <JLPT_ReadCard :read="jlpt_read" />
+        </n-collapse-item>
+    </n-collapse>
 </template>

@@ -23,6 +23,7 @@
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^22.13.1",
+    "@vicons/carbon": "^0.13.0",
     "@vicons/fluent": "^0.13.0",
     "@vicons/ionicons5": "^0.13.0",
     "@vitejs/plugin-vue": "^5.2.1",
