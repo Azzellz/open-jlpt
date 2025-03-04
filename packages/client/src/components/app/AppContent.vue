@@ -1,7 +1,7 @@
 <template>
-    <main class="flex-1 p-10 overflow-auto lg:px-35 xl:px-70">
-        <slot />
-    </main>
+    <router-view v-slot="{ Component }">
+        <keep-alive>
+            <component :is="Component" />
+        </keep-alive>
+    </router-view>
 </template>
-
-<script setup lang="ts"></script>

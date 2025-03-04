@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
 import AppHeader from './components/app/AppHeader.vue'
 import AppContent from './components/app/AppContent.vue'
 import AppProvider from './components/app/AppProvider.vue'
@@ -13,9 +12,7 @@ const userStore = useUserStore()
         <!-- 通过是否有 User 来判断是否登陆 -->
         <template v-if="userStore.user">
             <AppHeader />
-            <AppContent>
-                <RouterView />
-            </AppContent>
+            <AppContent />
         </template>
         <AppGuard v-else />
     </AppProvider>

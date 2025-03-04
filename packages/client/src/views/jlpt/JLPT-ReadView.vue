@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <main class="app-content py-10 reactive">
         <JLPT_Read />
-    </div>
+    </main>
 </template>
 
 <script setup lang="ts">

@@ -36,7 +36,7 @@
                 </n-button>
                 <RouterLink
                     class="px-2 block h-16 flex items-center"
-                    to="/user"
+                    to="/user/profile"
                     active-class="active-nav-item"
                 >
                     <n-avatar

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import UserView from '@/views/UserView.vue'
+import HomeView from '@/views/home/HomeView.vue'
+import UserView from '@/views/user/UserView.vue'
+import UserProfileView from '@/views/user/UserProfileView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,12 @@ const router = createRouter({
             path: '/user',
             name: 'user',
             component: UserView,
+            redirect: '/user/profile',
+            children: [
+                { path: 'profile', component: UserProfileView },
+                { path: 'setting', component: () => import('@/views/user/UserSettingView.vue') },
+                { path: 'history', component: () => import('@/views/user/UserHistoryView.vue') },
+            ],
         },
         {
             path: '/jlpt/text',
@@ -36,6 +43,13 @@ const router = createRouter({
             component: () => import('@/views/jlpt/JLPT-HearingView.vue'),
         },
     ],
+})
+
+// 重定向不存在的页面到主页
+router.beforeEach((to) => {
+    if (to.matched.length === 0) {
+        return { name: 'home' }
+    }
 })
 
 export default router

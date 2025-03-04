@@ -103,7 +103,7 @@ import {
 } from '@vicons/fluent'
 import { NDivider, NSelect, NCard, NModal, NButton, NIcon, useMessage } from 'naive-ui'
 import { computed, ref } from 'vue'
-import LLMForm from '../llm/LLM-Form.vue'
+import LLMForm from '@/components/llm/LLM-Form.vue'
 import type { LLM_Config } from '@root/models'
 import API from '@/api'
 import { nanoid } from 'nanoid'
