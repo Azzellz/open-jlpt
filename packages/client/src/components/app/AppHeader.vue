@@ -27,13 +27,22 @@
                 <RouterLink to="/jlpt/hearing" class="nav-item" active-class="active-nav-item">
                     听力
                 </RouterLink>
+
                 <!-- i18n -->
-                <n-button
-                    class="h-2/5 mx-5 px-3 border-x-1.5 border-x-gray-300 border-x-solid"
-                    text
-                >
-                    <I18nIcon size="22" />
+                <n-popselect v-model:value="locale" :options="options" size="medium" scrollable>
+                    <n-button
+                        class="h-2/5 mx-3 px-3 border-x-1.5 border-x-gray-300 border-x-solid"
+                        text
+                    >
+                        <n-icon :component="TranslateIcon" size="30" />
+                    </n-button>
+                </n-popselect>
+
+                <!-- Github -->
+                <n-button class="px-3" text @click="to('https://github.com/Azzellz/open-jlpt')">
+                    <n-icon :component="LogoGithubIcon" size="30" />
                 </n-button>
+
                 <RouterLink
                     class="px-2 block h-16 flex items-center"
                     to="/user/profile"
@@ -51,10 +60,28 @@
 </template>
 
 <script setup lang="ts">
-import { NAvatar, NButton } from 'naive-ui'
+import { NAvatar, NButton, NIcon, NPopselect } from 'naive-ui'
 import SakuraIcon from '@/components/icon/SakuraIcon.vue'
-import SettingIcon from '@/components/icon/SettingIcon.vue'
-import I18nIcon from '../icon/I18nIcon.vue'
+import { LogoGithub as LogoGithubIcon } from '@vicons/ionicons5'
+import { Translate20Regular as TranslateIcon } from '@vicons/fluent'
+import { useI18n } from 'vue-i18n'
+
+function to(href: string) {
+    location.href = href
+}
+
+//#region i18n
+const options = [
+    { label: '简体中文', value: 'zh' },
+    { label: 'English', value: 'en' },
+    { label: '日本語', value: 'ja' },
+]
+
+const { locale } = useI18n({ useScope: 'global' })
+
+locale.value = 'en' // change!
+
+//#endregion
 </script>
 
 <style scoped>

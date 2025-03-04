@@ -3,16 +3,16 @@
         <div v-if="!userStore.token" id="app-guard" class="flex max-md:flex-col h-full p-20">
             <div class="md:flex-2/3 flex">
                 <div class="m-auto flex flex-col gap-10">
-                    <div class="flex text-8xl gap-2 items-center">
+                    <div class="flex-x text-8xl gap-2 items-center">
                         <SakuraIcon class="mb-1.5 mr-2" size="150" />
                         <span class="text-gray">OPEN</span>
                         <span class="text-red-300">·</span>
-                        <span class="text-red">JLPT</span>
+                        <a class="text-red underline" href="https://www.jlpt.jp">JLPT</a>
                     </div>
-                    <div class="text-2xl italic text-center pl-5 text-gray-300">
-                        <a class="underline" href="https://www.jlpt.jp">{{ $t('guard.title') }}</a>
-                        {{ $t('guard.description') }}
-                    </div>
+                    <div
+                        class="text-2xl italic text-center text-gray-300 w-200"
+                        v-text="$t('guard.description')"
+                    />
                 </div>
             </div>
             <div class="flex-1/3 flex flex-col">
