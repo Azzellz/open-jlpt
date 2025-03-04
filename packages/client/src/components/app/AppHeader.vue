@@ -29,7 +29,7 @@
                 </RouterLink>
 
                 <!-- i18n -->
-                <n-popselect v-model:value="locale" :options="options" size="medium" scrollable>
+                <n-popselect v-model:value="locale" :options="i18nOptions" size="medium" scrollable>
                     <n-button
                         class="h-2/5 mx-3 px-3 border-x-1.5 border-x-gray-300 border-x-solid"
                         text
@@ -43,16 +43,29 @@
                     <n-icon :component="LogoGithubIcon" size="30" />
                 </n-button>
 
+                <!-- 用户头像交互 -->
                 <RouterLink
                     class="px-2 block h-16 flex items-center"
                     to="/user/profile"
                     active-class="active-nav-item"
                 >
-                    <n-avatar
-                        round
-                        size="small"
-                        src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-                    />
+                    <n-popselect @update:value="(v) => console.log(v)" class="p-0">
+                        <template #empty>
+                            <div>{{ userStore.user?.name }}</div>
+                        </template>
+                        <template #action>
+                            <div class="flex-y items-center">
+                                <n-button text @click="handleLoginout" :loading="isLoading">
+                                    注销登录
+                                </n-button>
+                            </div>
+                        </template>
+                        <n-avatar
+                            round
+                            size="small"
+                            src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+                        />
+                    </n-popselect>
                 </RouterLink>
             </nav>
         </div>
@@ -60,18 +73,25 @@
 </template>
 
 <script setup lang="ts">
-import { NAvatar, NButton, NIcon, NPopselect } from 'naive-ui'
+import { NAvatar, NButton, NIcon, NPopselect, useMessage } from 'naive-ui'
 import SakuraIcon from '@/components/icon/SakuraIcon.vue'
 import { LogoGithub as LogoGithubIcon } from '@vicons/ionicons5'
 import { Translate20Regular as TranslateIcon } from '@vicons/fluent'
 import { useI18n } from 'vue-i18n'
+import { useUserStore } from '@/stores/user'
+import { isSuccessResponse } from '@root/shared'
+import { ref } from 'vue'
+import API from '@/api'
+
+const userStore = useUserStore()
+const message = useMessage()
 
 function to(href: string) {
     location.href = href
 }
 
 //#region i18n
-const options = [
+const i18nOptions = [
     { label: '简体中文', value: 'zh' },
     { label: 'English', value: 'en' },
     { label: '日本語', value: 'ja' },
@@ -79,8 +99,25 @@ const options = [
 
 const { locale } = useI18n({ useScope: 'global' })
 
-locale.value = 'en' // change!
+//#endregion
 
+//#region 用户操作
+
+const isLoading = ref(false)
+async function handleLoginout() {
+    isLoading.value = true
+    const result = await API.Auth.deleteAuthSession(userStore.user!.id)
+    isLoading.value = false
+    if (isSuccessResponse(result)) {
+        userStore.user = null
+        userStore.token = ''
+        localStorage.removeItem('token')
+        message.success('注销成功')
+    } else {
+        console.error(result)
+        message.error('注销失败')
+    }
+}
 //#endregion
 </script>
 
