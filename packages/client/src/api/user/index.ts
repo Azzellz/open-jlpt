@@ -1,5 +1,7 @@
 import type {
     AuthVoucher,
+    JLPT_PracticeMap,
+    JLPT_ReadCreateParams,
     User,
     UserCreateParams,
     UserQueryParams,
@@ -8,6 +10,10 @@ import type {
 import { handleAxiosRequest } from '@root/shared'
 import { API_INSTANCE } from '..'
 import type { LLM_ChatParams } from '@root/models'
+import type {
+    JLPT_PracticeCreateParamsMap,
+    JLPT_PracticeCreateResponseMap,
+} from '@root/models/jlpt/practice'
 
 export async function getUsers(params?: UserQueryParams) {
     return handleAxiosRequest<Omit<User, 'password' | 'config'>>(() =>
@@ -67,7 +73,17 @@ export async function chatWithLLM(
             isContentStage = true
             continue
         }
-        
+
         isContentStage ? onContent?.(chunk) : onReasoning?.(chunk)
     }
+}
+
+export async function createHistory<T extends keyof JLPT_PracticeMap>(
+    userID: string,
+    type: T,
+    params: JLPT_PracticeCreateParamsMap[T],
+) {
+    return handleAxiosRequest<JLPT_PracticeCreateResponseMap[T]>(() =>
+        API_INSTANCE.post(`/users/${userID}/histories/${type}`, params),
+    )
 }

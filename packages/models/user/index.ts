@@ -21,7 +21,7 @@ export interface User {
     account: string
     password: string
     // key 是年份，如 2025
-    histories: Record<string, JLPT_PracticeMap>
+    histories: JLPT_PracticeMap
     favorites: JLPT_PracticeMap
     publishes: JLPT_PracticeMap
     config: UserConfig

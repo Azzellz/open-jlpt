@@ -2,7 +2,7 @@ import { DB_UserModel, RedisClient } from '@/db'
 import { createErrorResponse, createSuccessResponse, ERROR_RESPONSE, Log } from '@root/shared'
 import Elysia, { t } from 'elysia'
 import bcrypt from 'bcryptjs'
-import { omit, pick } from 'radash'
+import {  pick } from 'radash'
 import { accessJwtPlugin, refreshJwtPlugin } from '@/plugins'
 import { nanoid } from 'nanoid'
 
@@ -24,7 +24,7 @@ AuthService.post(
             // 检查密码是否正确
             const isValidPassword = await bcrypt.compare(body.password, user.password)
             if (isValidPassword) {
-                const userJson = omit(user.toJSON(), ['password'])
+                const userJson = user.toJSON()
                 const userPayload = pick(userJson, ['id', 'name', 'account'])
                 // 生成 tokens
                 const token = await accessJwt.sign({

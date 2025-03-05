@@ -1,7 +1,11 @@
 import { JLPT_Read } from '@root/models'
-import { model, Schema } from 'mongoose'
+import { model, Schema, Document } from 'mongoose'
 
-export const DB_JLPT_ReadSchema = new Schema<JLPT_Read>(
+interface JLPT_ReadDocument extends Omit<JLPT_Read, 'id' | 'user'>, Document {
+    user: Schema.Types.ObjectId
+}
+
+export const DB_JLPT_ReadSchema = new Schema<JLPT_ReadDocument>(
     {
         timeStamp: { type: Number, required: true },
         star: { type: Number, required: true },
@@ -50,5 +54,14 @@ export const DB_JLPT_ReadSchema = new Schema<JLPT_Read>(
         },
     }
 )
+
+// 查询,创建 自动填充用户
+DB_JLPT_ReadSchema.pre<JLPT_ReadDocument>(/^find|save/, function (next) {
+    this.populate({
+        path: 'user',
+        select: 'name avatar account -_id',
+    })
+    next()
+})
 
 export const DB_JLPT_ReadModel = model('read', DB_JLPT_ReadSchema, 'reads')

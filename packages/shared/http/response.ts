@@ -95,6 +95,13 @@ export const ERROR_RESPONSE = {
             error: '非法OBJECT_ID',
         },
     },
+    USER: {
+        NOT_FOUND: {
+            code: 404,
+            error: '用户不存在',
+        },
+    },
+
     AUTH: {
         MISSING_TOKEN: {
             code: 1000,
