@@ -8,10 +8,14 @@ export const useUserStore = defineStore('user-store', () => {
     const user = ref<Omit<User, 'password'> | null>(null)
     const token = ref(localStorage.getItem('token') || '')
 
-    // 自动注入令牌
     API_INSTANCE.interceptors.request.use((config) => {
+        // 自动注入令牌
         if (token.value) {
             config.headers.Authorization = `Bearer ${token.value}`
+        }
+        // 自动注入用户变量
+        if (user.value) {
+            config.url = config.url?.replace(/{{user.id}}/gi, user.value.id)
         }
         return config
     })

@@ -1,6 +1,4 @@
-import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
-import * as LLM from './llm'
-import * as Config from './config'
+import axios from 'axios'
 import * as User from './user'
 import * as Auth from './auth'
 
@@ -15,8 +13,6 @@ export const API_INSTANCE = axios.create({
 // ) => InternalAxiosRequestConfig<any> | Promise<InternalAxiosRequestConfig<any>>
 
 export const API = {
-    LLM,
-    Config,
     User,
     Auth,
 }

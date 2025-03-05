@@ -171,6 +171,7 @@ async function handleLogin(e: MouseEvent) {
             localStorage.setItem('token', userStore.token)
         } else {
             message.error('登录失败。')
+            console.log(result)
         }
 
         isLoading.value = false
@@ -248,6 +249,7 @@ onMounted(async () => {
         message.error('自动登录失败，请重新登录')
         userStore.token = ''
         localStorage.removeItem('token')
+        console.log(result)
     }
 })
 

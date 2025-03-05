@@ -31,12 +31,13 @@ export async function getUser() {
     return handleAxiosRequest<Omit<User, 'password'>>(() => API_INSTANCE.get(`/users/self`))
 }
 
-export async function updateUser(userID: string, params: Partial<UserUpdateParams>) {
-    return handleAxiosRequest<UserUpdateParams>(() => API_INSTANCE.put(`/users/${userID}`, params))
+export async function updateUser(params: Partial<UserUpdateParams>) {
+    return handleAxiosRequest<UserUpdateParams>(() =>
+        API_INSTANCE.put('/users/{{user.id}}', params),
+    )
 }
 
 export async function chatWithLLM(
-    userID: string,
     llmID: string,
     params: {
         messages: LLM_ChatParams['messages']
@@ -47,7 +48,7 @@ export async function chatWithLLM(
 ) {
     const { messages, onChunk, onContent, onReasoning } = params
     const response = await API_INSTANCE.post(
-        `/users/${userID}/llms/${llmID}/chat`,
+        `/users/{{user.id}}/llms/${llmID}/chat`,
         {
             isStream: true,
             messages,
@@ -79,11 +80,10 @@ export async function chatWithLLM(
 }
 
 export async function createHistory<T extends keyof JLPT_PracticeMap>(
-    userID: string,
     type: T,
     params: JLPT_PracticeCreateParamsMap[T],
 ) {
     return handleAxiosRequest<JLPT_PracticeCreateResponseMap[T]>(() =>
-        API_INSTANCE.post(`/users/${userID}/histories/${type}`, params),
+        API_INSTANCE.post(`/users/{{user.id}}/histories/${type}`, params),
     )
 }

@@ -127,7 +127,7 @@ function handleEditLLM(llm: LLM_Config) {
 }
 async function handleDeleteLLM(llm: LLM_Config) {
     currentEditingLLM.value = null
-    const result = await API.User.updateUser(userStore.user!.id, {
+    const result = await API.User.updateUser({
         config: {
             llm: {
                 items: config.value.llm.items.filter((item) => item.id !== llm.id),
@@ -148,7 +148,7 @@ async function handleSubmitLLMEditForm(model: Omit<LLM_Config, 'id'>, complete: 
         return [k, v]
     })
 
-    const result = await API.User.updateUser(userStore.user!.id, {
+    const result = await API.User.updateUser({
         config: config.value,
     })
     complete()
@@ -169,7 +169,7 @@ async function handleSubmitLLMAddForm(model: Omit<LLM_Config, 'id'>, complete: (
         id: nanoid(),
         ...model,
     }
-    const result = await API.User.updateUser(userStore.user!.id, {
+    const result = await API.User.updateUser({
         config: {
             llm: {
                 items: [...config.value.llm.items, newLLM],

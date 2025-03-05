@@ -331,7 +331,7 @@ async function generateRead() {
     jlpt_read.value = null
 
     const jsonBrook = createJsonBrook()
-    await API.User.chatWithLLM(userStore.user!.id, currentLLMID.value, {
+    await API.User.chatWithLLM(currentLLMID.value, {
         messages: [
             {
                 // prompt
@@ -367,7 +367,7 @@ async function generateRead() {
 
 // 推送历史记录
 async function createHistory(read: JLPT_ReadOrigin = jlpt_read.value! as any) {
-    const result = await API.User.createHistory(userStore.user!.id, 'reads', read)
+    const result = await API.User.createHistory('reads', read)
     if (isSuccessResponse(result)) {
         message.success('已保存到历史记录')
     } else {
@@ -383,7 +383,7 @@ onMounted(async () => {
     // 测试用
     // jlpt_read.value = JSON.parse(__testReadString)
     // jsonString.value = __testReadString.toString()
-    // saveHistory()
+    // createHistory()
 })
 
 //#endregion
