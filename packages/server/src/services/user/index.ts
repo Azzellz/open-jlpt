@@ -72,10 +72,20 @@ VerifyUserService.post(
                 modelID: llm.modelID,
                 messages,
             })
+
+            let isContentStage = false
             for await (const chunk of stream) {
                 const delta = chunk.choices[0]?.delta
                 const reasoning = (delta as any)?.reasoning_content
                 const content = delta?.content
+
+                // 思考部分结束，返回一段特殊字符串标识内容阶段开始
+                if (reasoning === void 0 && !isContentStage) {
+                    isContentStage = true
+                    // "open-jlpt" 的 SHA1 哈希字符串
+                    yield 'e7d974c7436c9a369b93fe49e405364b9bd3060a'
+                }
+
                 yield reasoning || content
             }
         } catch (error) {

@@ -22,13 +22,13 @@
                     :max="2000"
                 />
             </n-form-item-gi>
-            <n-form-item-gi :span="2" label="难度">
+            <n-form-item-gi :span="4" label="难度">
                 <n-select v-model:value="level" :options="levelOptions" />
             </n-form-item-gi>
-            <n-form-item-gi :span="6" label="模型" required>
+            <n-form-item-gi :span="4" label="模型" required>
                 <n-select v-model:value="currentLLMID" :options="llmOptions" />
             </n-form-item-gi>
-            <n-form-item-gi :span="4">
+            <n-form-item-gi :span="2">
                 <n-button
                     v-if="!jlpt_read || isGenerating"
                     type="primary"
@@ -107,6 +107,7 @@ const message = useMessage()
 //#region 配置栏
 
 //#region 阅读相关
+
 const wordCount = ref()
 const currentLLMID = ref('')
 const currentLLM = computed(() => {
@@ -162,22 +163,9 @@ const isShowJSON = ref(false)
 
 //#endregion
 
-const isReasoning = ref(true)
-const isAllowGenerate = computed(() => {
-    return theme.value && currentLLMID.value
-})
-const jsonString = ref('')
-const reasoningString = ref('')
-const reasoningCardTitle = computed(() => {
-    if (!reasoningString.value) {
-        return '输入相关信息后开始生成'
-    }
-    if (isReasoning.value) {
-        return '思考中...'
-    } else {
-        return '思考过程'
-    }
-})
+//#region 生成阅读
+
+//#region prompt 模板
 
 const __testReadString = `
 {
@@ -323,22 +311,36 @@ export interface JLPT_ReadOrigin {
 }
 `
 
-//#region 生成阅读
+//#endregion
 
+const isReasoning = ref(true)
+const isAllowGenerate = computed(() => {
+    return theme.value && currentLLMID.value
+})
+const jsonString = ref('')
+const reasoningString = ref('')
+const reasoningCardTitle = computed(() => {
+    if (!reasoningString.value) {
+        return '输入相关信息后开始生成'
+    }
+    if (isReasoning.value) {
+        return '思考中...'
+    } else {
+        return '思考过程'
+    }
+})
 const jlpt_read = ref<Partial<JLPT_ReadOrigin> | null>(null)
 const isGenerating = ref(false)
 async function generateRead() {
-    const jsonBrook = createJsonBrook()
+    // 重置状态
     isGenerating.value = true
-    let flag = ''
-    let isJsoning = false
     reasoningString.value = ''
     jsonString.value = ''
     jlpt_read.value = null
-    await API.User.chatWithLLM(
-        userStore.user!.id,
-        currentLLMID.value,
-        [
+
+    const jsonBrook = createJsonBrook()
+    await API.User.chatWithLLM(userStore.user!.id, currentLLMID.value, {
+        messages: [
             {
                 // prompt
                 role: 'system',
@@ -349,28 +351,21 @@ async function generateRead() {
                 content: theme.value,
             },
         ],
-        (chunk) => {
-            if (flag === '```' && chunk === 'json') {
-                isJsoning = true
-                isReasoning.value = false
+        onReasoning(reasoning) {
+            isReasoning.value = true
+            reasoningString.value += reasoning
+        },
+        onContent(content) {
+            isReasoning.value = false
+            if (content === 'json' || content === '```') {
                 return
-            }
-            flag = chunk
-
-            if (chunk === '```') {
-                return
-            }
-            if (isJsoning) {
-                // JSON部分
-                jsonString.value += chunk
-                jsonBrook.write(chunk)
-                jlpt_read.value = jsonBrook.getCurrent()
             } else {
-                // 思考部分
-                reasoningString.value += chunk
+                jsonString.value += content
+                jsonBrook.write(content)
+                jlpt_read.value = jsonBrook.getCurrent()
             }
         },
-    )
+    })
     jsonBrook.end()
     isGenerating.value = false
     message.success('生成完毕')
@@ -378,10 +373,13 @@ async function generateRead() {
 
 //#endregion
 
-// 初始化
+//#region 初始化
+
 onMounted(async () => {
     // 测试用
     // jlpt_read.value = JSON.parse(__testReadString)
     // jsonString.value = __testReadString.toString()
 })
+
+//#endregion
 </script>

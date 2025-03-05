@@ -32,9 +32,14 @@ export async function updateUser(userID: string, params: Partial<UserUpdateParam
 export async function chatWithLLM(
     userID: string,
     llmID: string,
-    messages: LLM_ChatParams['messages'],
-    onChunk: (chunk: string) => void,
+    params: {
+        messages: LLM_ChatParams['messages']
+        onContent?: (content: string) => void
+        onReasoning?: (reasoning: string) => void
+        onChunk?: (chunk: string) => void
+    },
 ) {
+    const { messages, onChunk, onContent, onReasoning } = params
     const response = await API_INSTANCE.post(
         `/users/${userID}/llms/${llmID}/chat`,
         {
@@ -49,11 +54,20 @@ export async function chatWithLLM(
     const reader = response.data.getReader()
     const decoder = new TextDecoder()
 
+    let isContentStage = false
     while (true) {
         const { done, value } = await reader.read()
         if (done) break
 
         const chunk = decoder.decode(value, { stream: true })
-        onChunk(chunk)
+        onChunk?.(chunk)
+
+        // 判断是推理阶段还是内容阶段，通过比较 chunk 是否等于特殊哈希字符串
+        if (chunk === 'e7d974c7436c9a369b93fe49e405364b9bd3060a') {
+            isContentStage = true
+            continue
+        }
+        
+        isContentStage ? onContent?.(chunk) : onReasoning?.(chunk)
     }
 }
