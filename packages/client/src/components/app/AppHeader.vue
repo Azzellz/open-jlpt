@@ -13,19 +13,19 @@
             </RouterLink>
             <nav class="h-full ml-auto flex items-center font-bold">
                 <RouterLink to="/jlpt/text" class="nav-item" active-class="active-nav-item">
-                    文字
+                    {{ $t('nav.jlpt.text') }}
                 </RouterLink>
                 <RouterLink to="/jlpt/vocabulary" class="nav-item" active-class="active-nav-item">
-                    词汇
+                    {{ $t('nav.jlpt.vocabulary') }}
                 </RouterLink>
                 <RouterLink to="/jlpt/grammar" class="nav-item" active-class="active-nav-item">
-                    语法
+                    {{ $t('nav.jlpt.grammar') }}
                 </RouterLink>
                 <RouterLink to="/jlpt/read" class="nav-item" active-class="active-nav-item">
-                    阅读
+                    {{ $t('nav.jlpt.read') }}
                 </RouterLink>
                 <RouterLink to="/jlpt/hearing" class="nav-item" active-class="active-nav-item">
-                    听力
+                    {{ $t('nav.jlpt.hearing') }}
                 </RouterLink>
 
                 <!-- i18n -->
