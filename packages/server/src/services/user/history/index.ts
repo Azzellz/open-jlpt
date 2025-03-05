@@ -18,16 +18,13 @@ UserHistoryService.post(
             if (!user) {
                 return ERROR_RESPONSE.USER.NOT_FOUND
             }
-            const newRead = await DB_JLPT_ReadModel.create({
+            const newHistory = {
                 ...body,
                 timeStamp: Date.now(),
-                user: userID,
-                star: 0,
-            })
-
-            user.histories.reads.push(newRead.id)
+            }
+            user.histories.reads.push(newHistory)
             await user.save()
-            return createSuccessResponse(200, '创建成功', newRead.toJSON())
+            return createSuccessResponse(200, '创建成功', newHistory)
         } catch (error) {
             Log.error(error)
             return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR

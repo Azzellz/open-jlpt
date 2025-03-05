@@ -1,4 +1,4 @@
-import type { JLPT_PracticeMap } from '../jlpt'
+import type { JLPT_PracticeMap, JLPT_Read, JLPT_ReadOrigin } from '../jlpt'
 export interface LLM_Config {
     id: string
     name: string
@@ -20,8 +20,9 @@ export interface User {
     avatar: string
     account: string
     password: string
-    // key 是年份，如 2025
-    histories: JLPT_PracticeMap
+    histories: {
+        reads: Omit<JLPT_Read, 'id' | 'user' | 'star'>[]
+    }
     favorites: JLPT_PracticeMap
     publishes: JLPT_PracticeMap
     config: UserConfig

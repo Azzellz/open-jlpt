@@ -8,7 +8,7 @@ export const JLPT_ReadService = new Elysia({
     prefix: '/reads',
 })
     .use(verifyPluginReference)
-    .use(checkObjectIdPlugin)
+    .use(checkObjectIdPlugin('readID'))
 
 //#region 查询
 
@@ -74,12 +74,9 @@ JLPT_ReadService.get(
     }
 )
 
-JLPT_ReadService.get('/:id', async ({ params: { id } }) => {
+JLPT_ReadService.get('/:readID', async ({ params: { readID } }) => {
     try {
-        const read = await DB_JLPT_ReadModel.findById(id).populate(
-            'user',
-            '_id name avatar account'
-        )
+        const read = await DB_JLPT_ReadModel.findById(readID)
         if (!read) {
             return ERROR_RESPONSE.SYSTEM.NOT_FOUND
         } else {
@@ -104,14 +101,13 @@ JLPT_ReadService.post(
         },
     }) => {
         try {
-            const newRead = await (
-                await DB_JLPT_ReadModel.create({
-                    ...body,
-                    star: 0,
-                    user: id,
-                    timeStamp: Date.now(),
-                })
-            ).populate('user', '_id name avatar account')
+            const newRead = await DB_JLPT_ReadModel.create({
+                ...body,
+                star: 0,
+                user: id,
+                timeStamp: Date.now(),
+            })
+
             return createSuccessResponse(200, '创建成功', newRead.toJSON())
         } catch (error) {
             Log.error(error)
@@ -159,15 +155,15 @@ JLPT_ReadService.post(
 //#region 删除
 
 JLPT_ReadService.delete(
-    '/:id',
+    '/:readID',
     async ({
-        params: { id },
+        params: { readID },
         store: {
             user: { id: userID },
         },
     }) => {
         try {
-            const targetRead = await DB_JLPT_ReadModel.findById(id).populate('user', '_id')
+            const targetRead = await DB_JLPT_ReadModel.findById(readID)
             if (!targetRead) {
                 return ERROR_RESPONSE.SYSTEM.NOT_FOUND
             }

@@ -1,7 +1,7 @@
 import { User } from '@root/models/user'
 import { model, Schema } from 'mongoose'
 import { DB_UserConfigSchema } from './config'
-import { DB_JLPTPracticeMapSchema } from '../common/jlpt'
+import { DB_JLPT_PracticeRefMapSchema, DB_JLPT_ReadBaseSchema } from '../common/jlpt'
 
 export * from './config'
 
@@ -12,9 +12,11 @@ export const DB_UserSchema = new Schema<User>(
         account: { type: String, required: true },
         password: { type: String, required: true },
         config: DB_UserConfigSchema,
-        histories: DB_JLPTPracticeMapSchema,
-        favorites: DB_JLPTPracticeMapSchema,
-        publishes: DB_JLPTPracticeMapSchema,
+        histories: {
+            reads: [DB_JLPT_ReadBaseSchema],
+        },
+        favorites: DB_JLPT_PracticeRefMapSchema,
+        publishes: DB_JLPT_PracticeRefMapSchema,
     },
     {
         versionKey: false,
