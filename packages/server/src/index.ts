@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia'
-import { UserService, AuthService, JLPT_Service } from './services'
+import { UserService, AuthService, JLPT_Service, TTS_Service } from './services'
 import { cors } from '@elysiajs/cors'
 import { formatResponsePlugin } from './plugins'
 import '@/db'
@@ -10,6 +10,7 @@ const app = new Elysia()
     .use(UserService)
     .use(AuthService)
     .use(JLPT_Service)
+    .use(TTS_Service)
     .listen({
         hostname: '0.0.0.0',
         port: 3000,

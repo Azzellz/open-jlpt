@@ -9,12 +9,13 @@
     "@elysiajs/bearer": "^1.2.0",
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/jwt": "^1.2.0",
-    "bcryptjs": "^3.0.2",
-    "elysia": "latest",
     "ai": "^4.1.46",
+    "bcryptjs": "^3.0.2",
+    "edge-tts": "^1.0.1",
+    "elysia": "latest",
     "mongoose": "^8.10.1",
-    "redis": "^4.7.0",
-    "openai": "^4.86.1"
+    "openai": "^4.86.1",
+    "redis": "^4.7.0"
   },
   "devDependencies": {
     "bun-types": "latest"

@@ -144,6 +144,9 @@ importers:
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.2
+      edge-tts:
+        specifier: ^1.0.1
+        version: 1.0.1(typescript@5.7.3)
       elysia:
         specifier: latest
         version: 1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3)
@@ -152,7 +155,7 @@ importers:
         version: 8.10.1
       openai:
         specifier: ^4.86.1
-        version: 4.86.1(zod@3.24.2)
+        version: 4.86.1(ws@8.18.1)(zod@3.24.2)
       redis:
         specifier: ^4.7.0
         version: 4.7.0
@@ -1390,6 +1393,11 @@ packages:
   duplexer@0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
 
+  edge-tts@1.0.1:
+    resolution: {integrity: sha512-Yv5S4y5k3bWC+0iyD6PDCOI0SLpBN5B1Mv6apgyWjhHzU8GDrBMv6BvT9lZBY5O/4Ow7KFcYaItXC/H0BFmewA==}
+    peerDependencies:
+      typescript: ^5.0.0
+
   electron-to-chromium@1.5.103:
     resolution: {integrity: sha512-P6+XzIkfndgsrjROJWfSvVEgNHtPgbhVyTkwLjUM2HU/h7pZRORgaTlHqfAikqxKmdJMLW8fftrdGWbd/Ds0FA==}
 
@@ -2550,6 +2558,18 @@ packages:
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
+
+  ws@8.18.1:
+    resolution: {integrity: sha512-RKW2aJZMXeMxVpnZ6bck+RswznaxmzdULiBr6KY7XkTnW8uvt0iT9H5DkHUChXrc+uurzwa0rVI16n/Xzjdz1w==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
 
   xml-name-validator@4.0.0:
     resolution: {integrity: sha512-ICP2e+jsHvAj2E2lIHxa5tjXRlKDJo4IdvPvCXbXQGdzSfmSpNVyIKMvoZHjDY9DP0zV17iI85o90vRFXNccRw==}
@@ -3839,6 +3859,14 @@ snapshots:
 
   duplexer@0.1.2: {}
 
+  edge-tts@1.0.1(typescript@5.7.3):
+    dependencies:
+      typescript: 5.7.3
+      ws: 8.18.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   electron-to-chromium@1.5.103: {}
 
   elysia@1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3):
@@ -4468,7 +4496,7 @@ snapshots:
       is-inside-container: 1.0.0
       is-wsl: 3.1.0
 
-  openai@4.86.1(zod@3.24.2):
+  openai@4.86.1(ws@8.18.1)(zod@3.24.2):
     dependencies:
       '@types/node': 18.19.76
       '@types/node-fetch': 2.6.12
@@ -4478,6 +4506,7 @@ snapshots:
       formdata-node: 4.4.1
       node-fetch: 2.7.0
     optionalDependencies:
+      ws: 8.18.1
       zod: 3.24.2
     transitivePeerDependencies:
       - encoding
@@ -4969,6 +4998,8 @@ snapshots:
       isexe: 3.1.1
 
   word-wrap@1.2.5: {}
+
+  ws@8.18.1: {}
 
   xml-name-validator@4.0.0: {}
 
