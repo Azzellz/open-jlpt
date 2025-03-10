@@ -32,13 +32,13 @@
                 <n-button
                     v-if="!jlpt_read || isGenerating"
                     type="primary"
-                    @click="generateRead"
+                    @click="handleGenerateRead"
                     :loading="isGenerating"
                     :disabled="isGenerating || !isAllowGenerate"
                 >
                     {{ isGenerating ? '生成中' : isAllowGenerate ? '开始生成' : '请填写配置' }}
                 </n-button>
-                <n-button v-else type="warning" @click="generateRead"> 重新生成 </n-button>
+                <n-button v-else type="warning" @click="handleGenerateRead"> 重新生成 </n-button>
             </n-form-item-gi>
         </n-grid>
         <div class="flex gap-4">
@@ -56,17 +56,17 @@
         <!-- 折叠栏 -->
         <n-collapse>
             <n-collapse-item
-                v-if="reasoningString && isShowReasoning"
+                v-if="reasoning && isShowReasoning"
                 :title="reasoningCardTitle"
                 name="1"
             >
                 <n-card class="text-gray overflow-auto">
-                    <div class="italic">{{ reasoningString }}</div>
+                    <div class="italic">{{ reasoning }}</div>
                 </n-card>
             </n-collapse-item>
-            <n-collapse-item v-if="jsonString && isShowJSON" title="JSON" name="2">
+            <n-collapse-item v-if="content && isShowJSON" title="JSON" name="2">
                 <n-card class="text-gray overflow-auto">
-                    <pre>{{ jsonString }}</pre>
+                    <pre>{{ content }}</pre>
                 </n-card>
             </n-collapse-item>
             <n-collapse-item v-if="jlpt_read?.article?.title" title="阅读" name="3">
@@ -100,7 +100,8 @@ import {
 import JLPT_ReadCard from '@/components/jlpt/read/JLPT-ReadCard.vue'
 import { useUserStore } from '@/stores/user'
 import { Json as JsonIcon } from '@vicons/carbon'
-import { isSuccessResponse, Log } from '@root/shared'
+import { isSuccessResponse } from '@root/shared'
+import { useLLM } from '@/composables/llm'
 
 const userStore = useUserStore()
 const message = useMessage()
@@ -305,14 +306,12 @@ export interface JLPT_ReadOrigin {
 
 //#endregion
 
-const isReasoning = ref(true)
+const { isReasoning, isGenerating, reasoning, content, generate } = useLLM()
 const isAllowGenerate = computed(() => {
     return theme.value && currentLLMID.value
 })
-const jsonString = ref('')
-const reasoningString = ref('')
 const reasoningCardTitle = computed(() => {
-    if (!reasoningString.value) {
+    if (!reasoning.value) {
         return '输入相关信息后开始生成'
     }
     if (isReasoning.value) {
@@ -322,17 +321,13 @@ const reasoningCardTitle = computed(() => {
     }
 })
 const jlpt_read = ref<Partial<JLPT_ReadOrigin> | null>(null)
-const isGenerating = ref(false)
-async function generateRead() {
+async function handleGenerateRead() {
     // 重置状态
-    isGenerating.value = true
-    reasoningString.value = ''
-    jsonString.value = ''
     jlpt_read.value = null
-
     const jsonBrook = createJsonBrook()
-    await API.User.chatWithLLM(currentLLMID.value, {
-        messages: [
+    await generate(
+        currentLLMID.value,
+        [
             {
                 // prompt
                 role: 'system',
@@ -343,25 +338,21 @@ async function generateRead() {
                 content: theme.value,
             },
         ],
-        onReasoning(reasoning) {
-            isReasoning.value = true
-            reasoningString.value += reasoning
+        {
+            onContent(str) {
+                isReasoning.value = false
+                if (str === 'json' || str === '```') {
+                    return
+                } else {
+                    content.value += str
+                    jsonBrook.write(str)
+                    jlpt_read.value = jsonBrook.getCurrent()
+                }
+            },
         },
-        onContent(content) {
-            isReasoning.value = false
-            if (content === 'json' || content === '```') {
-                return
-            } else {
-                jsonString.value += content
-                jsonBrook.write(content)
-                jlpt_read.value = jsonBrook.getCurrent()
-            }
-        },
-    })
+    )
     jsonBrook.end()
-    isGenerating.value = false
     message.success('生成完毕')
-
     createHistory()
 }
 
@@ -382,7 +373,7 @@ async function createHistory(read: JLPT_ReadOrigin = jlpt_read.value! as any) {
 onMounted(async () => {
     // 测试用
     jlpt_read.value = JSON.parse(__testReadString)
-    jsonString.value = __testReadString.toString()
+    content.value = __testReadString.toString()
     // createHistory()
 })
 
