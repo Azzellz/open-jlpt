@@ -64,7 +64,10 @@ const handleMouseUp = (e: MouseEvent) => {
 
 // 点击外部关闭菜单
 const handleClickOutside = (e: MouseEvent) => {
-    if (!showMenu.value) return
+    // 如果有_vts字段则为特殊情况，不关闭
+    if (!showMenu.value || (e as any)._vts) {
+        return
+    }
     if (!(e.target as HTMLElement).closest('.floating-menu')) {
         showMenu.value = false
     }

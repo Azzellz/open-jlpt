@@ -26,7 +26,7 @@ export function useLLM() {
         reasoning.value = ''
         content.value = ''
 
-        const result = await API.User.chatWithLLM(llmID, {
+        await API.User.chatWithLLM(llmID, {
             messages,
             onReasoning(str) {
                 isReasoning.value = true
@@ -43,7 +43,6 @@ export function useLLM() {
 
         isGenerating.value = false
         options?.onFinish?.()
-        return result
     }
 
     return {

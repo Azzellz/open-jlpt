@@ -42,9 +42,9 @@ importers:
 
   packages/client:
     dependencies:
-      '@vicons/material':
-        specifier: ^0.13.0
-        version: 0.13.0
+      marked:
+        specifier: ^15.0.7
+        version: 15.0.7
       pinia:
         specifier: ^2.3.1
         version: 2.3.1(typescript@5.7.3)(vue@3.5.13(typescript@5.7.3))
@@ -71,6 +71,9 @@ importers:
         specifier: ^0.13.0
         version: 0.13.0
       '@vicons/ionicons5':
+        specifier: ^0.13.0
+        version: 0.13.0
+      '@vicons/material':
         specifier: ^0.13.0
         version: 0.13.0
       '@vitejs/plugin-vue':
@@ -134,13 +137,13 @@ importers:
     dependencies:
       '@elysiajs/bearer':
         specifier: ^1.2.0
-        version: 1.2.0(elysia@1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3))
+        version: 1.2.0(elysia@1.2.25(@sinclair/typebox@0.34.28)(typescript@5.7.3))
       '@elysiajs/cors':
         specifier: ^1.2.0
-        version: 1.2.0(elysia@1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3))
+        version: 1.2.0(elysia@1.2.25(@sinclair/typebox@0.34.28)(typescript@5.7.3))
       '@elysiajs/jwt':
         specifier: ^1.2.0
-        version: 1.2.0(elysia@1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3))
+        version: 1.2.0(elysia@1.2.25(@sinclair/typebox@0.34.28)(typescript@5.7.3))
       ai:
         specifier: ^4.1.46
         version: 4.1.46(react@19.0.0)(zod@3.24.2)
@@ -152,7 +155,7 @@ importers:
         version: 1.0.1(typescript@5.7.3)
       elysia:
         specifier: latest
-        version: 1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3)
+        version: 1.2.25(@sinclair/typebox@0.34.28)(typescript@5.7.3)
       mongoose:
         specifier: ^8.10.1
         version: 8.10.1
@@ -1407,8 +1410,8 @@ packages:
   electron-to-chromium@1.5.103:
     resolution: {integrity: sha512-P6+XzIkfndgsrjROJWfSvVEgNHtPgbhVyTkwLjUM2HU/h7pZRORgaTlHqfAikqxKmdJMLW8fftrdGWbd/Ds0FA==}
 
-  elysia@1.2.24:
-    resolution: {integrity: sha512-z849iAFdOCLd/a/ra3dtOmMd9jN4ow1G5Enq5RRRfheu/HEcO61cnwSaj0EScbT91pDiVbozhzqxF/K6b6amEw==}
+  elysia@1.2.25:
+    resolution: {integrity: sha512-WsdQpORJvb4uszzeqYT0lg97knw1iBW1NTzJ1Jm57tiHg+DfAotlWXYbjmvQ039ssV0fYELDHinLLoUazZkEHg==}
     peerDependencies:
       '@sinclair/typebox': '>= 0.34.0'
       openapi-types: '>= 12.0.0'
@@ -1885,6 +1888,11 @@ packages:
 
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
+
+  marked@15.0.7:
+    resolution: {integrity: sha512-dgLIeKGLx5FwziAnsk4ONoGwHwGPJzselimvlVskE9XLN4Orv9u2VA3GWw/lYUqjfA0rUT/6fqKwfZJapP9BEg==}
+    engines: {node: '>= 18'}
+    hasBin: true
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -2853,17 +2861,17 @@ snapshots:
     dependencies:
       vue: 3.5.13(typescript@5.7.3)
 
-  '@elysiajs/bearer@1.2.0(elysia@1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3))':
+  '@elysiajs/bearer@1.2.0(elysia@1.2.25(@sinclair/typebox@0.34.28)(typescript@5.7.3))':
     dependencies:
-      elysia: 1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3)
+      elysia: 1.2.25(@sinclair/typebox@0.34.28)(typescript@5.7.3)
 
-  '@elysiajs/cors@1.2.0(elysia@1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3))':
+  '@elysiajs/cors@1.2.0(elysia@1.2.25(@sinclair/typebox@0.34.28)(typescript@5.7.3))':
     dependencies:
-      elysia: 1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3)
+      elysia: 1.2.25(@sinclair/typebox@0.34.28)(typescript@5.7.3)
 
-  '@elysiajs/jwt@1.2.0(elysia@1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3))':
+  '@elysiajs/jwt@1.2.0(elysia@1.2.25(@sinclair/typebox@0.34.28)(typescript@5.7.3))':
     dependencies:
-      elysia: 1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3)
+      elysia: 1.2.25(@sinclair/typebox@0.34.28)(typescript@5.7.3)
       jose: 4.15.9
 
   '@emotion/hash@0.8.0': {}
@@ -3877,7 +3885,7 @@ snapshots:
 
   electron-to-chromium@1.5.103: {}
 
-  elysia@1.2.24(@sinclair/typebox@0.34.28)(typescript@5.7.3):
+  elysia@1.2.25(@sinclair/typebox@0.34.28)(typescript@5.7.3):
     dependencies:
       '@sinclair/typebox': 0.34.28
       cookie: 1.0.2
@@ -4343,6 +4351,8 @@ snapshots:
   magic-string@0.30.17:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  marked@15.0.7: {}
 
   math-intrinsics@1.1.0: {}
 

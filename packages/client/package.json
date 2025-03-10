@@ -15,6 +15,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "marked": "^15.0.7",
     "pinia": "^2.3.1",
     "vue": "^3.5.13",
     "vue-i18n": "10",
@@ -26,6 +27,7 @@
     "@vicons/carbon": "^0.13.0",
     "@vicons/fluent": "^0.13.0",
     "@vicons/ionicons5": "^0.13.0",
+    "@vicons/material": "^0.13.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitejs/plugin-vue-jsx": "^4.1.1",
     "@vue/eslint-config-prettier": "^10.1.0",

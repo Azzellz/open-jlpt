@@ -46,6 +46,7 @@ export async function chatWithLLM(
         onChunk?: (chunk: string) => void
     },
 ) {
+    const _mark = 'e7d974c7436c9a369b93fe49e405364b9bd3060a'
     const { messages, onChunk, onContent, onReasoning } = params
     const response = await API_INSTANCE.post(
         `/users/{{user.id}}/llms/${llmID}/chat`,
@@ -70,7 +71,10 @@ export async function chatWithLLM(
         onChunk?.(chunk)
 
         // 判断是推理阶段还是内容阶段，通过比较 chunk 是否等于特殊哈希字符串
-        if (chunk === 'e7d974c7436c9a369b93fe49e405364b9bd3060a') {
+        if (chunk.startsWith(_mark)) {
+            const tail = chunk.split(_mark)[1]
+            tail && onContent?.(tail)
+
             isContentStage = true
             continue
         }
