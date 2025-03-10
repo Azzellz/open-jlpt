@@ -1,22 +1,87 @@
 import API from '@/api'
-import { isSuccessResponse } from '@root/shared'
-import { ref } from 'vue'
+import { createErrorResponse, createSuccessResponse, isSuccessResponse } from '@root/shared'
+import { ref, computed, watch, onUnmounted } from 'vue'
 
-export function useEdgeTTS(text: string, voice: 'female' | 'male', immediate: boolean = true) {
+interface Params {
+    text?: string
+    voice?: 'ja-JP-KeitaNeural' | 'ja-JP-NanamiNeural'
+    immediate?: boolean
+}
+export function useEdgeTTS(params?: Params) {
     const url = ref('')
-    const loading = ref(false)
+    const isLoading = ref(false)
     const isError = ref(false)
-    async function generate(newText: string = text, newVoice?: 'female' | 'male') {
+    const isSpeaking = ref(false)
+    const audio = computed(() => {
+        return url.value ? new Audio(url.value) : null
+    })
+    const progress = ref(0)
+    async function generate(
+        text: string = params?.text ||
+            '日本語能力試験を学習するためのAI主導のプラットフォームで、日本語能力試験の全問題形式とパーソナライズされた学習コンテンツをサポートします。',
+        voice: Params['voice'] = params?.voice || 'ja-JP-NanamiNeural',
+    ) {
+        // 生成前先释放之前的 ObjectURL
+        free()
+        isLoading.value = true
         const result = await API.TTS.createTTS({
-            text: newText,
-            voice: (newVoice || voice) === 'male' ? 'ja-JP-KeitaNeural' : 'ja-JP-NanamiNeural',
+            text,
+            voice,
         })
+        isLoading.value = false
         if (isSuccessResponse(result)) {
+            isError.value = false
             url.value = URL.createObjectURL(result.data)
+            return createSuccessResponse(200, 'OK', url.value)
+        } else {
+            isError.value = true
+            return createErrorResponse(400, '生成失败')
+        }
+    }
+    function toggle() {
+        if (!audio.value) {
+            return
+        }
+        if (audio.value.paused) {
+            isSpeaking.value = true
+            audio.value.play()
+        } else {
+            isSpeaking.value = false
+            audio.value.pause()
+        }
+    }
+    function replay() {
+        if (audio.value) {
+            audio.value.src = ''
+            setTimeout(() => {
+                if (audio.value && url.value) {
+                    audio.value.src = url.value
+                    audio.value.play()
+                }
+            }, 1000)
         }
     }
 
-    immediate && generate()
+    function free() {
+        if (audio.value) {
+            audio.value.src = ''
+            URL.revokeObjectURL(url.value)
+        }
+    }
+    onUnmounted(free)
 
-    return { url, isError, loading, generate }
+    // 监听进度
+    function _updateProgress() {
+        progress.value = Math.floor((audio.value!.currentTime / audio.value!.duration) * 100)
+    }
+    watch(audio, () => {
+        audio.value?.addEventListener('timeupdate', _updateProgress)
+    })
+    onUnmounted(() => {
+        audio.value?.removeEventListener('timeupdate', _updateProgress)
+    })
+
+    params?.immediate && generate()
+
+    return { url, isError, isLoading, generate, free, audio, isSpeaking, toggle, replay, progress }
 }

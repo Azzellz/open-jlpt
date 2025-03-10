@@ -381,8 +381,8 @@ async function createHistory(read: JLPT_ReadOrigin = jlpt_read.value! as any) {
 
 onMounted(async () => {
     // 测试用
-    // jlpt_read.value = JSON.parse(__testReadString)
-    // jsonString.value = __testReadString.toString()
+    jlpt_read.value = JSON.parse(__testReadString)
+    jsonString.value = __testReadString.toString()
     // createHistory()
 })
 
