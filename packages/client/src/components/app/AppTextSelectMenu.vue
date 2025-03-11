@@ -1,7 +1,8 @@
 <template>
-    <div class="max-h-40 max-w-100 flex-y gap-2">
+    <!-- <ResizableBox class="max-h-40 max-w-100 flex-y gap-2"> -->
+    <div class="flex-y gap-2 max-h-40 max-w-100 flex-y gap-2">
         <!-- 交互栏 -->
-        <div class="flex-x items-center px-2 pb-1 pt-2">
+        <div class="flex-x items-center p-2">
             <!-- TTS -->
             <n-button text>
                 <n-icon size="22" :component="CopyIcon" />
@@ -64,6 +65,7 @@
             :show-indicator="false"
         />
     </div>
+    <!-- </ResizableBox> -->
 </template>
 
 <script setup lang="ts">
@@ -79,11 +81,11 @@ import {
     BookQuestionMark20Regular as AnalysisIcon,
 } from '@vicons/fluent'
 import { GTranslateOutlined as TranslateIcon } from '@vicons/material'
-
 import { computed, ref } from 'vue'
 import { useLLM } from '@/composables/llm'
 import { useI18n } from 'vue-i18n'
 import { marked } from 'marked'
+import ResizableBox from '../tools/ResizableBox.vue'
 
 const props = defineProps<{
     selectedText: string
@@ -119,7 +121,7 @@ async function handleGenerateTTS() {
 
 //#region LLM服务
 
-const llmID = ref()
+const llmID = ref(userStore.user?.config.llm.default || '')
 const llmOptions = computed(() => {
     return userStore.user!.config.llm.items.map((llm) => {
         return {

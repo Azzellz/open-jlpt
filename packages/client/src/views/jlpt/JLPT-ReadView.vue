@@ -111,7 +111,7 @@ const message = useMessage()
 //#region 阅读相关
 
 const wordCount = ref()
-const currentLLMID = ref('')
+const currentLLMID = ref(userStore.user!.config.llm.default)
 const currentLLM = computed(() => {
     return userStore.user!.config.llm.items.find((llm) => llm.id === currentLLMID.value)
 })

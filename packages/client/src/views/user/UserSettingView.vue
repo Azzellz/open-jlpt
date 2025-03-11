@@ -26,29 +26,13 @@
                         </n-button>
                     </div>
                     <div v-if="config.llm.items.length" class="flex gap-5">
-                        <n-card
+                        <LLMCard
                             v-for="llm in config.llm.items"
                             class="w-auto"
-                            :title="llm.name"
-                            hoverable
-                        >
-                            <template #header-extra>
-                                <div class="flex items-center">
-                                    <n-button text @click="handleEditLLM(llm)">
-                                        <n-icon size="24" :component="CalendarEdit20RegularIcon" />
-                                    </n-button>
-                                    <n-divider vertical />
-                                    <n-button text @click="handleDeleteLLM(llm)">
-                                        <n-icon size="24" :component="Delete20RegularIcon" />
-                                    </n-button>
-                                </div>
-                            </template>
-                            <div class="flex flex-col gap-1 text-gray">
-                                <div>ApiKey: {{ llm.apiKey }}</div>
-                                <div>BaseURL: {{ llm.baseURL }}</div>
-                                <div>ModelID: {{ llm.modelID }}</div>
-                            </div>
-                        </n-card>
+                            :llm="llm"
+                            @edit="handleEditLLM"
+                            @delete="handleDeleteLLM"
+                        />
                     </div>
 
                     <!-- 模型添加 模态框表单 -->
@@ -81,11 +65,18 @@
                         </n-card>
                     </n-modal>
                 </div>
-                <!-- 默认模型配置 -->
-                <div class="flex flex-col gap-1 w-75">
-                    <span class="text-gray">默认模型</span>
-                    <n-select v-model:value="defaultLLMID" :options="defaultLLMOptions" />
-                </div>
+                <!-- 有模型才展示更多选项 -->
+                <template v-if="config.llm.items.length">
+                    <!-- 默认模型配置 -->
+                    <div class="flex flex-col gap-1 w-75">
+                        <span class="text-gray">默认模型</span>
+                        <n-select
+                            v-model:value="defaultLLMID"
+                            :options="defaultLLMOptions"
+                            @update:value="handleEditDefaultLLM"
+                        />
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -96,12 +87,8 @@ import AiIcon from '@/components/icon/AiIcon.vue'
 import SettingIcon from '@/components/icon/SettingIcon.vue'
 import { useUserStore } from '@/stores/user'
 import { Close as CloseIcon } from '@vicons/ionicons5'
-import {
-    CalendarEdit20Regular as CalendarEdit20RegularIcon,
-    Delete20Regular as Delete20RegularIcon,
-    AppsAddIn20Regular as AppsAddIn20RegularIcon,
-} from '@vicons/fluent'
-import { NDivider, NSelect, NCard, NModal, NButton, NIcon, useMessage } from 'naive-ui'
+import { AppsAddIn20Regular as AppsAddIn20RegularIcon } from '@vicons/fluent'
+import { NDivider, NSelect, NCard, NModal, NButton, NIcon, useMessage, useDialog } from 'naive-ui'
 import { computed, ref } from 'vue'
 import LLMForm from '@/components/llm/LLM-Form.vue'
 import type { LLM_Config } from '@root/models'
@@ -109,9 +96,11 @@ import API from '@/api'
 import { nanoid } from 'nanoid'
 import { isSuccessResponse } from '@root/shared'
 import { mapEntries } from 'radash'
+import LLMCard from '@/components/llm/LLM-Card.vue'
 
 const userStore = useUserStore()
 const message = useMessage()
+const dialog = useDialog()
 const config = computed(() => {
     return userStore.user!.config
 })
@@ -126,20 +115,34 @@ function handleEditLLM(llm: LLM_Config) {
     currentEditingLLM.value = llm
 }
 async function handleDeleteLLM(llm: LLM_Config) {
-    currentEditingLLM.value = null
-    const result = await API.User.updateUser({
-        config: {
-            llm: {
-                items: config.value.llm.items.filter((item) => item.id !== llm.id),
-            },
+    dialog.warning({
+        title: '警告',
+        content: '你确定要删除这个模型吗？',
+        positiveText: '确定',
+        negativeText: '取消',
+        draggable: true,
+        async onPositiveClick() {
+            currentEditingLLM.value = null
+            const result = await API.User.updateUser({
+                config: {
+                    llm: {
+                        items: config.value.llm.items.filter((item) => item.id !== llm.id),
+                        default:
+                            config.value.llm.default === llm.id ? '' : config.value.llm.default,
+                    },
+                },
+            })
+            if (isSuccessResponse(result)) {
+                message.success('删除成功')
+                userStore.user!.config = result.data.config
+                if (defaultLLMID.value === llm.id) {
+                    defaultLLMID.value = void 0
+                }
+            } else {
+                message.error('删除失败')
+            }
         },
     })
-    if (isSuccessResponse(result)) {
-        message.success('删除成功')
-        userStore.user!.config.llm.items = result.data.config.llm.items
-    } else {
-        message.error('删除失败')
-    }
 }
 async function handleSubmitLLMEditForm(model: Omit<LLM_Config, 'id'>, complete: () => void) {
     const llm = config.value.llm.items.find((llm) => llm.id === currentEditingLLM.value?.id)!
@@ -173,6 +176,7 @@ async function handleSubmitLLMAddForm(model: Omit<LLM_Config, 'id'>, complete: (
         config: {
             llm: {
                 items: [...config.value.llm.items, newLLM],
+                default: config.value.llm.default,
             },
         },
     })
@@ -186,7 +190,7 @@ async function handleSubmitLLMAddForm(model: Omit<LLM_Config, 'id'>, complete: (
     }
 }
 
-const defaultLLMID = ref()
+const defaultLLMID = ref(config.value.llm.default || void 0)
 const defaultLLMOptions = computed(() => {
     return userStore.user!.config.llm.items.map((llm) => {
         return {
@@ -195,6 +199,26 @@ const defaultLLMOptions = computed(() => {
         }
     })
 })
+async function handleEditDefaultLLM(llmID: string) {
+    if (llmID === config.value.llm.default) {
+        return
+    }
+    const result = await API.User.updateUser({
+        config: {
+            llm: {
+                items: config.value.llm.items,
+                default: llmID,
+            },
+        },
+    })
+    if (isSuccessResponse(result)) {
+        message.success('更新成功')
+        config.value.llm.default = llmID
+    } else {
+        message.error('更新失败')
+        console.error(result)
+    }
+}
 
 //#endregion
 </script>

@@ -10,7 +10,7 @@ export interface LLM_Config {
 export interface UserConfig {
     llm: {
         items: LLM_Config[]
-        default?: string
+        default: string
     }
 }
 

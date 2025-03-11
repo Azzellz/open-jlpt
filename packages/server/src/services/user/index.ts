@@ -141,7 +141,13 @@ VerifyUserService.put(
             return ERROR_RESPONSE.SYSTEM.INVALID_OBJECTID
         }
         try {
-            const user = await DB_UserModel.findByIdAndUpdate(id, body, { new: true })
+            const user = await DB_UserModel.findByIdAndUpdate(
+                id,
+                {
+                    $set: body,
+                },
+                { new: true }
+            )
             if (!user) {
                 return ERROR_RESPONSE.SYSTEM.NOT_FOUND
             }

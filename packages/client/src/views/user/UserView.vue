@@ -16,7 +16,7 @@
             />
         </n-layout-sider>
         <n-layout-content>
-            <main class="flex-y gap-10 p-10">
+            <main class="flex-y gap-10 p-10 lg:px-35">
                 <router-view />
             </main>
         </n-layout-content>
@@ -31,7 +31,6 @@ import {
     Settings20Regular as Settings20RegularIcon,
 } from '@vicons/fluent'
 import { User as UserIcon } from '@vicons/carbon'
-import type { MenuOption } from 'naive-ui'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
