@@ -65,12 +65,12 @@
                             v-for="(option, optionIndex) in question.options"
                         >
                             <n-radio
-                                :checked="selects[questionIndex] === optionIndex + 1"
+                                :checked="answers[questionIndex] === optionIndex + 1"
                                 :value="optionIndex + 1"
                                 :disabled="isSubmitted"
                                 @change="
                                     () => {
-                                        selects[questionIndex] = optionIndex + 1
+                                        answers[questionIndex] = optionIndex + 1
                                         answerCount++
                                     }
                                 "
@@ -101,8 +101,8 @@
 </template>
 
 <script setup lang="ts">
-import type { JLPT_ReadOrigin } from '@root/models'
-import { NCard, NDivider, NRadio, NTag, NButton} from 'naive-ui'
+import type { JLPT_ReadOrigin, UserHistoryCreateParams } from '@root/models'
+import { NCard, NDivider, NRadio, NTag, NButton } from 'naive-ui'
 import { computed, ref } from 'vue'
 import JLPT_ReadVocabCard from './JLPT-ReadVocabCard.vue'
 import ErrorIcon from '@/components/icon/ErrorIcon.vue'
@@ -113,8 +113,11 @@ import AppTextSelectMenu from '@/components/app/AppTextSelectMenu.vue'
 const { read } = defineProps<{
     read: Partial<JLPT_ReadOrigin>
 }>()
+const emits = defineEmits<{
+    submit: [params: UserHistoryCreateParams]
+}>()
 
-const selects = ref<number[]>([])
+const answers = ref<number[]>([])
 // 记录已经回答的题数
 const answerCount = ref(0)
 const isAllowSubmit = computed(() => {
@@ -124,10 +127,13 @@ const isAllowSubmit = computed(() => {
 const isSubmitted = ref(false)
 async function handleSubmitAnswers() {
     isSubmitted.value = true
+    // emits('submit', {
+    //     // ref:
+    // })
 }
 async function handleReAnswer() {
     isSubmitted.value = false
-    selects.value = []
+    answers.value = []
     answerCount.value = 0
 }
 

@@ -1,5 +1,5 @@
 import { UserConfig } from '@root/models'
-import { Schema, model } from 'mongoose'
+import { Schema } from 'mongoose'
 
 const DB_LLM_Schema = new Schema<UserConfig['llm']>(
     {
@@ -44,5 +44,3 @@ export const DB_UserConfigSchema = new Schema<UserConfig>(
         versionKey: false,
     }
 )
-
-export const DB_ConfigModel = model('config', DB_UserConfigSchema, 'config')

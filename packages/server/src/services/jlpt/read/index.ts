@@ -1,5 +1,6 @@
 import { DB_JLPT_ReadModel } from '@/db'
-import { checkObjectIdPlugin, verifyPluginReference } from '@/plugins'
+import { JLPT_Model } from '@/models'
+import { verifyPluginReference } from '@/plugins'
 import { createSuccessResponse, ERROR_RESPONSE, Log } from '@root/shared'
 import Elysia, { t } from 'elysia'
 import { isValidObjectId } from 'mongoose'
@@ -8,7 +9,7 @@ export const JLPT_ReadService = new Elysia({
     prefix: '/reads',
 })
     .use(verifyPluginReference)
-    .use(checkObjectIdPlugin('readID'))
+    .use(JLPT_Model)
 
 //#region 查询
 
@@ -18,6 +19,7 @@ JLPT_ReadService.get(
     async ({ query }) => {
         const filter: Record<string, any> = {
             $or: [],
+            visible: true, // 这里根据是否是管理员来获取可见或者不可见
         }
         Object.entries(query || {}).forEach(([key, value]) => {
             if (key === 'id' && isValidObjectId(value)) {
@@ -77,7 +79,7 @@ JLPT_ReadService.get(
 JLPT_ReadService.get('/:readID', async ({ params: { readID } }) => {
     try {
         const read = await DB_JLPT_ReadModel.findById(readID)
-        if (!read) {
+        if (!read || !read.visible) {
             return ERROR_RESPONSE.SYSTEM.NOT_FOUND
         } else {
             return createSuccessResponse(200, '查询成功', read.toJSON())
@@ -106,6 +108,7 @@ JLPT_ReadService.post(
                 star: 0,
                 user: id,
                 timeStamp: Date.now(),
+                visible: false,
             })
 
             return createSuccessResponse(200, '创建成功', newRead.toJSON())
@@ -115,38 +118,7 @@ JLPT_ReadService.post(
         }
     },
     {
-        body: t.Object({
-            difficulty: t.Union([
-                t.Literal('N1'),
-                t.Literal('N2'),
-                t.Literal('N3'),
-                t.Literal('N4'),
-                t.Literal('N5'),
-            ]),
-            article: t.Object({
-                title: t.String(),
-                contents: t.Array(t.String()),
-            }),
-            vocabList: t.Array(
-                t.Object({
-                    word: t.String(),
-                    definition: t.String(),
-                })
-            ),
-            structure: t.Object({
-                paragraphFocus: t.Array(t.String()),
-            }),
-            questions: t.Array(
-                t.Object({
-                    number: t.Number(),
-                    answer: t.Number(),
-                    type: t.String(),
-                    question: t.String(),
-                    options: t.Array(t.String()),
-                    analysis: t.String(),
-                })
-            ),
-        }),
+        body: 'reads.create.body',
     }
 )
 
@@ -176,6 +148,41 @@ JLPT_ReadService.delete(
             Log.error(error)
             return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR
         }
+    }
+)
+
+//#endregion
+
+//#region 更新
+
+JLPT_ReadService.patch(
+    '/:readID/visible',
+    async ({
+        params: { readID },
+        store: {
+            user: { id: userID },
+        },
+        body,
+    }) => {
+        try {
+            const targetRead = await DB_JLPT_ReadModel.findById(readID)
+            if (!targetRead) {
+                return ERROR_RESPONSE.SYSTEM.NOT_FOUND
+            }
+            if (targetRead.user.id !== userID) {
+                return ERROR_RESPONSE.SYSTEM.NOT_PERMISSIONS
+            }
+            const result = await targetRead.updateOne(body)
+            return createSuccessResponse(200, '更新成功', null)
+        } catch (error) {
+            Log.error(error)
+            return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR
+        }
+    },
+    {
+        body: t.Object({
+            visible: t.Boolean(),
+        }),
     }
 )
 

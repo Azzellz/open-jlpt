@@ -61,4 +61,6 @@ const JLPT_Read = t.Composite([
 ])
 
 // 创建参数类型
-export const JLPT_ReadCreateParamsBody = t.Omit(JLPT_Read, ['id', 'timeStamp', 'user', 'star'])
+export const JLPT_ModelReadCreateBody = t.Omit(JLPT_Read, ['id', 'timeStamp', 'user', 'star'])
+
+// export const JLPT_ModelReadUpdateBody = t.Object({})

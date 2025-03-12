@@ -1,7 +1,8 @@
 import { DB_UserModel } from '@/db'
+import { UserModel } from '@/models/user'
 import { verifyPluginReference } from '@/plugins'
 import { ERROR_RESPONSE, Log } from '@root/shared'
-import Elysia, { t } from 'elysia'
+import Elysia from 'elysia'
 import { isValidObjectId } from 'mongoose'
 import OpenAI from 'openai'
 
@@ -39,7 +40,9 @@ async function streamChat({
 
 export const UserLLMService = new Elysia({
     prefix: '/:userID/llms/:llmID',
-}).use(verifyPluginReference)
+})
+    .use(verifyPluginReference)
+    .use(UserModel)
 
 UserLLMService.post(
     '/chat',
@@ -86,14 +89,6 @@ UserLLMService.post(
         }
     },
     {
-        body: t.Object({
-            isStream: t.Boolean(),
-            messages: t.Array(
-                t.Object({
-                    role: t.Union([t.Literal('user'), t.Literal('system')]),
-                    content: t.String(),
-                })
-            ),
-        }),
+        body: 'llms.chat.body',
     }
 )

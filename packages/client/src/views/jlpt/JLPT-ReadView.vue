@@ -30,7 +30,7 @@
             </n-form-item-gi>
             <n-form-item-gi :span="2">
                 <n-button
-                    v-if="!jlpt_read || isGenerating"
+                    v-if="!originRead || isGenerating"
                     type="primary"
                     @click="handleGenerateRead"
                     :loading="isGenerating"
@@ -69,8 +69,8 @@
                     <pre>{{ content }}</pre>
                 </n-card>
             </n-collapse-item>
-            <n-collapse-item v-if="jlpt_read?.article?.title" title="阅读" name="3">
-                <JLPT_ReadCard :read="jlpt_read" />
+            <n-collapse-item v-if="originRead?.article?.title" title="阅读" name="3">
+                <JLPT_ReadCard :read="originRead" />
             </n-collapse-item>
         </n-collapse>
     </main>
@@ -78,9 +78,9 @@
 
 <script setup lang="ts">
 import API from '@/api'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onDeactivated, onMounted, onUnmounted, ref } from 'vue'
 import { createJsonBrook } from 'json-brook'
-import type { JLPT_ReadOrigin } from '@root/models'
+import type { JLPT_Read, JLPT_ReadOrigin, UserHistoryCreateParams } from '@root/models'
 import {
     NCard,
     NButton,
@@ -100,8 +100,8 @@ import {
 import JLPT_ReadCard from '@/components/jlpt/read/JLPT-ReadCard.vue'
 import { useUserStore } from '@/stores/user'
 import { Json as JsonIcon } from '@vicons/carbon'
-import { isSuccessResponse } from '@root/shared'
 import { useLLM } from '@/composables/llm'
+import { isSuccessResponse } from '@root/shared'
 
 const userStore = useUserStore()
 const message = useMessage()
@@ -320,10 +320,11 @@ const reasoningCardTitle = computed(() => {
         return '思考过程'
     }
 })
-const jlpt_read = ref<Partial<JLPT_ReadOrigin> | null>(null)
+const originRead = ref<Partial<JLPT_ReadOrigin> | null>(null)
+const read = ref<JLPT_Read | null>(null)
 async function handleGenerateRead() {
     // 重置状态
-    jlpt_read.value = null
+    originRead.value = null
     const jsonBrook = createJsonBrook()
     await generate(
         currentLLMID.value,
@@ -346,25 +347,40 @@ async function handleGenerateRead() {
                 } else {
                     content.value += str
                     jsonBrook.write(str)
-                    jlpt_read.value = jsonBrook.getCurrent()
+                    originRead.value = jsonBrook.getCurrent()
                 }
             },
         },
     )
     jsonBrook.end()
-    message.success('生成完毕')
-    createHistory()
+    await createRead()
 }
 
-// 推送历史记录
-async function createHistory(read: JLPT_ReadOrigin = jlpt_read.value! as any) {
-    const result = await API.User.createHistory('reads', read)
+async function createRead() {
+    const result = await API.JLPT.Read.createRead(originRead.value as any)
     if (isSuccessResponse(result)) {
-        message.success('已保存到历史记录')
+        message.success('生成完毕')
+        read.value = result.data
     } else {
-        message.error('保存到历史记录失败')
+        console.error(result)
     }
 }
+
+async function handlePublishRead() {
+    if (!read.value) return
+
+    // 发布阅读就是把 visible 设置为 true
+    const result = await API.JLPT.Read.updateReadVisible(read.value.id, true)
+    if (isSuccessResponse(result)) {
+        message.success('发布成功')
+    } else {
+        message.error('发布失败')
+        console.error(result)
+    }
+}
+
+// 提交作答（推送至历史记录）
+async function handleSubmitToHistories(params: UserHistoryCreateParams) {}
 
 //#endregion
 
@@ -372,9 +388,8 @@ async function createHistory(read: JLPT_ReadOrigin = jlpt_read.value! as any) {
 
 onMounted(async () => {
     // 测试用
-    jlpt_read.value = JSON.parse(__testReadString)
+    originRead.value = JSON.parse(__testReadString)
     content.value = __testReadString.toString()
-    // createHistory()
 })
 
 //#endregion

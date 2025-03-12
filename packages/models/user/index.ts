@@ -1,4 +1,5 @@
-import type { JLPT_PracticeMap, JLPT_Read, JLPT_ReadOrigin } from '../jlpt'
+import type { JLPT_PracticeMap } from '../jlpt'
+import type { UserHistory } from './history'
 export interface LLM_Config {
     id: string
     name: string
@@ -20,9 +21,7 @@ export interface User {
     avatar: string
     account: string
     password: string
-    histories: {
-        reads: Omit<JLPT_Read, 'id' | 'user' | 'star'>[]
-    }
+    histories: UserHistory
     favorites: JLPT_PracticeMap
     publishes: JLPT_PracticeMap
     config: UserConfig
@@ -33,3 +32,5 @@ export interface UserInfo extends Pick<User, 'id' | 'account' | 'name' | 'avatar
 export interface UserCreateParams extends Pick<User, 'account' | 'name' | 'password'> {}
 export interface UserQueryParams extends Pick<User, 'account' | 'name' | 'id'> {}
 export interface UserUpdateParams extends Pick<User, 'name' | 'avatar' | 'config'> {}
+
+export * from './history'

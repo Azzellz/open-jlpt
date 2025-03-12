@@ -4,6 +4,7 @@ import { DB_JLPT_ReadBaseSchema } from '../common/jlpt'
 
 interface JLPT_ReadDocument extends Omit<JLPT_Read, 'id' | 'user'>, Document {
     user: JLPT_Read['user']
+    visible: boolean
 }
 
 export const DB_JLPT_ReadSchema = new Schema<JLPT_ReadDocument>(
@@ -12,6 +13,10 @@ export const DB_JLPT_ReadSchema = new Schema<JLPT_ReadDocument>(
         user: {
             type: Schema.Types.ObjectId,
             ref: 'user',
+        },
+        visible: {
+            type: Boolean,
+            required: true,
         },
         ...DB_JLPT_ReadBaseSchema.obj,
     },

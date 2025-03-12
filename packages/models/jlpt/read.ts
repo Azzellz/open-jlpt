@@ -32,6 +32,8 @@ export interface JLPT_ReadOrigin {
     questions: JLPT_ReadQuestion[] // 问题
 }
 
-export interface JLPT_Read extends JLPT_ReadOrigin, JLPT_PracticeBase {}
+export interface JLPT_Read extends JLPT_ReadOrigin, JLPT_PracticeBase {
+    visible: boolean
+}
 
 export interface JLPT_ReadCreateParams extends JLPT_ReadOrigin {}
