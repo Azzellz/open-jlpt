@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/home/HomeView.vue'
-import UserView from '@/views/user/UserView.vue'
-import UserProfileView from '@/views/user/UserProfileView.vue'
+import HomeView from '@/views/home/HomeView'
+import UserView from '@/views/user/UserView'
+import UserProfileView from '@/views/user/UserProfileView'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,29 +18,29 @@ const router = createRouter({
             redirect: '/user/profile',
             children: [
                 { path: 'profile', component: UserProfileView },
-                { path: 'setting', component: () => import('@/views/user/UserSettingView.vue') },
-                { path: 'history', component: () => import('@/views/user/UserHistoryView.vue') },
+                { path: 'setting', component: () => import('@/views/user/UserSettingView') },
+                { path: 'history', component: () => import('@/views/user/UserHistoryView') },
             ],
         },
         {
             path: '/jlpt/text',
-            component: () => import('@/views/jlpt/JLPT-TextView.vue'),
+            component: () => import('@/views/jlpt/JLPT-TextView'),
         },
         {
             path: '/jlpt/vocabulary',
-            component: () => import('@/views/jlpt/JLPT-VocabularyView.vue'),
+            component: () => import('@/views/jlpt/JLPT-VocabularyView'),
         },
         {
             path: '/jlpt/grammar',
-            component: () => import('@/views/jlpt/JLPT-GrammarView.vue'),
+            component: () => import('@/views/jlpt/JLPT-GrammarView'),
         },
         {
             path: '/jlpt/read',
-            component: () => import('@/views/jlpt/JLPT-ReadView.vue'),
+            component: () => import('@/views/jlpt/JLPT-ReadView'),
         },
         {
             path: '/jlpt/hearing',
-            component: () => import('@/views/jlpt/JLPT-HearingView.vue'),
+            component: () => import('@/views/jlpt/JLPT-HearingView'),
         },
     ],
 })

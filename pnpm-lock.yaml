@@ -124,6 +124,9 @@ importers:
       vite:
         specifier: ^6.0.11
         version: 6.1.1(@types/node@22.13.5)(jiti@2.4.2)
+      vite-plugin-tsx-resolve-types:
+        specifier: ^0.0.4
+        version: 0.0.4(typescript@5.7.3)(vite@6.1.1(@types/node@22.13.5)(jiti@2.4.2))
       vite-plugin-vue-devtools:
         specifier: ^7.7.1
         version: 7.7.2(rollup@4.34.8)(vite@6.1.1(@types/node@22.13.5)(jiti@2.4.2))(vue@3.5.13(typescript@5.7.3))
@@ -168,7 +171,7 @@ importers:
     devDependencies:
       bun-types:
         specifier: latest
-        version: 1.2.4
+        version: 1.2.5
 
   packages/shared: {}
 
@@ -1241,8 +1244,8 @@ packages:
     resolution: {integrity: sha512-MTxGsqgYTwfshYWTRdmZRC+M7FnG1b4y7RO7p2k3X24Wq0yv1m77Wsj0BzlPzd/IowgESfsruQCUToa7vbOpPQ==}
     engines: {node: '>=16.20.1'}
 
-  bun-types@1.2.4:
-    resolution: {integrity: sha512-nDPymR207ZZEoWD4AavvEaa/KZe/qlrbMSchqpQwovPZCKc7pwMoENjEtHgMKaAjJhy+x6vfqSBA1QU3bJgs0Q==}
+  bun-types@1.2.5:
+    resolution: {integrity: sha512-3oO6LVGGRRKI4kHINx5PIdIgnLRb7l/SprhzqXapmoYkFl5m4j6EvALvbDVuuBFaamB46Ap6HCUxIXNLCGy+tg==}
 
   bundle-name@4.1.0:
     resolution: {integrity: sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q==}
@@ -2429,6 +2432,12 @@ packages:
     peerDependenciesMeta:
       '@nuxt/kit':
         optional: true
+
+  vite-plugin-tsx-resolve-types@0.0.4:
+    resolution: {integrity: sha512-HKtQ8B7dgZHrsYM3wAjAoicgfmqFSnwmijuRe9rJkoFiGXC8ko5d4gMetV4dyTO0esf0LIvxmlLTy9JM3DCYcQ==}
+    peerDependencies:
+      typescript: '>=5'
+      vite: '>=4'
 
   vite-plugin-vue-devtools@7.7.2:
     resolution: {integrity: sha512-5V0UijQWiSBj32blkyPEqIbzc6HO9c1bwnBhx+ay2dzU0FakH+qMdNUT8nF9BvDE+i6I1U8CqCuJiO20vKEdQw==}
@@ -3741,7 +3750,7 @@ snapshots:
 
   bson@6.10.3: {}
 
-  bun-types@1.2.4:
+  bun-types@1.2.5:
     dependencies:
       '@types/node': 22.13.5
       '@types/ws': 8.5.14
@@ -4881,6 +4890,18 @@ snapshots:
       vite: 6.1.1(@types/node@22.13.5)(jiti@2.4.2)
     transitivePeerDependencies:
       - rollup
+      - supports-color
+
+  vite-plugin-tsx-resolve-types@0.0.4(typescript@5.7.3)(vite@6.1.1(@types/node@22.13.5)(jiti@2.4.2)):
+    dependencies:
+      '@babel/generator': 7.26.9
+      '@babel/parser': 7.26.9
+      '@babel/traverse': 7.26.9
+      '@babel/types': 7.26.9
+      '@vue/compiler-sfc': 3.5.13
+      typescript: 5.7.3
+      vite: 6.1.1(@types/node@22.13.5)(jiti@2.4.2)
+    transitivePeerDependencies:
       - supports-color
 
   vite-plugin-vue-devtools@7.7.2(rollup@4.34.8)(vite@6.1.1(@types/node@22.13.5)(jiti@2.4.2))(vue@3.5.13(typescript@5.7.3)):
