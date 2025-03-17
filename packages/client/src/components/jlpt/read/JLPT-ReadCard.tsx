@@ -1,4 +1,9 @@
-import type { JLPT_ReadOrigin, JLPT_ReadQuestion, UserHistoryCreateParams } from '@root/models'
+import type {
+    JLPT_Read,
+    JLPT_ReadOrigin,
+    JLPT_ReadQuestion,
+    UserHistoryCreateParams,
+} from '@root/models'
 import { NCard, NDivider, NRadio, NTag, NButton } from 'naive-ui'
 import { computed, defineComponent, ref } from 'vue'
 import JLPT_ReadVocabCard from './JLPT-ReadVocabCard'
@@ -20,22 +25,24 @@ const difficultyColorMap: Record<
 }
 
 interface Props {
-    read: Partial<JLPT_ReadOrigin>
-    onSubmit?: (params: UserHistoryCreateParams) => void
+    originRead: Partial<JLPT_ReadOrigin>
+    read: JLPT_Read | null
+    onSubmit?: (answers: UserHistoryCreateParams['answers']) => void
+    onPublish?: () => void
 }
 export default defineComponent((props: Props) => {
-
-    const answers = ref<number[]>([])
+    const answers = ref<UserHistoryCreateParams['answers']>([])
 
     // 记录已经回答的题数
     const answerCount = ref(0)
     const isAllowSubmit = computed(() => {
-        return answerCount.value === props.read.questions?.length
+        return answerCount.value === props.originRead.questions?.length
     })
 
     const isSubmitted = ref(false)
     async function handleSubmitAnswers() {
         isSubmitted.value = true
+        props.onSubmit?.(answers.value)
     }
     async function handleReAnswer() {
         isSubmitted.value = false
@@ -46,10 +53,10 @@ export default defineComponent((props: Props) => {
     //#region 动态UI
 
     const TextContainer = computed(() => {
-        if (props.read.article?.contents?.length) {
+        if (props.originRead.article?.contents?.length) {
             return (
                 <div class="flex flex-col gap-5">
-                    {props.read.article.contents.map((content) => {
+                    {props.originRead.article.contents.map((content) => {
                         return <div>{content}</div>
                     })}
                 </div>
@@ -60,14 +67,14 @@ export default defineComponent((props: Props) => {
     })
 
     const VocabListContainer = computed(() => {
-        if (props.read.vocabList?.length) {
+        if (props.originRead.vocabList?.length) {
             return (
                 <>
                     <NDivider />
                     <div class="flex flex-col gap-5">
                         <div class="text-lg">词汇表</div>
                         <div class="flex flex-wrap gap-5">
-                            {props.read.vocabList?.map((vocab) => {
+                            {props.originRead.vocabList?.map((vocab) => {
                                 return (
                                     <JLPT_ReadVocabCard
                                         class="min-w-50 max-w-75 flex-1"
@@ -111,12 +118,12 @@ export default defineComponent((props: Props) => {
         }
     }
     const QuestionsContainer = computed(() => {
-        if (props.read.questions?.length) {
+        if (props.originRead.questions?.length) {
             return (
                 <>
                     <NDivider />
                     <div class="flex flex-col gap-5">
-                        {props.read.questions.map((question, questionIndex) => {
+                        {props.originRead.questions.map((question, questionIndex) => {
                             return (
                                 <div class="flex flex-col gap-5">
                                     {/* 题干 */}
@@ -153,10 +160,13 @@ export default defineComponent((props: Props) => {
         <NCard
             title={() => (
                 <div class="flex gap-3 items-center">
-                    <NTag size="small" type={difficultyColorMap[props.read.difficulty || 'N5']}>
-                        {props.read.difficulty}
+                    <NTag
+                        size="small"
+                        type={difficultyColorMap[props.originRead.difficulty || 'N5']}
+                    >
+                        {props.originRead.difficulty}
                     </NTag>
-                    <span>{props.read.article?.title}</span>
+                    <span>{props.originRead.article?.title}</span>
                 </div>
             )}
             headerExtra={() => (
@@ -170,6 +180,15 @@ export default defineComponent((props: Props) => {
                         <span class="font-bold">
                             {isAllowSubmit.value ? '提交答案' : '请完成所有问题'}
                         </span>
+                    </NButton>
+
+                    <NButton
+                        disabled={!props.read || props.read.visible}
+                        ghost
+                        type="success"
+                        onClick={() => props.onPublish?.()}
+                    >
+                        <span class="font-bold"> {props.read?.visible ? '已发布' : '发布'} </span>
                     </NButton>
 
                     {isSubmitted.value && (

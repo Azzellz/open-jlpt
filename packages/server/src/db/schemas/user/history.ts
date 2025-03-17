@@ -5,7 +5,7 @@ export const DB_UserHistorySchema = new Schema(
         reads: [
             {
                 id: { type: String, required: true },
-                answer: [{ type: Number }],
+                answers: [{ type: Number }],
                 timeStamp: { type: Number, required: true },
                 ref: {
                     type: Schema.Types.ObjectId,

@@ -42,7 +42,10 @@ export function isStandardResponse<T = any, U = any>(
         return false
     }
 
-    if ((response as any)['code'] && ((response as any)['error'] || (response as any)['data'])) {
+    if (
+        ((response as any)['code'] !== void 0 && (response as any)['error'] !== void 0) ||
+        (response as any)['data'] !== void 0
+    ) {
         return true
     } else {
         return false

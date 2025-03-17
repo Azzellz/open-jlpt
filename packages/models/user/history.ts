@@ -7,7 +7,7 @@ export interface UserHistory {
 
 export interface UserHistoryItem {
     id: string
-    answer: number[]
+    answers: number[]
     timeStamp: number
     /**
      * 引用的阅读ID
@@ -15,4 +15,4 @@ export interface UserHistoryItem {
     ref: string
 }
 
-export interface UserHistoryCreateParams extends Pick<UserHistoryItem, 'answer' | 'ref'> {}
+export interface UserHistoryCreateParams extends Pick<UserHistoryItem, 'answers' | 'ref'> {}

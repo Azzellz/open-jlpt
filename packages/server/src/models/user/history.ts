@@ -1,12 +1,12 @@
 import { t } from 'elysia'
 
 export const UserHistoryCreateBody = t.Object({
-    answer: t.Array(t.Number()),
+    answers: t.Array(t.Number()),
     ref: t.String(),
 })
 
 export const UserHistoryCreateParams = t.Object({
-    userID: t.Numeric(),
+    userID: t.String(),
     type: t.Union([t.Literal('reads')]),
 })
 

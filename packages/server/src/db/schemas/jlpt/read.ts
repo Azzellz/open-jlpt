@@ -41,7 +41,7 @@ export const DB_JLPT_ReadSchema = new Schema<JLPT_ReadDocument>(
 DB_JLPT_ReadSchema.pre<JLPT_ReadDocument>(/^find|save/, function (next) {
     this.populate({
         path: 'user',
-        select: 'name avatar account -_id',
+        select: 'name avatar account _id',
     })
     next()
 })
