@@ -74,7 +74,6 @@ export default defineComponent({
         // 分享功能
         const shareText = () => {
             // 实现分享逻辑
-            console.log('Sharing:', selectedText.value)
             showMenu.value = false
         }
 
