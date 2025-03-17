@@ -61,7 +61,7 @@ export default defineComponent({
 
         const { generate, content } = useLLM()
         const { locale } = useI18n()
-        const markdownContent = computed(() => marked.parse(content.value))
+        const markdownContent = computed(() => marked.parse(content.value) as string)
         const markdownContentContainerClass = ref('')
         const isTranslating = ref(false)
         const isAnalysising = ref(false)
@@ -82,7 +82,7 @@ export default defineComponent({
             isTranslating.value = false
         }
         async function handleAnalysis() {
-            markdownContentContainerClass.value = 'pl-7 pr-3'
+            markdownContentContainerClass.value = ' pl-7 pr-3 '
             isAnalysising.value = true
             await generate(llmID.value, [
                 {
@@ -165,8 +165,10 @@ export default defineComponent({
                     <>
                         <NDivider style="margin-top: 0; margin-bottom: 0" />
                         <div
-                            class={markdownContentContainerClass + 'pb-2 flex-1 overflow-auto'}
-                            v-html="markdownContent"
+                            class={
+                                markdownContentContainerClass.value + ' pb-2 flex-1 overflow-auto'
+                            }
+                            innerHTML={markdownContent.value}
                         />
                     </>
                 )}
