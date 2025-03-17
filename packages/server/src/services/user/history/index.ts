@@ -1,7 +1,8 @@
-import { DB_UserModel } from '@/db'
+import { DB_JLPT_ModelMap, DB_UserModel } from '@/db'
+import { CommonModel } from '@/models/common'
 import { UserModel } from '@/models/user'
 import { verifyPluginReference } from '@/plugins'
-import { checkObjectIdPlugin } from '@/plugins/other'
+import { checkUserAvailablePlugin } from '@/plugins/user'
 import type { UserHistoryItem } from '@root/models'
 import { createSuccessResponse, ERROR_RESPONSE, Log } from '@root/shared'
 import Elysia from 'elysia'
@@ -9,17 +10,15 @@ import { nanoid } from 'nanoid'
 
 export const UserHistoryService = new Elysia({ prefix: '/:userID/histories/:type' })
     .use(UserModel)
+    .use(CommonModel)
     .use(verifyPluginReference)
-    .use(checkObjectIdPlugin('userID'))
+    .use(checkUserAvailablePlugin())
 
+// 创建历史记录
 UserHistoryService.post(
     '/',
-    async ({ params: { userID, type }, body }) => {
+    async ({ params: { type }, body, store: { user } }) => {
         try {
-            const user = await DB_UserModel.findById(userID)
-            if (!user) {
-                return ERROR_RESPONSE.USER.NOT_FOUND
-            }
             const newHistory: UserHistoryItem = {
                 ...body,
                 id: nanoid(),
@@ -39,16 +38,44 @@ UserHistoryService.post(
     }
 )
 
+// 获取历史记录 (数组)
+UserHistoryService.get(
+    '/',
+    async ({ params: { type }, store: { user }, query: { page, pageSize } }) => {
+        try {
+            const historyRefs = user.histories[type].map((i) => i.ref)
+            const historyRecords = user.histories[type]
+            const histories = await DB_JLPT_ModelMap[type]
+                .find({
+                    _id: { $in: historyRefs },
+                })
+                .skip((page - 1) * pageSize)
+                .limit(0)
+
+            return createSuccessResponse(200, '获取成功', {
+                items: histories.map((h) => h.toJSON()),
+                records: historyRecords,
+                page,
+                pageSize,
+                total: historyRefs.length,
+            })
+        } catch (error) {
+            Log.error(error)
+            return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR
+        }
+    },
+    {
+        params: 'histories.get.params',
+        query: 'histories.get.query',
+    }
+)
+
+// 删除历史记录
 UserHistoryService.delete(
     '/:historyID',
-    async ({ params: { userID, type, historyID } }) => {
+    async ({ params: { type, historyID }, store: { user } }) => {
         try {
-            const user = await DB_UserModel.findById(userID)
-            if (!user) {
-                return ERROR_RESPONSE.USER.NOT_FOUND
-            }
             user.histories[type] = user.histories[type].filter((item) => item.id !== historyID)
-
             await user.save()
             return createSuccessResponse(200, '删除成功', null)
         } catch (error) {
