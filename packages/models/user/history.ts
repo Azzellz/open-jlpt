@@ -1,11 +1,13 @@
+import type { PaginationQueryParams } from '../common'
+
 /**
  * 用户的答题历史记录
  */
 export interface UserHistory {
-    reads: UserHistoryItem[]
+    reads: UserHistoryRecord[]
 }
 
-export interface UserHistoryItem {
+export interface UserHistoryRecord {
     id: string
     answers: number[]
     timeStamp: number
@@ -15,4 +17,6 @@ export interface UserHistoryItem {
     ref: string
 }
 
-export interface UserHistoryCreateParams extends Pick<UserHistoryItem, 'answers' | 'ref'> {}
+export interface UserHistoryCreateParams extends Pick<UserHistoryRecord, 'answers' | 'ref'> {}
+
+export interface UserHistoryQueryParams extends PaginationQueryParams {}

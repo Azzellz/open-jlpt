@@ -135,14 +135,14 @@ UserService.post(
 
 // 更新基本信息
 VerifyUserService.put(
-    '/:id',
-    async ({ params: { id }, body }) => {
-        if (!isValidObjectId(id)) {
+    '/:userID',
+    async ({ params: { userID }, body }) => {
+        if (!isValidObjectId(userID)) {
             return ERROR_RESPONSE.SYSTEM.INVALID_OBJECTID
         }
         try {
             const user = await DB_UserModel.findByIdAndUpdate(
-                id,
+                userID,
                 {
                     $set: body,
                 },

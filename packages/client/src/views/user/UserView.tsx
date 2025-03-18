@@ -1,5 +1,5 @@
 import { defineComponent } from 'vue'
-import { NMenu, NIcon, NLayoutSider, NLayout, NLayoutContent } from 'naive-ui'
+import { NMenu, NIcon, NLayoutSider, NLayout, NLayoutContent, type MenuOption } from 'naive-ui'
 import { ref, h, type Component, computed } from 'vue'
 import {
     History20Regular as History20RegularIcon,
@@ -8,21 +8,19 @@ import {
 import { User as UserIcon } from '@vicons/carbon'
 import { RouterLink, RouterView } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { BookOutline as BookIcon } from '@vicons/ionicons5'
 
-export default defineComponent(() => {
+function renderIcon(icon: Component) {
+    return () => h(NIcon, null, { default: () => h(icon) })
+}
+function renderRouterLink(to: string, label: string) {
+    return () => <RouterLink to={to}> {label} </RouterLink>
+}
+
+function UserViewMenu() {
     const { t } = useI18n()
 
-    //#region 菜单
-
-    function renderIcon(icon: Component) {
-        return () => h(NIcon, null, { default: () => h(icon) })
-    }
-    function renderRouterLink(to: string, label: string) {
-        return () => <RouterLink to={to}> {label} </RouterLink>
-    }
-
-    const activeKey = ref('profile')
-    const menuOptions = computed(() => {
+    const menuOptions = computed<MenuOption[]>(() => {
         return [
             {
                 label: renderRouterLink('/user/profile', t('user.menu.profile')),
@@ -35,14 +33,33 @@ export default defineComponent(() => {
                 icon: renderIcon(Settings20RegularIcon),
             },
             {
-                label: renderRouterLink('/user/history', t('user.menu.history')),
+                label: t('user.menu.history'),
                 key: 'history',
                 icon: renderIcon(History20RegularIcon),
+                children: [
+                    {
+                        label: renderRouterLink('/user/history/read', t('jlpt.read')),
+                        icon: renderIcon(BookIcon),
+                        key: 'read',
+                    },
+                ],
             },
         ]
     })
 
-    //#endregion
+    return (
+        <NMenu
+            class="py-2"
+            defaultValue="profile"
+            defaultExpandAll
+            collapsedWidth={64}
+            collapsedIconSize={22}
+            options={menuOptions.value}
+        />
+    )
+}
+
+export default defineComponent(() => {
     return () => (
         <NLayout hasSider={true}>
             <NLayoutSider
@@ -52,16 +69,10 @@ export default defineComponent(() => {
                 width={200}
                 showTrigger={true}
             >
-                <NMenu
-                    class="py-2"
-                    v-model:value={activeKey.value}
-                    collapsedWidth={64}
-                    collapsedIconSize={22}
-                    options={menuOptions.value}
-                />
+                <UserViewMenu />
             </NLayoutSider>
             <NLayoutContent>
-                <main class="flex-y gap-10 p-10 lg:px-35">
+                <main class="h-full flex-y gap-10 p-10 lg:px-35">
                     <RouterView />
                 </main>
             </NLayoutContent>

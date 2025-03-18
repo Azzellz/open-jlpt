@@ -11,18 +11,7 @@ import ErrorIcon from '@/components/icon/ErrorIcon'
 import SuccessIcon from '@/components/icon/SuccessIcon'
 import TextSelectMenu from '@/components/tools/TextSelectMenu'
 import AppTextSelectMenu from '@/components/app/AppTextSelectMenu'
-
-// 映射难度标签的颜色
-const difficultyColorMap: Record<
-    JLPT_ReadOrigin['difficulty'],
-    'error' | 'warning' | 'info' | 'success' | 'default' | 'primary' | undefined
-> = {
-    N1: 'error',
-    N2: 'warning',
-    N3: 'info',
-    N4: 'success',
-    N5: 'success',
-}
+import { JLPT_DifficultyTag } from '../JLPT-DiffucultyTag'
 
 interface Props {
     originRead: Partial<JLPT_ReadOrigin>
@@ -160,12 +149,7 @@ export default defineComponent((props: Props) => {
         <NCard
             title={() => (
                 <div class="flex gap-3 items-center">
-                    <NTag
-                        size="small"
-                        type={difficultyColorMap[props.originRead.difficulty || 'N5']}
-                    >
-                        {props.originRead.difficulty}
-                    </NTag>
+                    <JLPT_DifficultyTag difficulty={props.originRead.difficulty} />
                     <span>{props.originRead.article?.title}</span>
                 </div>
             )}

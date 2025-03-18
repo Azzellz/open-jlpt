@@ -1,3 +1,4 @@
+import type { JLPT_Difficulty } from './common'
 import type { JLPT_PracticeBase } from './practice'
 
 export interface JLPT_ReadVocab {
@@ -25,7 +26,7 @@ export interface JLPT_ReadStructure {
 
 // 由 LLM 生成的原始数据
 export interface JLPT_ReadOrigin {
-    difficulty: 'N1' | 'N2' | 'N3' | 'N4' | 'N5' // 难度
+    difficulty: JLPT_Difficulty // 难度
     article: JLPT_ReadArticle // 文章
     vocabList: JLPT_ReadVocab[] // 词汇表
     structure: JLPT_ReadStructure // 文章结构

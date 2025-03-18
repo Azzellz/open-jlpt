@@ -19,7 +19,16 @@ const router = createRouter({
             children: [
                 { path: 'profile', component: UserProfileView },
                 { path: 'setting', component: () => import('@/views/user/UserSettingView') },
-                { path: 'history', component: () => import('@/views/user/UserHistoryView') },
+                {
+                    path: 'history',
+                    // component: () => import('@/views/user/history/UserHistoryView'),
+                    children: [
+                        {
+                            path: 'read',
+                            component: () => import('@/views/user/history/UserHistoryReadView'),
+                        },
+                    ],
+                },
             ],
         },
         {

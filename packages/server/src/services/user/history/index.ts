@@ -1,16 +1,14 @@
-import { DB_JLPT_ModelMap, DB_UserModel } from '@/db'
-import { CommonModel } from '@/models/common'
+import { DB_JLPT_ModelMap } from '@/db'
 import { UserModel } from '@/models/user'
 import { verifyPluginReference } from '@/plugins'
 import { checkUserAvailablePlugin } from '@/plugins/user'
-import type { UserHistoryItem } from '@root/models'
+import type { UserHistoryRecord } from '@root/models'
 import { createSuccessResponse, ERROR_RESPONSE, Log } from '@root/shared'
 import Elysia from 'elysia'
 import { nanoid } from 'nanoid'
 
 export const UserHistoryService = new Elysia({ prefix: '/:userID/histories/:type' })
     .use(UserModel)
-    .use(CommonModel)
     .use(verifyPluginReference)
     .use(checkUserAvailablePlugin())
 
@@ -19,14 +17,14 @@ UserHistoryService.post(
     '/',
     async ({ params: { type }, body, store: { user } }) => {
         try {
-            const newHistory: UserHistoryItem = {
+            const newHistoryRecord: UserHistoryRecord = {
                 ...body,
                 id: nanoid(),
                 timeStamp: Date.now(),
             }
-            user.histories[type].push(newHistory)
+            user.histories[type].push(newHistoryRecord)
             await user.save()
-            return createSuccessResponse(200, '创建成功', newHistory)
+            return createSuccessResponse(200, '创建成功', newHistoryRecord)
         } catch (error) {
             Log.error(error)
             return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR

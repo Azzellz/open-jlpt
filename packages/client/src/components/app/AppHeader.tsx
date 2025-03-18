@@ -70,35 +70,35 @@ export default defineComponent(() => {
                         class={navItemClass}
                         active-class={activeNavItemClass}
                     >
-                        {t('nav.jlpt.text')}
+                        {t('jlpt.text')}
                     </RouterLink>
                     <RouterLink
                         to="/jlpt/vocabulary"
                         class={navItemClass}
                         active-class={activeNavItemClass}
                     >
-                        {t('nav.jlpt.vocabulary')}
+                        {t('jlpt.vocabulary')}
                     </RouterLink>
                     <RouterLink
                         to="/jlpt/grammar"
                         class={navItemClass}
                         active-class={activeNavItemClass}
                     >
-                        {t('nav.jlpt.grammar')}
+                        {t('jlpt.grammar')}
                     </RouterLink>
                     <RouterLink
                         to="/jlpt/read"
                         class={navItemClass}
                         active-class={activeNavItemClass}
                     >
-                        {t('nav.jlpt.read')}
+                        {t('jlpt.read')}
                     </RouterLink>
                     <RouterLink
                         to="/jlpt/hearing"
                         class={navItemClass}
                         active-class={activeNavItemClass}
                     >
-                        {t('nav.jlpt.hearing')}
+                        {t('jlpt.hearing')}
                     </RouterLink>
 
                     {/*  i18n  */}
@@ -148,11 +148,7 @@ export default defineComponent(() => {
                                 ),
                             }}
                         >
-                            <NAvatar
-                                round
-                                size="small"
-                                src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-                            />
+                            <NAvatar round size="small" src={userStore.user?.avatar} />
                         </NPopselect>
                     </RouterLink>
                 </nav>
