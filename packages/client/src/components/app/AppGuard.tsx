@@ -139,23 +139,20 @@ export default defineComponent(() => {
             message.error('自动登录失败，请重新登录')
             userStore.token = ''
             localStorage.removeItem('token')
-            console.log(result)
+            console.error(result)
         }
     })
 
     //#endregion
 
-    if (userStore.token) {
-        return () => (
-            <SakuraRain>
+    return () => (
+        <SakuraRain>
+            {/* 如果有token则展示加载界面，此时为自动登录，如果自动登录失败则重新展示登录框 */}
+            {userStore.token ? (
                 <div class="h-full flex">
                     <AppLoader class="m-auto" />
                 </div>
-            </SakuraRain>
-        )
-    } else {
-        return () => (
-            <SakuraRain>
+            ) : (
                 <div id="app-guard" class="flex max-md:flex-col h-full p-20">
                     <div class="md:flex-2/3 flex">
                         <div class="m-auto flex flex-col gap-10">
@@ -262,7 +259,7 @@ export default defineComponent(() => {
                         </NCard>
                     </div>
                 </div>
-            </SakuraRain>
-        )
-    }
+            )}
+        </SakuraRain>
+    )
 })
