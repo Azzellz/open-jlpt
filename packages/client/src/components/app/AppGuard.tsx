@@ -132,6 +132,7 @@ export default defineComponent(() => {
 
         message.info('自动登录中...')
         const result = await API.User.getUser()
+        message.destroyAll()
         if (isSuccessResponse(result)) {
             userStore.user = result.data
             message.success('自动登录成功！')

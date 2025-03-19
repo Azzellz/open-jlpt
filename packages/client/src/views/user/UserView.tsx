@@ -1,17 +1,18 @@
 import { defineComponent } from 'vue'
-import { NMenu, NIcon, NLayoutSider, NLayout, NLayoutContent, type MenuOption } from 'naive-ui'
-import { ref, h, type Component, computed } from 'vue'
+import { NMenu, NIcon, type MenuOption } from 'naive-ui'
+import { type Component, computed } from 'vue'
 import {
     History20Regular as History20RegularIcon,
     Settings20Regular as Settings20RegularIcon,
 } from '@vicons/fluent'
 import { User as UserIcon } from '@vicons/carbon'
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { BookOutline as BookIcon } from '@vicons/ionicons5'
+import AppLayout from '@/components/app/AppLayout'
 
 function renderIcon(icon: Component) {
-    return () => h(NIcon, null, { default: () => h(icon) })
+    return () => <NIcon component={icon} />
 }
 function renderRouterLink(to: string, label: string) {
     return () => <RouterLink to={to}> {label} </RouterLink>
@@ -19,17 +20,18 @@ function renderRouterLink(to: string, label: string) {
 
 function UserViewMenu() {
     const { t } = useI18n()
+    const route = useRoute()
 
     const menuOptions = computed<MenuOption[]>(() => {
         return [
             {
                 label: renderRouterLink('/user/profile', t('user.menu.profile')),
-                key: 'profile',
+                key: '/user/profile',
                 icon: renderIcon(UserIcon),
             },
             {
                 label: renderRouterLink('/user/setting', t('user.menu.setting')),
-                key: 'setting',
+                key: '/user/setting',
                 icon: renderIcon(Settings20RegularIcon),
             },
             {
@@ -39,8 +41,8 @@ function UserViewMenu() {
                 children: [
                     {
                         label: renderRouterLink('/user/history/read', t('jlpt.read')),
+                        key: '/user/history/read',
                         icon: renderIcon(BookIcon),
-                        key: 'read',
                     },
                 ],
             },
@@ -50,7 +52,7 @@ function UserViewMenu() {
     return (
         <NMenu
             class="py-2"
-            defaultValue="profile"
+            value={route.path}
             defaultExpandAll
             collapsedWidth={64}
             collapsedIconSize={22}
@@ -60,22 +62,5 @@ function UserViewMenu() {
 }
 
 export default defineComponent(() => {
-    return () => (
-        <NLayout hasSider={true}>
-            <NLayoutSider
-                bordered
-                collapseMode="width"
-                collapsedWidth={64}
-                width={200}
-                showTrigger={true}
-            >
-                <UserViewMenu />
-            </NLayoutSider>
-            <NLayoutContent>
-                <main class="h-full flex-y gap-10 p-10 lg:px-35">
-                    <RouterView />
-                </main>
-            </NLayoutContent>
-        </NLayout>
-    )
+    return () => <AppLayout sider={UserViewMenu} contentClass="p-10" />
 })

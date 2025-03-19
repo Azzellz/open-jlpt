@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/home/HomeView'
 import UserView from '@/views/user/UserView'
 import UserProfileView from '@/views/user/UserProfileView'
+import JLPT_ReadView from '@/views/jlpt/read/JLPT-ReadView'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,7 +46,18 @@ const router = createRouter({
         },
         {
             path: '/jlpt/read',
-            component: () => import('@/views/jlpt/JLPT-ReadView'),
+            redirect: '/jlpt/read/generate',
+            component: () => import('@/views/jlpt/read/JLPT-ReadView'),
+            children: [
+                {
+                    path: 'generate',
+                    component: () => import('@/views/jlpt/read/JLPT-ReadGenerateView'),
+                },
+                {
+                    path: 'hub',
+                    component: () => import('@/views/jlpt/read/JLPT-ReadHubView'),
+                },
+            ],
         },
         {
             path: '/jlpt/hearing',
