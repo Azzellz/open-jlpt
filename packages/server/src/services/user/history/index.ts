@@ -48,7 +48,7 @@ UserHistoryService.get(
                     _id: { $in: historyRefs },
                 })
                 .skip((page - 1) * pageSize)
-                .limit(0)
+                .limit(pageSize)
 
             return createSuccessResponse(200, '获取成功', {
                 items: histories.map((h) => h.toJSON()),

@@ -47,7 +47,7 @@ const router = createRouter({
         {
             path: '/jlpt/read',
             redirect: '/jlpt/read/generate',
-            component: () => import('@/views/jlpt/read/JLPT-ReadView'),
+            component: JLPT_ReadView,
             children: [
                 {
                     path: 'generate',
@@ -56,6 +56,10 @@ const router = createRouter({
                 {
                     path: 'hub',
                     component: () => import('@/views/jlpt/read/JLPT-ReadHubView'),
+                },
+                {
+                    path: 'detail/:id',
+                    component: () => import('@/views/jlpt/read/JLPT-ReadDetailView'),
                 },
             ],
         },

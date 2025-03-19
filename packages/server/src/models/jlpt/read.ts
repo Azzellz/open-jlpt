@@ -1,4 +1,5 @@
 import { t } from 'elysia'
+import { PaginationModel } from '../common'
 
 // 基础词汇类型
 const JLPT_ReadVocab = t.Object({
@@ -62,5 +63,22 @@ const JLPT_Read = t.Composite([
 
 // 创建参数类型
 export const JLPT_ModelReadCreateBody = t.Omit(JLPT_Read, ['id', 'timeStamp', 'user', 'star'])
-
-// export const JLPT_ModelReadUpdateBody = t.Object({})
+export const JLPT_ModelReadQuery = t.Composite([
+    PaginationModel,
+    t.Object({
+        id: t.Optional(t.String()),
+        'user.name': t.Optional(t.String()),
+        'user.account': t.Optional(t.String()),
+        orderBy: t.Optional(t.Union([t.Literal('star-asc'), t.Literal('star-desc')])),
+        keyword: t.Optional(t.String()),
+        difficulty: t.Optional(
+            t.Union([
+                t.Literal('N1'),
+                t.Literal('N2'),
+                t.Literal('N3'),
+                t.Literal('N4'),
+                t.Literal('N5'),
+            ])
+        ),
+    }),
+])

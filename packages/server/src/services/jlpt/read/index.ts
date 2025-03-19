@@ -13,7 +13,9 @@ export const JLPT_ReadService = new Elysia({
 
 //#region 查询
 
+// 查询多个阅读（数组）
 const keywords = ['article.title', 'article.contents', 'vocabList.word']
+const excludeKeys = ['page', 'pageSize']
 JLPT_ReadService.get(
     '/',
     async ({ query }) => {
@@ -22,6 +24,9 @@ JLPT_ReadService.get(
             visible: true, // 这里根据是否是管理员来获取可见或者不可见
         }
         Object.entries(query || {}).forEach(([key, value]) => {
+            if (excludeKeys.includes(key)) {
+                return
+            }
             if (key === 'id' && isValidObjectId(value)) {
                 filter['_id'] = value
             } else if (value) {
@@ -42,10 +47,10 @@ JLPT_ReadService.get(
             }
         })
         try {
-            const reads = await DB_JLPT_ReadModel.find(filter).populate(
-                'user',
-                '_id name avatar account'
-            )
+            const { page, pageSize } = query
+            const reads = await DB_JLPT_ReadModel.find(filter)
+                .skip((page - 1) * pageSize)
+                .limit(pageSize)
             return createSuccessResponse(
                 200,
                 '查询成功',
@@ -57,25 +62,11 @@ JLPT_ReadService.get(
         }
     },
     {
-        query: t.Object({
-            id: t.Optional(t.String()),
-            'user.name': t.Optional(t.String()),
-            'user.account': t.Optional(t.String()),
-            orderBy: t.Optional(t.Union([t.Literal('star-asc'), t.Literal('star-desc')])),
-            keyword: t.Optional(t.String()),
-            difficulty: t.Optional(
-                t.Union([
-                    t.Literal('N1'),
-                    t.Literal('N2'),
-                    t.Literal('N3'),
-                    t.Literal('N4'),
-                    t.Literal('N5'),
-                ])
-            ),
-        }),
+        query: 'reads.get.query',
     }
 )
 
+// 查询单个阅读
 JLPT_ReadService.get('/:readID', async ({ params: { readID } }) => {
     try {
         const read = await DB_JLPT_ReadModel.findById(readID)

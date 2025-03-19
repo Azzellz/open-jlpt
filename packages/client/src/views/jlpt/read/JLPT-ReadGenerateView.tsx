@@ -19,7 +19,7 @@ import {
     NSpin,
     NIcon,
 } from 'naive-ui'
-import JLPT_ReadCard from '@/components/jlpt/read/JLPT-ReadCard'
+import JLPT_ReadBody from '@/components/jlpt/read/JLPT-ReadBody'
 import { useUserStore } from '@/stores/user'
 import { Json as JsonIcon } from '@vicons/carbon'
 import { useLLM } from '@/composables/llm'
@@ -379,7 +379,7 @@ export default defineComponent(() => {
                 {/* 阅读模块 */}
                 {originRead.value?.article?.title && (
                     <NCollapseItem title="阅读" name="3">
-                        <JLPT_ReadCard
+                        <JLPT_ReadBody
                             originRead={originRead.value}
                             read={read.value}
                             onSubmit={handleSubmit}

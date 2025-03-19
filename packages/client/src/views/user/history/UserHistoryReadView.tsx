@@ -1,13 +1,13 @@
 import API from '@/api'
-import { JLPT_DifficultyTag } from '@/components/jlpt/JLPT-DiffucultyTag'
 import { useUserStore } from '@/stores/user'
 import type { JLPT_Read, PaginationQueryParams, UserHistoryRecord, UserInfo } from '@root/models'
 import { isSuccessResponse } from '@root/shared'
 import dayjs from 'dayjs'
-import { NCard, useMessage, NDivider, NEllipsis, NCollapseTransition, NButton } from 'naive-ui'
+import { useMessage, NDivider, NCollapseTransition, NButton } from 'naive-ui'
 import { defineComponent, onMounted, ref } from 'vue'
 import ErrorIcon from '@/components/icon/ErrorIcon'
 import SuccessIcon from '@/components/icon/SuccessIcon'
+import JLPT_ReadCard from '@/components/jlpt/read/JLPT_ReadCard'
 
 function UserHistoryRecordLine({
     record,
@@ -54,10 +54,6 @@ function UserHistoryReadCard({
     read: JLPT_Read
     records: UserHistoryRecord[]
 }) {
-    // 字数统计
-    let wordCount = 0
-    read.article.contents.forEach((c) => (wordCount += c.length))
-
     // 答题记录
     const showRecords = ref(false)
     function handleToggleRecords() {
@@ -79,29 +75,17 @@ function UserHistoryReadCard({
     const correctRate = Math.floor((correctCount / (correctCount + wrongCount)) * 100)
 
     return (
-        <NCard class="w-125  shadow-lg">
-            <div class="flex-y">
-                <div class="flex-y">
-                    <div class="flex-x gap-2 items-center">
-                        <JLPT_DifficultyTag difficulty={read.difficulty} />
-                        <NDivider vertical />
-                        <NEllipsis class="text-lg" style="max-width:250px">
-                            {read.article.title}
-                        </NEllipsis>
-                        <div class="ml-auto flex-x gap-2">
-                            <NButton size="small" onClick={handleToggleRecords}>
-                                {showRecords.value ? '收起' : '展开'}答题记录
-                            </NButton>
-                            <NButton size="small">详情</NButton>
-                        </div>
-                    </div>
-                    <div class="mt-3 text-sm">
-                        <div>{read.article.contents[0]}</div>
-                        <div class="mt-2">......... {wordCount} 字</div>
-                    </div>
+        <JLPT_ReadCard
+            read={read}
+            headerExtra={() => (
+                <div class="ml-auto flex-x gap-2">
+                    <NButton size="small" onClick={handleToggleRecords}>
+                        {showRecords.value ? '收起' : '展开'}答题记录
+                    </NButton>
+                    <NButton size="small">详情</NButton>
                 </div>
-
-                {/* 答题记录 */}
+            )}
+            actionsExtra={() => (
                 <NCollapseTransition show={showRecords.value}>
                     <NDivider class="text-sm text-gray">
                         <div class="flex-x gap-2 items-center">
@@ -124,8 +108,8 @@ function UserHistoryReadCard({
                         })}
                     </div>
                 </NCollapseTransition>
-            </div>
-        </NCard>
+            )}
+        />
     )
 }
 

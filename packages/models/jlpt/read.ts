@@ -1,3 +1,4 @@
+import type { PaginationQueryParams } from '../common'
 import type { JLPT_Difficulty } from './common'
 import type { JLPT_PracticeBase } from './practice'
 
@@ -38,3 +39,12 @@ export interface JLPT_Read extends JLPT_ReadOrigin, JLPT_PracticeBase {
 }
 
 export interface JLPT_ReadCreateParams extends JLPT_ReadOrigin {}
+
+export interface JLPT_ReadQueryParams extends PaginationQueryParams {
+    id?: string
+    'user.name'?: string
+    'user.account'?: string
+    orderBy?: 'star-asc' | 'star-desc'
+    keyword?: string
+    difficulty?: JLPT_Difficulty
+}

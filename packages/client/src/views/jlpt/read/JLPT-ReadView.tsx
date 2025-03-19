@@ -1,8 +1,9 @@
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import { NMenu, NIcon, type MenuOption } from 'naive-ui'
 import { type Component, computed } from 'vue'
 import { ChannelShare20Regular as HubIcon } from '@vicons/fluent'
 import { AiStatusInProgress as GenerateIcon } from '@vicons/carbon'
+import { BookOutline as BookIcon } from '@vicons/ionicons5'
 import { RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/app/AppLayout'
@@ -19,7 +20,7 @@ function JLPT_ReadViewMenu() {
     const route = useRoute()
 
     const menuOptions = computed<MenuOption[]>(() => {
-        return [
+        const base = [
             {
                 label: renderRouterLink('/jlpt/read/generate', '生成阅读'),
                 key: '/jlpt/read/generate',
@@ -31,6 +32,30 @@ function JLPT_ReadViewMenu() {
                 icon: renderIcon(HubIcon),
             },
         ]
+        const title = route.query['title'] as string
+        if (title) {
+            return [
+                base[0],
+                {
+                    label: renderRouterLink('/jlpt/read/hub', '阅读广场'),
+                    key: '/jlpt/read/hub',
+                    icon: renderIcon(HubIcon),
+                    children: [
+                        {
+                            label: renderRouterLink(
+                                `/jlpt/read/detail/${route.params['id']}`,
+                                title,
+                            ),
+
+                            key: `/jlpt/read/detail/${route.params['id']}`,
+                            icon: renderIcon(BookIcon),
+                        },
+                    ],
+                },
+            ]
+        } else {
+            return base
+        }
     })
 
     return (
@@ -41,6 +66,8 @@ function JLPT_ReadViewMenu() {
             collapsedWidth={64}
             collapsedIconSize={22}
             options={menuOptions.value}
+            rootIndent={36}
+            indent={0}
         />
     )
 }
