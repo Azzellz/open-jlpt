@@ -63,5 +63,5 @@ function JLPT_ReadViewMenu() {
 }
 
 export default defineComponent(() => {
-    return () => <AppLayout sider={JLPT_ReadViewMenu} />
+    return () => <AppLayout sider={JLPT_ReadViewMenu} footer={() => <div>123</div>} />
 })

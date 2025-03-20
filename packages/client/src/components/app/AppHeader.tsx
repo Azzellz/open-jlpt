@@ -2,17 +2,21 @@ import { defineComponent } from 'vue'
 import { RouterLink } from 'vue-router'
 import SakuraIcon from '@/components/icon/SakuraIcon'
 import { useI18n } from 'vue-i18n'
-import { NAvatar, NButton, NIcon, NPopselect, useMessage } from 'naive-ui'
+import { NAvatar, NButton, NIcon, NPopselect, useMessage, NPopover, NDivider } from 'naive-ui'
 import { LogoGithub as LogoGithubIcon } from '@vicons/ionicons5'
-import { Translate20Regular as TranslateIcon } from '@vicons/fluent'
+import {
+    Translate20Regular as TranslateIcon,
+    MoreHorizontal20Regular as MoreIcon,
+} from '@vicons/fluent'
 import { useUserStore } from '@/stores/user'
 import { isSuccessResponse } from '@root/shared'
 import { ref } from 'vue'
 import API from '@/api'
 
-const navItemClass =
+const desktopNavItemClass =
     'cursor-pointer px-5 block whitespace-nowrap h-16 line-height-16 hover:text-red-300 transition'
-const activeNavItemClass = 'text-red-300 border-b-2 border-b-red-300 border-b-solid transition'
+const mobileNavItemClass = 'w-full text-center h-7 hover:text-red-300 transition'
+const activeNavItemClass = 'text-red-300 border-b-2 border-b-red-300 border-b-solid'
 
 export default defineComponent(() => {
     const userStore = useUserStore()
@@ -23,6 +27,7 @@ export default defineComponent(() => {
     }
 
     //#region i18n
+
     const i18nOptions = [
         { label: '简体中文', value: 'zh' },
         { label: 'English', value: 'en' },
@@ -50,52 +55,85 @@ export default defineComponent(() => {
             message.error('注销失败')
         }
     }
+
     //#endregion
+
+    //#region 菜单导航栏
+    const UserAvatar = () => (
+        <RouterLink
+            class="px-2 block h-16 flex items-center"
+            to="/user/profile"
+            active-class={activeNavItemClass}
+        >
+            <NPopselect
+                class="p-0"
+                v-slots={{
+                    empty: () => <div>{userStore.user?.name}</div>,
+                    action: () => (
+                        <div class="flex-y items-center">
+                            <NButton text onClick={handleLoginout} loading={isLoading.value}>
+                                注销登录
+                            </NButton>
+                        </div>
+                    ),
+                }}
+            >
+                <NAvatar round src={userStore.user?.avatar} />
+            </NPopselect>
+        </RouterLink>
+    )
+    //#endregion
+
     return () => (
         <header class="h-16 shadow-md z-10">
-            <div class="px-8 h-16 flex items-center gap-10">
+            <div class="px-2 md:px-8  h-16 flex-x gap-10">
+                {/* Logo */}
                 <RouterLink
                     to="/"
                     class="h-full text-lg cursor-pointer transition flex items-center px-2"
-                    active-class={activeNavItemClass}
+                    activeClass={activeNavItemClass}
                 >
                     <SakuraIcon class="mb-1.5 mr-2" size="24" />
-                    <span class="text-gray">OPEN</span>
-                    <span class="text-red-300">·</span>
-                    <span class="text-red">JLPT</span>
+                    <div>
+                        <span class="text-gray">OPEN</span>
+                        <span class="text-red-300">·</span>
+                        <span class="text-red">JLPT</span>
+                    </div>
                 </RouterLink>
-                <nav class="h-full ml-auto flex items-center font-bold">
+                {/* 响应式菜单导航栏 */}
+                {/* 桌面端导航栏 */}
+                <nav class="h-full max-md:hidden ml-auto flex items-center font-bold">
                     <RouterLink
                         to="/jlpt/text"
-                        class={navItemClass}
+                        class={desktopNavItemClass}
                         active-class={activeNavItemClass}
                     >
                         {t('jlpt.text')}
                     </RouterLink>
                     <RouterLink
+                        to="/jlpt/read"
+                        class={desktopNavItemClass}
+                        active-class={activeNavItemClass}
+                    >
+                        {t('jlpt.read')}
+                    </RouterLink>
+                    <RouterLink
                         to="/jlpt/vocabulary"
-                        class={navItemClass}
+                        class={desktopNavItemClass}
                         active-class={activeNavItemClass}
                     >
                         {t('jlpt.vocabulary')}
                     </RouterLink>
                     <RouterLink
                         to="/jlpt/grammar"
-                        class={navItemClass}
+                        class={desktopNavItemClass}
                         active-class={activeNavItemClass}
                     >
                         {t('jlpt.grammar')}
                     </RouterLink>
                     <RouterLink
-                        to="/jlpt/read"
-                        class={navItemClass}
-                        active-class={activeNavItemClass}
-                    >
-                        {t('jlpt.read')}
-                    </RouterLink>
-                    <RouterLink
                         to="/jlpt/hearing"
-                        class={navItemClass}
+                        class={desktopNavItemClass}
                         active-class={activeNavItemClass}
                     >
                         {t('jlpt.hearing')}
@@ -126,31 +164,82 @@ export default defineComponent(() => {
                     </NButton>
 
                     {/*  用户头像交互  */}
-                    <RouterLink
-                        class="px-2 block h-16 flex items-center"
-                        to="/user/profile"
-                        active-class={activeNavItemClass}
+                    <UserAvatar />
+                </nav>
+                {/* 移动端导航栏 */}
+                <nav class="h-full md:hidden ml-auto flex gap-2 items-center font-bold">
+                    {/* 更多选项 */}
+                    <NPopover
+                        trigger="click"
+                        v-slots={{
+                            trigger: () => (
+                                <NButton text>
+                                    <NIcon size="28" component={MoreIcon} />
+                                </NButton>
+                            ),
+                        }}
                     >
-                        <NPopselect
-                            class="p-0"
-                            v-slots={{
-                                empty: () => <div>{userStore.user?.name}</div>,
-                                action: () => (
-                                    <div class="flex-y items-center">
-                                        <NButton
-                                            text
-                                            onClick={handleLoginout}
-                                            loading={isLoading.value}
-                                        >
-                                            注销登录
-                                        </NButton>
-                                    </div>
-                                ),
-                            }}
-                        >
-                            <NAvatar round size="small" src={userStore.user?.avatar} />
-                        </NPopselect>
-                    </RouterLink>
+                        <div class="flex-y items-center gap-2">
+                            <RouterLink
+                                to="/jlpt/text"
+                                class={mobileNavItemClass}
+                                active-class={activeNavItemClass}
+                            >
+                                {t('jlpt.text')}
+                            </RouterLink>
+                            <RouterLink
+                                to="/jlpt/read"
+                                class={mobileNavItemClass}
+                                active-class={activeNavItemClass}
+                            >
+                                {t('jlpt.read')}
+                            </RouterLink>
+                            <RouterLink
+                                to="/jlpt/vocabulary"
+                                class={mobileNavItemClass}
+                                active-class={activeNavItemClass}
+                            >
+                                {t('jlpt.vocabulary')}
+                            </RouterLink>
+                            <RouterLink
+                                to="/jlpt/grammar"
+                                class={mobileNavItemClass}
+                                active-class={activeNavItemClass}
+                            >
+                                {t('jlpt.grammar')}
+                            </RouterLink>
+                            <RouterLink
+                                to="/jlpt/hearing"
+                                class={mobileNavItemClass}
+                                active-class={activeNavItemClass}
+                            >
+                                {t('jlpt.hearing')}
+                            </RouterLink>
+                            <NDivider style="margin-top:0px;margin-bottom:0px" />
+                            {/*  i18n  */}
+                            <NPopselect
+                                v-model:value={locale.value}
+                                options={i18nOptions}
+                                size="medium"
+                                scrollable
+                            >
+                                <NButton text>
+                                    <NIcon component={TranslateIcon} size="30" />
+                                </NButton>
+                            </NPopselect>
+
+                            {/*  Github  */}
+                            <NButton
+                                class="px-3"
+                                text
+                                onClick={() => to('https://github.com/Azzellz/open-jlpt')}
+                            >
+                                <NIcon component={LogoGithubIcon} size="30" />
+                            </NButton>
+                        </div>
+                    </NPopover>
+                    {/*  用户头像交互  */}
+                    <UserAvatar />
                 </nav>
             </div>
         </header>

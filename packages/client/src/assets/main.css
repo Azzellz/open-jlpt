@@ -9,6 +9,8 @@ body,
 #app {
   width: 100%;
   height: 100%;
+  /* 可以禁止移动端 H5 出现多余滚动动画 */
+  overflow: hidden;
 }
 
 #app {
