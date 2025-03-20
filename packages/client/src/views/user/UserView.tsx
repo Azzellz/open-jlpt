@@ -18,7 +18,7 @@ function renderRouterLink(to: string, label: string) {
     return () => <RouterLink to={to}> {label} </RouterLink>
 }
 
-function UserViewMenu() {
+function Sider() {
     const { t } = useI18n()
     const route = useRoute()
 
@@ -61,6 +61,10 @@ function UserViewMenu() {
     )
 }
 
+function Footer() {
+    return <div>123</div>
+}
+
 export default defineComponent(() => {
-    return () => <AppLayout sider={UserViewMenu} contentClass="p-10" />
+    return () => <AppLayout sider={Sider} contentClass="p-10" footer={Footer} />
 })

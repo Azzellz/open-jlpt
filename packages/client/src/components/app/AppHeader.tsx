@@ -4,10 +4,8 @@ import SakuraIcon from '@/components/icon/SakuraIcon'
 import { useI18n } from 'vue-i18n'
 import { NAvatar, NButton, NIcon, NPopselect, useMessage, NPopover, NDivider } from 'naive-ui'
 import { LogoGithub as LogoGithubIcon } from '@vicons/ionicons5'
-import {
-    Translate20Regular as TranslateIcon,
-    MoreHorizontal20Regular as MoreIcon,
-} from '@vicons/fluent'
+import { MenuOpenOutlined as MenuIcon } from '@vicons/material'
+import { Translate20Regular as TranslateIcon } from '@vicons/fluent'
 import { useUserStore } from '@/stores/user'
 import { isSuccessResponse } from '@root/shared'
 import { ref } from 'vue'
@@ -61,7 +59,7 @@ export default defineComponent(() => {
     //#region 菜单导航栏
     const UserAvatar = () => (
         <RouterLink
-            class="px-2 block h-16 flex items-center"
+            class="px-2 h-16 flex items-center"
             to="/user/profile"
             active-class={activeNavItemClass}
         >
@@ -78,7 +76,7 @@ export default defineComponent(() => {
                     ),
                 }}
             >
-                <NAvatar round src={userStore.user?.avatar} />
+                <NAvatar round src={userStore.user?.avatar} size={36} />
             </NPopselect>
         </RouterLink>
     )
@@ -174,7 +172,7 @@ export default defineComponent(() => {
                         v-slots={{
                             trigger: () => (
                                 <NButton text>
-                                    <NIcon size="28" component={MoreIcon} />
+                                    <NIcon size="32" component={MenuIcon} />
                                 </NButton>
                             ),
                         }}
@@ -234,7 +232,7 @@ export default defineComponent(() => {
                                 text
                                 onClick={() => to('https://github.com/Azzellz/open-jlpt')}
                             >
-                                <NIcon component={LogoGithubIcon} size="30" />
+                                <NIcon component={LogoGithubIcon} size="32" />
                             </NButton>
                         </div>
                     </NPopover>

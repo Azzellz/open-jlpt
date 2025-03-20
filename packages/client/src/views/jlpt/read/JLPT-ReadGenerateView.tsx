@@ -199,6 +199,7 @@ export default defineComponent(() => {
     async function handleGenerateRead() {
         // 重置状态
         originRead.value = null
+        read.value = null
         const jsonBrook = createJsonBrook()
         await generate(
             currentLLMID.value,
@@ -287,12 +288,13 @@ export default defineComponent(() => {
     //#endregion
 
     return () => (
-        <main class="app-content py-10 reactive">
+        <main class="app-content">
             {/* <!-- 配置栏 --> */}
-            <NGrid cols={24} x-gap={24}>
-                <NFormItemGi span={8} label="主题" required>
+            <NGrid responsive="screen" cols="2 s:3 m:4" x-gap={24}>
+                <NFormItemGi label="主题" required>
                     <NInput
                         v-model:value={theme.value}
+                        class="w-full"
                         type="text"
                         placeholder="不能是敏感内容哦."
                         clearable
@@ -300,44 +302,48 @@ export default defineComponent(() => {
                         show-count
                     />
                 </NFormItemGi>
-                <NFormItemGi span={4} label="词数">
+                <NFormItemGi label="词数">
                     <NInputNumber
                         v-model:value={wordCount.value}
                         placeholder="任意"
+                        class="w-full"
                         min={100}
                         max={2000}
                     />
                 </NFormItemGi>
-                <NFormItemGi span={4} label="难度">
-                    <NSelect v-model:value={level.value} options={levelOptions} />
+                <NFormItemGi label="难度">
+                    <NSelect v-model:value={level.value} class="w-full" options={levelOptions} />
                 </NFormItemGi>
-                <NFormItemGi span={4} label="模型" required>
-                    <NSelect v-model:value={currentLLMID.value} options={llmOptions.value} />
-                </NFormItemGi>
-                <NFormItemGi span={2}>
-                    {!originRead.value || isGenerating.value ? (
-                        <NButton
-                            type="primary"
-                            onClick={handleGenerateRead}
-                            loading={isGenerating.value}
-                            disabled={isGenerating.value || !isAllowGenerate.value}
-                        >
-                            {isGenerating.value
-                                ? '生成中'
-                                : isAllowGenerate.value
-                                  ? '开始生成'
-                                  : '请填写配置'}
-                        </NButton>
-                    ) : (
-                        <NButton type="warning" onClick={handleGenerateRead}>
-                            重新生成
-                        </NButton>
-                    )}
+                <NFormItemGi label="模型" required>
+                    <NSelect
+                        v-model:value={currentLLMID.value}
+                        class="w-full"
+                        options={llmOptions.value}
+                    />
                 </NFormItemGi>
             </NGrid>
 
             {/* 调试栏，包含显示思考、JSON */}
-            <div class="flex gap-4">
+            <div class="flex items-center gap-4">
+                {!originRead.value || isGenerating.value ? (
+                    <NButton
+                        type="primary"
+                        size="small"
+                        onClick={handleGenerateRead}
+                        loading={isGenerating.value}
+                        disabled={isGenerating.value || !isAllowGenerate.value}
+                    >
+                        {isGenerating.value
+                            ? '生成中'
+                            : isAllowGenerate.value
+                              ? '开始生成'
+                              : '请填写配置'}
+                    </NButton>
+                ) : (
+                    <NButton type="warning" size="small" onClick={handleGenerateRead}>
+                        重新生成
+                    </NButton>
+                )}
                 <NSwitch
                     v-model:value={isShowReasoning.value}
                     round={false}

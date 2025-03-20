@@ -60,9 +60,9 @@ export default defineComponent((props: Props) => {
             return (
                 <>
                     <NDivider />
-                    <div class="flex flex-col gap-5">
+                    <div class="flex-y gap-5">
                         <div class="text-lg">词汇表</div>
-                        <div class="flex flex-wrap gap-5">
+                        <div class="flex-x flex-wrap gap-5 justify-center">
                             {props.originRead.vocabList?.map((vocab) => {
                                 return (
                                     <JLPT_ReadVocabCard
@@ -153,7 +153,23 @@ export default defineComponent((props: Props) => {
                     <span>{props.originRead.article?.title}</span>
                 </div>
             )}
-            headerExtra={() => (
+        >
+            {/* 内容部分 */}
+            <TextSelectMenu
+                menu={(selectedText: string) => <AppTextSelectMenu selectedText={selectedText} />}
+            >
+                {/* 正文部分 */}
+                {TextContainer.value}
+
+                {/* 词汇表 */}
+                {VocabListContainer.value}
+
+                {/* 问题部分 */}
+                {QuestionsContainer.value}
+            </TextSelectMenu>
+
+            {/* 交互栏 */}
+            {props.read ? (
                 <div class="flex gap-5">
                     <NButton
                         ghost
@@ -185,21 +201,9 @@ export default defineComponent((props: Props) => {
                         <span class="font-bold"> 收藏 </span>
                     </NButton>
                 </div>
+            ) : (
+                void 0
             )}
-        >
-            {/* 内容部分 */}
-            <TextSelectMenu
-                menu={(selectedText: string) => <AppTextSelectMenu selectedText={selectedText} />}
-            >
-                {/* 正文部分 */}
-                {TextContainer.value}
-
-                {/* 词汇表 */}
-                {VocabListContainer.value}
-
-                {/* 问题部分 */}
-                {QuestionsContainer.value}
-            </TextSelectMenu>
         </NCard>
     )
 })

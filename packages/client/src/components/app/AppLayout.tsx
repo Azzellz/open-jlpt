@@ -11,7 +11,7 @@ export default function AppLayout(props: Props) {
     return (
         <NLayout class="flex-1" hasSider={true}>
             <NLayoutSider
-                class="max-sm:hidden"
+                class="max-md:hidden"
                 bordered
                 collapseMode="width"
                 collapsedWidth={64}
@@ -22,8 +22,8 @@ export default function AppLayout(props: Props) {
             </NLayoutSider>
             <NLayoutContent>
                 <main class="h-full flex-y">
-                    <RouterView class={props.contentClass + ' flex-1 '} />
-                    <div class="mt-auto mb-10">
+                    <RouterView class={props.contentClass + ' flex-1 mb-2.5'} />
+                    <div class="md:hidden mt-auto mb-7.5">
                         <props.footer />
                     </div>
                 </main>

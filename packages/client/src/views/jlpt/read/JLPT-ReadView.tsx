@@ -16,7 +16,7 @@ function renderRouterLink(to: string, label: string) {
     return () => <RouterLink to={to}> {label} </RouterLink>
 }
 
-function JLPT_ReadViewMenu() {
+function Sider() {
     const { t } = useI18n()
     const route = useRoute()
     const readStore = useJLPTReadStore()
@@ -63,5 +63,61 @@ function JLPT_ReadViewMenu() {
 }
 
 export default defineComponent(() => {
-    return () => <AppLayout sider={JLPT_ReadViewMenu} footer={() => <div>123</div>} />
+    const { t } = useI18n()
+    const route = useRoute()
+    const readStore = useJLPTReadStore()
+
+    const menuOptions = computed<MenuOption[]>(() => {
+        return [
+            {
+                label: renderRouterLink('/jlpt/read/generate', '生成阅读'),
+                key: '/jlpt/read/generate',
+                icon: renderIcon(GenerateIcon),
+            },
+            {
+                label: renderRouterLink('/jlpt/read/hub', '阅读广场'),
+                key: '/jlpt/read/hub',
+                icon: renderIcon(HubIcon),
+                children: readStore.historyRecords.length
+                    ? readStore.historyRecords.map((read) => {
+                          return {
+                              label: renderRouterLink(
+                                  `/jlpt/read/detail/${read.id}`,
+                                  read.article.title,
+                              ),
+                              key: `/jlpt/read/detail/${read.id}`,
+                              icon: renderIcon(BookIcon),
+                          }
+                      })
+                    : void 0,
+            },
+        ]
+    })
+
+    return () => (
+        <AppLayout
+            sider={() => (
+                <NMenu
+                    class="py-2"
+                    value={route.path}
+                    defaultExpandAll
+                    collapsedWidth={64}
+                    collapsedIconSize={22}
+                    options={menuOptions.value}
+                    rootIndent={36}
+                    indent={0}
+                />
+            )}
+            footer={() => (
+                <div class="mx-6 rounded-full oj-shadow h-16">
+                    <NMenu
+                        class="pt-2.5"
+                        value={route.path}
+                        options={menuOptions.value}
+                        mode="horizontal"
+                    />
+                </div>
+            )}
+        />
+    )
 })
