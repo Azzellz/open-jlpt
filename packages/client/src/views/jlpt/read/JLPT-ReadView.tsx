@@ -7,6 +7,7 @@ import { BookOutline as BookIcon } from '@vicons/ionicons5'
 import { RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/app/AppLayout'
+import { useJLPTReadStore } from '@/stores/jlpt/read'
 
 function renderIcon(icon: Component) {
     return () => <NIcon component={icon} />
@@ -18,9 +19,10 @@ function renderRouterLink(to: string, label: string) {
 function JLPT_ReadViewMenu() {
     const { t } = useI18n()
     const route = useRoute()
+    const readStore = useJLPTReadStore()
 
     const menuOptions = computed<MenuOption[]>(() => {
-        const base = [
+        return [
             {
                 label: renderRouterLink('/jlpt/read/generate', '生成阅读'),
                 key: '/jlpt/read/generate',
@@ -30,32 +32,20 @@ function JLPT_ReadViewMenu() {
                 label: renderRouterLink('/jlpt/read/hub', '阅读广场'),
                 key: '/jlpt/read/hub',
                 icon: renderIcon(HubIcon),
+                children: readStore.historyRecords.length
+                    ? readStore.historyRecords.map((read) => {
+                          return {
+                              label: renderRouterLink(
+                                  `/jlpt/read/detail/${read.id}`,
+                                  read.article.title,
+                              ),
+                              key: `/jlpt/read/detail/${read.id}`,
+                              icon: renderIcon(BookIcon),
+                          }
+                      })
+                    : void 0,
             },
         ]
-        const title = route.query['title'] as string
-        if (title) {
-            return [
-                base[0],
-                {
-                    label: renderRouterLink('/jlpt/read/hub', '阅读广场'),
-                    key: '/jlpt/read/hub',
-                    icon: renderIcon(HubIcon),
-                    children: [
-                        {
-                            label: renderRouterLink(
-                                `/jlpt/read/detail/${route.params['id']}`,
-                                title,
-                            ),
-
-                            key: `/jlpt/read/detail/${route.params['id']}`,
-                            icon: renderIcon(BookIcon),
-                        },
-                    ],
-                },
-            ]
-        } else {
-            return base
-        }
     })
 
     return (

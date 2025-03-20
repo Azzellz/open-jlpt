@@ -4,7 +4,7 @@ import JLPTReadBody from '@/components/jlpt/read/JLPT-ReadBody'
 import type { JLPT_Read } from '@root/models'
 import { isSuccessResponse } from '@root/shared'
 import { useMessage } from 'naive-ui'
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 export default defineComponent(() => {
@@ -12,8 +12,8 @@ export default defineComponent(() => {
     const message = useMessage()
 
     const read = ref<JLPT_Read | null>(null)
-    onMounted(async () => {
-        const readID = route.params['id'] as string
+    async function getRead(readID: string) {
+        read.value = null
         const result = await API.JLPT.Read.getRead(readID)
         if (isSuccessResponse(result)) {
             read.value = result.data
@@ -21,7 +21,12 @@ export default defineComponent(() => {
             message.error('获取失败')
             console.error(result)
         }
+    }
+    onMounted(async () => {
+        const readID = route.params['id'] as string
+        await getRead(readID)
     })
+    watch(() => route.params['id'] as string, getRead)
 
     return () =>
         read.value ? (

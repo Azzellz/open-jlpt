@@ -8,9 +8,10 @@ import { useMessage, NButton, NDivider, NInput, NIcon } from 'naive-ui'
 import { defineComponent, onMounted, ref } from 'vue'
 import { FlashOutline } from '@vicons/ionicons5'
 import router from '@/router'
+import { useJLPTReadStore } from '@/stores/jlpt/read'
 
 export default defineComponent(() => {
-    const reads = ref<JLPT_Read[]>([])
+    const readStore = useJLPTReadStore()
     const message = useMessage()
     const params = ref<JLPT_ReadQueryParams>({
         page: 1,
@@ -20,7 +21,7 @@ export default defineComponent(() => {
     async function getReads(_params: JLPT_ReadQueryParams = params.value) {
         const result = await API.JLPT.Read.getReads(_params)
         if (isSuccessResponse(result)) {
-            reads.value = result.data
+            readStore.reads = result.data
         } else {
             message.error('获取阅读失败')
             console.error(result)
@@ -41,6 +42,16 @@ export default defineComponent(() => {
     }
 
     // 跳转详情页
+    function handleToDetail(read: JLPT_Read) {
+        router.push({
+            path: `/jlpt/read/detail/${read.id}`,
+            query: {
+                title: read.article.title,
+            },
+        })
+        readStore.createHistoryRecord(read)
+        console.log(readStore.historyRecords)
+    }
 
     return () => (
         <div class="h-full py-10 px-15% flex-y">
@@ -58,19 +69,12 @@ export default defineComponent(() => {
                 />
             </div>
             <NDivider></NDivider>
-            <div class="flex-x gap-2 flex-wrap">
-                {reads.value.map((read) => {
+            <div class="flex-y gap-4 flex-wrap md:flex-x md:justify-between">
+                {readStore.reads.map((read) => {
                     return (
                         <JLPT_ReadCard
                             read={read}
-                            onClick={() =>
-                                router.push({
-                                    path: `/jlpt/read/detail/${read.id}`,
-                                    query: {
-                                        title: read.article.title,
-                                    },
-                                })
-                            }
+                            onClick={() => handleToDetail(read)}
                             headerExtra={() => (
                                 <div class="flex-x gap-1 items-center">
                                     <span class="text-4.5 text-gray mt-0.5">{read.star}</span>
