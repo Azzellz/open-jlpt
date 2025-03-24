@@ -140,7 +140,7 @@ export default defineComponent(() => {
 
     //#endregion
     return () => (
-        <div class="flex flex-col gap-10">
+        <div class="gap-10">
             {/* <!-- 通用设置 --> */}
             <div>
                 <div class="flex items-center">

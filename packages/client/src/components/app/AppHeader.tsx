@@ -80,6 +80,61 @@ export default defineComponent(() => {
             </NPopselect>
         </RouterLink>
     )
+
+    const NavItems = ({ type }: { type: 'desktop' | 'mobile' }) => {
+        const itemClass = type === 'desktop' ? desktopNavItemClass : mobileNavItemClass
+        return (
+            <>
+                <RouterLink to="/jlpt/text" class={itemClass} active-class={activeNavItemClass}>
+                    {t('jlpt.text')}
+                </RouterLink>
+                <RouterLink to="/jlpt/read" class={itemClass} active-class={activeNavItemClass}>
+                    {t('jlpt.read')}
+                </RouterLink>
+                <RouterLink
+                    to="/jlpt/vocabulary"
+                    class={itemClass}
+                    active-class={activeNavItemClass}
+                >
+                    {t('jlpt.vocabulary')}
+                </RouterLink>
+                <RouterLink to="/jlpt/grammar" class={itemClass} active-class={activeNavItemClass}>
+                    {t('jlpt.grammar')}
+                </RouterLink>
+                <RouterLink to="/jlpt/hearing" class={itemClass} active-class={activeNavItemClass}>
+                    {t('jlpt.hearing')}
+                </RouterLink>
+                {type === 'mobile' && <NDivider style="margin-top:0px;margin-bottom:0px" />}
+                {/*  i18n  */}
+                <NPopselect
+                    v-model:value={locale.value}
+                    options={i18nOptions}
+                    size="medium"
+                    scrollable
+                >
+                    <NButton
+                        text
+                        class={
+                            type === 'desktop'
+                                ? 'h-2/5 mx-3 px-3 border-x-1.5 border-x-gray-300 border-x-solid'
+                                : ''
+                        }
+                    >
+                        <NIcon component={TranslateIcon} size="30" />
+                    </NButton>
+                </NPopselect>
+
+                {/*  Github  */}
+                <NButton
+                    class="px-3"
+                    text
+                    onClick={() => to('https://github.com/Azzellz/open-jlpt')}
+                >
+                    <NIcon component={LogoGithubIcon} size="32" />
+                </NButton>
+            </>
+        )
+    }
     //#endregion
 
     return () => (
@@ -101,67 +156,7 @@ export default defineComponent(() => {
                 {/* 响应式菜单导航栏 */}
                 {/* 桌面端导航栏 */}
                 <nav class="h-full max-md:hidden ml-auto flex items-center font-bold">
-                    <RouterLink
-                        to="/jlpt/text"
-                        class={desktopNavItemClass}
-                        active-class={activeNavItemClass}
-                    >
-                        {t('jlpt.text')}
-                    </RouterLink>
-                    <RouterLink
-                        to="/jlpt/read"
-                        class={desktopNavItemClass}
-                        active-class={activeNavItemClass}
-                    >
-                        {t('jlpt.read')}
-                    </RouterLink>
-                    <RouterLink
-                        to="/jlpt/vocabulary"
-                        class={desktopNavItemClass}
-                        active-class={activeNavItemClass}
-                    >
-                        {t('jlpt.vocabulary')}
-                    </RouterLink>
-                    <RouterLink
-                        to="/jlpt/grammar"
-                        class={desktopNavItemClass}
-                        active-class={activeNavItemClass}
-                    >
-                        {t('jlpt.grammar')}
-                    </RouterLink>
-                    <RouterLink
-                        to="/jlpt/hearing"
-                        class={desktopNavItemClass}
-                        active-class={activeNavItemClass}
-                    >
-                        {t('jlpt.hearing')}
-                    </RouterLink>
-
-                    {/*  i18n  */}
-                    <NPopselect
-                        v-model:value={locale.value}
-                        options={i18nOptions}
-                        size="medium"
-                        scrollable
-                    >
-                        <NButton
-                            class="h-2/5 mx-3 px-3 border-x-1.5 border-x-gray-300 border-x-solid"
-                            text
-                        >
-                            <NIcon component={TranslateIcon} size="30" />
-                        </NButton>
-                    </NPopselect>
-
-                    {/*  Github  */}
-                    <NButton
-                        class="px-3"
-                        text
-                        onClick={() => to('https://github.com/Azzellz/open-jlpt')}
-                    >
-                        <NIcon component={LogoGithubIcon} size="30" />
-                    </NButton>
-
-                    {/*  用户头像交互  */}
+                    <NavItems type="desktop" />
                     <UserAvatar />
                 </nav>
                 {/* 移动端导航栏 */}
@@ -178,65 +173,9 @@ export default defineComponent(() => {
                         }}
                     >
                         <div class="flex-y items-center gap-2">
-                            <RouterLink
-                                to="/jlpt/text"
-                                class={mobileNavItemClass}
-                                active-class={activeNavItemClass}
-                            >
-                                {t('jlpt.text')}
-                            </RouterLink>
-                            <RouterLink
-                                to="/jlpt/read"
-                                class={mobileNavItemClass}
-                                active-class={activeNavItemClass}
-                            >
-                                {t('jlpt.read')}
-                            </RouterLink>
-                            <RouterLink
-                                to="/jlpt/vocabulary"
-                                class={mobileNavItemClass}
-                                active-class={activeNavItemClass}
-                            >
-                                {t('jlpt.vocabulary')}
-                            </RouterLink>
-                            <RouterLink
-                                to="/jlpt/grammar"
-                                class={mobileNavItemClass}
-                                active-class={activeNavItemClass}
-                            >
-                                {t('jlpt.grammar')}
-                            </RouterLink>
-                            <RouterLink
-                                to="/jlpt/hearing"
-                                class={mobileNavItemClass}
-                                active-class={activeNavItemClass}
-                            >
-                                {t('jlpt.hearing')}
-                            </RouterLink>
-                            <NDivider style="margin-top:0px;margin-bottom:0px" />
-                            {/*  i18n  */}
-                            <NPopselect
-                                v-model:value={locale.value}
-                                options={i18nOptions}
-                                size="medium"
-                                scrollable
-                            >
-                                <NButton text>
-                                    <NIcon component={TranslateIcon} size="30" />
-                                </NButton>
-                            </NPopselect>
-
-                            {/*  Github  */}
-                            <NButton
-                                class="px-3"
-                                text
-                                onClick={() => to('https://github.com/Azzellz/open-jlpt')}
-                            >
-                                <NIcon component={LogoGithubIcon} size="32" />
-                            </NButton>
+                            <NavItems type="mobile" />
                         </div>
                     </NPopover>
-                    {/*  用户头像交互  */}
                     <UserAvatar />
                 </nav>
             </div>

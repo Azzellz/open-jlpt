@@ -22,7 +22,7 @@ export default function AppLayout(props: Props) {
             </NLayoutSider>
             <NLayoutContent>
                 <main class="h-full flex-y">
-                    <RouterView class={props.contentClass + ' flex-1 mb-2.5'} />
+                    <RouterView class={props.contentClass || '' + ' app-content mb-2.5 '} />
                     <div class="md:hidden mt-auto mb-7.5">
                         <props.footer />
                     </div>

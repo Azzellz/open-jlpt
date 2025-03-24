@@ -8,6 +8,8 @@ import { defineComponent, onMounted, ref } from 'vue'
 import ErrorIcon from '@/components/icon/ErrorIcon'
 import SuccessIcon from '@/components/icon/SuccessIcon'
 import JLPT_ReadCard from '@/components/jlpt/read/JLPT_ReadCard'
+import router from '@/router'
+import { useJLPTReadStore } from '@/stores/jlpt/read'
 
 function UserHistoryRecordLine({
     record,
@@ -49,10 +51,13 @@ function UserHistoryReadCard({
     read,
     user,
     records,
+    onClick,
 }: {
     user: UserInfo
     read: JLPT_Read
     records: UserHistoryRecord[]
+    class?: string
+    onClick?: () => void
 }) {
     // 答题记录
     const showRecords = ref(false)
@@ -77,37 +82,35 @@ function UserHistoryReadCard({
     return (
         <JLPT_ReadCard
             read={read}
-            headerExtra={() => (
-                <div class="ml-auto flex-x gap-2">
+            onClick={onClick}
+            actionsExtra={() => (
+                <div class="mt-3">
                     <NButton size="small" onClick={handleToggleRecords}>
                         {showRecords.value ? '收起' : '展开'}答题记录
                     </NButton>
-                    <NButton size="small">详情</NButton>
-                </div>
-            )}
-            actionsExtra={() => (
-                <NCollapseTransition show={showRecords.value}>
-                    <NDivider class="text-sm text-gray">
-                        <div class="flex-x gap-2 items-center">
-                            <SuccessIcon size={16} />
-                            <div>{correctRate}%</div>
-                            <ErrorIcon class="ml-2" size={16} />
-                            <div>{100 - correctRate}%</div>
+                    <NCollapseTransition show={showRecords.value}>
+                        <NDivider class="text-sm text-gray">
+                            <div class="flex-x gap-2 items-center">
+                                <SuccessIcon size={16} />
+                                <div>{correctRate}%</div>
+                                <ErrorIcon class="ml-2" size={16} />
+                                <div>{100 - correctRate}%</div>
+                            </div>
+                        </NDivider>
+                        <div class="flex-y gap-3">
+                            {records.map((record, index) => {
+                                return (
+                                    <UserHistoryRecordLine
+                                        user={user}
+                                        record={record}
+                                        index={index + 1}
+                                        read={read}
+                                    />
+                                )
+                            })}
                         </div>
-                    </NDivider>
-                    <div class="flex-y gap-3">
-                        {records.map((record, index) => {
-                            return (
-                                <UserHistoryRecordLine
-                                    user={user}
-                                    record={record}
-                                    index={index + 1}
-                                    read={read}
-                                />
-                            )
-                        })}
-                    </div>
-                </NCollapseTransition>
+                    </NCollapseTransition>
+                </div>
             )}
         />
     )
@@ -116,7 +119,7 @@ function UserHistoryReadCard({
 export default defineComponent(() => {
     const userStore = useUserStore()
     const message = useMessage()
-
+    const readStore = useJLPTReadStore()
     const histories = ref<JLPT_Read[]>([])
     const historyRecords = ref<UserHistoryRecord[]>([])
 
@@ -140,14 +143,27 @@ export default defineComponent(() => {
         getUserHistories()
     })
 
+    function handleToDetail(read: JLPT_Read) {
+        router.push({
+            path: `/jlpt/read/detail/${read.id}`,
+            query: {
+                title: read.article.title,
+            },
+        })
+        readStore.createHistoryRecord(read)
+    }
     return () => (
-        <div class="h-full flex-x flex-wrap gap-4">
+        <div class="max-md:items-center md:flex-x md:flex-wrap gap-4">
             {histories.value.map((read) => {
                 const records = historyRecords.value.filter((record) => record.ref === read.id)
                 return (
-                    <div class="h-1/2">
-                        <UserHistoryReadCard user={userStore.user!} records={records} read={read} />
-                    </div>
+                    <UserHistoryReadCard
+                        class="max-w-125"
+                        user={userStore.user!}
+                        records={records}
+                        read={read}
+                        onClick={() => handleToDetail(read)}
+                    />
                 )
             })}
         </div>

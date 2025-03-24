@@ -7,9 +7,9 @@ import { ref } from 'vue'
 export const useUserStore = defineStore('user-store', () => {
     const user = ref<Omit<User, 'password'> | null>(null)
     const token = ref(localStorage.getItem('token') || '')
-    function saveToken(token: string) {
-        localStorage.setItem('token', token)
-        token.value = token
+    function saveToken(value: string) {
+        localStorage.setItem('token', value)
+        token.value = value
     }
     function removeToken() {
         localStorage.removeItem('token')

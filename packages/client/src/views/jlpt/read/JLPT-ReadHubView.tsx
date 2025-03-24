@@ -53,7 +53,7 @@ export default defineComponent(() => {
     }
 
     return () => (
-        <main class="app-content">
+        <div>
             <div class="flex-x justify-center px-5% h-10">
                 <NInput
                     class="max-w-100"
@@ -90,6 +90,6 @@ export default defineComponent(() => {
                     )
                 })}
             </div>
-        </main>
+        </div>
     )
 })

@@ -2,6 +2,7 @@ import { defineComponent } from 'vue'
 import { NAvatar, NCard } from 'naive-ui'
 import CalendarHeatmap from '@/components/tools/CalendarHeatmap'
 import { ref } from 'vue'
+import { useUserStore } from '@/stores/user'
 
 const records = ref([
     { date: '2025-02-25', completed: true },
@@ -10,20 +11,17 @@ const records = ref([
 ])
 
 export default defineComponent(() => {
+    const userStore = useUserStore()
     return () => (
-        <div class="flex-x gap-10">
+        <div class="gap-10 md:flex-x">
             <div class="flex-1/3 flex-y">
-                <NAvatar
-                    round
-                    size={256}
-                    src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-                />
-                <div class="mt-10 text-xl font-bold">OpenJLPT</div>
-                <div class="text-xl text-gray font-light">YuzuTea</div>
-                <div class="mt-4">Code for code. Live for life. Tyee my tea</div>
+                <NAvatar round size={256} src={userStore.user!.avatar} />
+                <div class="mt-10 text-2xl">{userStore.user!.name}</div>
+                <div class="text-xl text-gray-300">{userStore.user!.account}</div>
+                {/* <div class="mt-4">{userStore.user!.description}</div> */}
             </div>
             <div class="flex-2/3">
-                <NCard class="h-full">
+                <NCard>
                     <CalendarHeatmap records={records.value} year={2025} />
                 </NCard>
             </div>

@@ -22,7 +22,8 @@ const router = createRouter({
                 { path: 'setting', component: () => import('@/views/user/UserSettingView') },
                 {
                     path: 'history',
-                    // component: () => import('@/views/user/history/UserHistoryView'),
+                    component: () => import('@/views/user/history/UserHistoryView'),
+                    redirect: '/user/history/read',
                     children: [
                         {
                             path: 'read',

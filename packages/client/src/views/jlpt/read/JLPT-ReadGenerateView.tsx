@@ -288,7 +288,7 @@ export default defineComponent(() => {
     //#endregion
 
     return () => (
-        <main class="app-content">
+        <div>
             {/* <!-- 配置栏 --> */}
             <NGrid responsive="screen" cols="2 s:3 m:4" x-gap={24}>
                 <NFormItemGi label="主题" required>
@@ -394,6 +394,6 @@ export default defineComponent(() => {
                     </NCollapseItem>
                 )}
             </NCollapse>
-        </main>
+        </div>
     )
 })
