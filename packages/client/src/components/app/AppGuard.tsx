@@ -266,7 +266,7 @@ export default defineComponent(() => {
             ) : (
                 <div id="app-guard" class="flex gap-10 h-full p-20 max-md:flex-y max-md:p-5">
                     <div class="md:flex-2/3 flex">
-                        <AppIntroduction />
+                        <AppIntroduction responsive />
                     </div>
                     <div class="flex-1/3 flex-y">
                         <NCard class="max-w-100 md:m-auto shadow-xl">

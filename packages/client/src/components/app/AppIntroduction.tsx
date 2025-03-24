@@ -1,9 +1,10 @@
 import { useI18n } from 'vue-i18n'
 import SakuraIcon from '../icon/SakuraIcon'
 
-export default function AppIntroduction() {
+export default function AppIntroduction(props: { responsive?: boolean }) {
     const { t } = useI18n()
 
+    const baseClass = 'p-2 w-75% text-2xl max-md:text-lg italic text-center text-gray-300'
     return (
         <div class="m-auto flex-y items-center gap-10">
             <div class="flex-x text-8xl gap-2 items-center max-md:flex-y max-md:text-4xl">
@@ -16,7 +17,7 @@ export default function AppIntroduction() {
                     </a>
                 </div>
             </div>
-            <div class="max-md:hidden p-2 w-75% text-2xl max-md:text-lg italic text-center text-gray-300">
+            <div class={baseClass + (props.responsive ? ' max-md:hidden ' : '')}>
                 {t('guard.description')}
             </div>
         </div>
