@@ -44,6 +44,7 @@ export default defineComponent((props: Props) => {
         },
     }
     async function handleSubmitForm(e: MouseEvent) {
+        console.log(1)
         e.preventDefault()
         formRef.value?.validate(async (errors) => {
             if (errors) {
@@ -59,7 +60,7 @@ export default defineComponent((props: Props) => {
         }
     }
     return () => (
-        <NForm ref="formRef" model={formModel.value} rules={rules}>
+        <NForm ref={formRef} model={formModel.value} rules={rules}>
             <NGrid cols="24" xGap="24" yGap="12">
                 <NFormItemGi required span="8" label="Name" path="name">
                     <NInput v-model:value={formModel.value.name} />

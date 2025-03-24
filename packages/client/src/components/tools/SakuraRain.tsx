@@ -104,7 +104,7 @@ export default defineComponent({
         })
 
         return () => (
-            <div ref={containerRef} class="relative w-full h-full">
+            <div ref={containerRef} class="app-content">
                 {slots.default?.()}
             </div>
         )

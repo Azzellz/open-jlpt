@@ -87,7 +87,6 @@ export default defineComponent(() => {
                     collapsedIconSize={22}
                     options={desktopMenuOptions.value}
                     rootIndent={36}
-                    indent={0}
                 />
             )}
             footer={() => (
