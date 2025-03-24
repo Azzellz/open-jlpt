@@ -11,18 +11,18 @@ import {
     type FormRules,
     NAlert,
 } from 'naive-ui'
-import SakuraIcon from '../icon/SakuraIcon'
 import SakuraRain from '../tools/SakuraRain'
 import { defineComponent, onMounted, ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user'
 import API from '@/api'
 import { isSuccessResponse } from '@root/shared'
 import AppLoader from './loader/AppLoader'
+import AppIntroduction from './AppIntroduction'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent(() => {
-    const { t } = useI18n()
     const message = useMessage()
+    const { t } = useI18n()
     const isLoading = ref(false)
     const userStore = useUserStore()
     const loginErrorMessage = ref('')
@@ -81,7 +81,6 @@ export default defineComponent(() => {
             if (isSuccessResponse(result)) {
                 message.success('登录成功！')
                 userStore.user = result.data.user
-                userStore.token = result.data.token
                 userStore.saveToken(result.data.token)
                 loginAttempts.value = 0
             } else {
@@ -200,7 +199,6 @@ export default defineComponent(() => {
             if (isSuccessResponse(result)) {
                 message.success('注册成功！')
                 userStore.user = result.data.user
-                userStore.token = result.data.token
                 userStore.saveToken(result.data.token)
                 registerAttempts.value = 0
             } else {
@@ -233,7 +231,6 @@ export default defineComponent(() => {
             message.success('自动登录成功！')
         } else {
             message.error('自动登录失败，请重新登录')
-            userStore.token = ''
             userStore.removeToken()
             console.error(result)
         }
@@ -241,7 +238,7 @@ export default defineComponent(() => {
 
     //#endregion
 
-    // 验证码相关（模拟，实际应该对接真实验证码服务）
+    //#region 验证码相关（模拟，实际应该对接真实验证码服务）
     const captchaUrl = ref('')
     function refreshCaptcha() {
         // 模拟生成新的验证码URL
@@ -257,6 +254,7 @@ export default defineComponent(() => {
     function handleForgotPassword() {
         message.info('请联系管理员重置密码')
     }
+    //#endregion
 
     return () => (
         <SakuraRain>
@@ -266,24 +264,12 @@ export default defineComponent(() => {
                     <AppLoader class="m-auto" />
                 </div>
             ) : (
-                <div id="app-guard" class="flex max-md:flex-col h-full p-20">
+                <div id="app-guard" class="flex gap-10 h-full p-20 max-md:flex-y max-md:p-5">
                     <div class="md:flex-2/3 flex">
-                        <div class="m-auto flex flex-col gap-10">
-                            <div class="flex-x text-8xl gap-2 items-center">
-                                <SakuraIcon class="mb-1.5 mr-2" size="150" />
-                                <span class="text-gray">OPEN</span>
-                                <span class="text-red-300">·</span>
-                                <a class="text-red underline" href="https://www.jlpt.jp">
-                                    JLPT
-                                </a>
-                            </div>
-                            <div class="text-2xl italic text-center text-gray-300 w-200">
-                                {t('guard.description')}
-                            </div>
-                        </div>
+                        <AppIntroduction />
                     </div>
-                    <div class="flex-1/3 flex flex-col">
-                        <NCard class="w-100 m-auto shadow-xl">
+                    <div class="flex-1/3 flex-y">
+                        <NCard class="max-w-100 md:m-auto shadow-xl">
                             <NTabs
                                 class="card-tabs"
                                 defaultValue="signin"

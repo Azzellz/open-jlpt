@@ -7,6 +7,14 @@ import { ref } from 'vue'
 export const useUserStore = defineStore('user-store', () => {
     const user = ref<Omit<User, 'password'> | null>(null)
     const token = ref(localStorage.getItem('token') || '')
+    function saveToken(token: string) {
+        localStorage.setItem('token', token)
+        token.value = token
+    }
+    function removeToken() {
+        localStorage.removeItem('token')
+        token.value = ''
+    }
 
     API_INSTANCE.interceptors.request.use((config) => {
         // 自动注入令牌
@@ -57,5 +65,7 @@ export const useUserStore = defineStore('user-store', () => {
     return {
         user,
         token,
+        saveToken,
+        removeToken,
     }
 })
