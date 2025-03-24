@@ -50,12 +50,11 @@ export default defineComponent(() => {
             },
         })
         readStore.createHistoryRecord(read)
-        console.log(readStore.historyRecords)
     }
 
     return () => (
-        <div class="h-full py-10 px-15% flex-y">
-            <div class="flex-x justify-center">
+        <main class="app-content">
+            <div class="flex-x justify-center px-5% h-10">
                 <NInput
                     class="max-w-100"
                     placeholder="搜索"
@@ -68,11 +67,12 @@ export default defineComponent(() => {
                     }}
                 />
             </div>
-            <NDivider></NDivider>
-            <div class="flex-y gap-4 flex-wrap md:flex-x md:justify-between">
+            <NDivider class="text-gray-300">共 {readStore.reads.length} 篇</NDivider>
+            <div class="app-content py-0 px-4% gap-6 md:flex-wrap md:flex-x">
                 {readStore.reads.map((read) => {
                     return (
                         <JLPT_ReadCard
+                            class="max-w-125"
                             read={read}
                             onClick={() => handleToDetail(read)}
                             headerExtra={() => (
@@ -90,6 +90,6 @@ export default defineComponent(() => {
                     )
                 })}
             </div>
-        </div>
+        </main>
     )
 })

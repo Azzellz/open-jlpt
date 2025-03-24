@@ -30,7 +30,9 @@ export default defineComponent(() => {
 
     return () =>
         read.value ? (
-            <JLPTReadBody originRead={read.value} read={read.value} />
+            <div class="app-content">
+                <JLPTReadBody originRead={read.value} read={read.value} />
+            </div>
         ) : (
             <div class="h-full flex">
                 <AppLoader class="m-auto" />

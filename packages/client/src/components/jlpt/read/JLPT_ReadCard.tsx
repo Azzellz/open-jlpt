@@ -16,7 +16,7 @@ export default function JLPT_ReadCard(props: Props) {
     props.read.article.contents.forEach((c) => (wordCount += c.length))
 
     return (
-        <div class="w-125 shadow-lg cursor-pointer" onClick={props.onClick}>
+        <div class="oj-shadow cursor-pointer" onClick={props.onClick}>
             <NCard>
                 <div class="flex-y">
                     <div class="flex-y">

@@ -264,12 +264,15 @@ export default defineComponent(() => {
                     <AppLoader class="m-auto" />
                 </div>
             ) : (
-                <div id="app-guard" class="flex gap-10 h-full p-20 max-md:flex-y max-md:p-5">
-                    <div class="md:flex-2/3 flex">
+                <div
+                    id="app-guard"
+                    class="flex gap-10 items-center h-full p-20 max-lg:flex-y max-md:p-5"
+                >
+                    <div class="md:flex-2/3 w-full flex">
                         <AppIntroduction responsive />
                     </div>
-                    <div class="flex-1/3 flex-y">
-                        <NCard class="max-w-100 md:m-auto shadow-xl">
+                    <div class="flex-1/3 w-full flex-y">
+                        <NCard class="md:m-auto shadow-xl">
                             <NTabs
                                 class="card-tabs"
                                 defaultValue="signin"

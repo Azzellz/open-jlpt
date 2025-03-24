@@ -9,57 +9,21 @@ import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/app/AppLayout'
 import { useJLPTReadStore } from '@/stores/jlpt/read'
 
-function renderIcon(icon: Component) {
-    return () => <NIcon component={icon} />
-}
-function renderRouterLink(to: string, label: string) {
-    return () => <RouterLink to={to}> {label} </RouterLink>
-}
-
-function Sider() {
-    const { t } = useI18n()
-    const route = useRoute()
-    const readStore = useJLPTReadStore()
-
-    const menuOptions = computed<MenuOption[]>(() => {
-        return [
-            {
-                label: renderRouterLink('/jlpt/read/generate', '生成阅读'),
-                key: '/jlpt/read/generate',
-                icon: renderIcon(GenerateIcon),
-            },
-            {
-                label: renderRouterLink('/jlpt/read/hub', '阅读广场'),
-                key: '/jlpt/read/hub',
-                icon: renderIcon(HubIcon),
-                children: readStore.historyRecords.length
-                    ? readStore.historyRecords.map((read) => {
-                          return {
-                              label: renderRouterLink(
-                                  `/jlpt/read/detail/${read.id}`,
-                                  read.article.title,
-                              ),
-                              key: `/jlpt/read/detail/${read.id}`,
-                              icon: renderIcon(BookIcon),
-                          }
-                      })
-                    : void 0,
-            },
-        ]
-    })
-
-    return (
-        <NMenu
-            class="py-2"
-            value={route.path}
-            defaultExpandAll
-            collapsedWidth={64}
-            collapsedIconSize={22}
-            options={menuOptions.value}
-            rootIndent={36}
-            indent={0}
-        />
-    )
+function createMenuOption(options: {
+    icon: Component
+    label: string
+    to: string
+    children?: MenuOption[]
+}): MenuOption {
+    return {
+        label: () => (
+            <div class="flex-y h-full items-center">
+                <NIcon size="24" component={options.icon} />
+                <RouterLink to={options.to}> {options.label} </RouterLink>
+            </div>
+        ),
+        key: options.to,
+    }
 }
 
 export default defineComponent(() => {
@@ -69,28 +33,21 @@ export default defineComponent(() => {
 
     const menuOptions = computed<MenuOption[]>(() => {
         return [
-            {
-                label: renderRouterLink('/jlpt/read/generate', '生成阅读'),
-                key: '/jlpt/read/generate',
-                icon: renderIcon(GenerateIcon),
-            },
-            {
-                label: renderRouterLink('/jlpt/read/hub', '阅读广场'),
-                key: '/jlpt/read/hub',
-                icon: renderIcon(HubIcon),
+            createMenuOption({ icon: GenerateIcon, label: '生成阅读', to: '/jlpt/read/generate' }),
+            createMenuOption({
+                icon: HubIcon,
+                label: '阅读广场',
+                to: '/jlpt/read/hub',
                 children: readStore.historyRecords.length
                     ? readStore.historyRecords.map((read) => {
-                          return {
-                              label: renderRouterLink(
-                                  `/jlpt/read/detail/${read.id}`,
-                                  read.article.title,
-                              ),
-                              key: `/jlpt/read/detail/${read.id}`,
-                              icon: renderIcon(BookIcon),
-                          }
+                          return createMenuOption({
+                              icon: BookIcon,
+                              label: read.article.title,
+                              to: `/jlpt/read/detail/${read.id}`,
+                          })
                       })
                     : void 0,
-            },
+            }),
         ]
     })
 
@@ -109,9 +66,9 @@ export default defineComponent(() => {
                 />
             )}
             footer={() => (
-                <div class="mx-6 rounded-full oj-shadow h-16">
+                <div class="mx-6 rounded-full p-2 oj-shadow">
                     <NMenu
-                        class="pt-2.5"
+                        class="mb-2 py-2"
                         value={route.path}
                         options={menuOptions.value}
                         mode="horizontal"
