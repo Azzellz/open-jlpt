@@ -257,22 +257,19 @@ export default defineComponent(() => {
     //#endregion
 
     return () => (
-        <SakuraRain>
+        <SakuraRain class="h-full">
             {/* 如果有token则展示加载界面，此时为自动登录，如果自动登录失败则重新展示登录框 */}
             {userStore.token ? (
                 <div class="h-full flex">
                     <AppLoader class="m-auto" />
                 </div>
             ) : (
-                <div
-                    id="app-guard"
-                    class="flex gap-10 items-center h-full p-20 max-lg:flex-y max-md:p-5"
-                >
-                    <div class="md:flex-2/3 w-full flex">
+                <div class="flex gap-10 items-center h-full p-20 max-lg:flex-y max-md:p-5">
+                    <div class="md:flex-2/3 flex">
                         <AppIntroduction responsive />
                     </div>
                     <div class="flex-1/3 w-full flex-y">
-                        <NCard class="md:m-auto shadow-xl">
+                        <NCard class="max-w-100 md:m-auto shadow-xl">
                             <NTabs
                                 class="card-tabs"
                                 defaultValue="signin"

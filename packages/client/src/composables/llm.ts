@@ -6,6 +6,7 @@ interface LLM_GenerateOptions {
     onReasoning?: (str: string) => void
     onContent?: (str: string) => void
     onFinish?: () => void
+    onBeforeContent?: () => void
 }
 
 export function useLLM() {
@@ -34,6 +35,10 @@ export function useLLM() {
                 options?.onReasoning?.(str)
             },
             onContent(str) {
+                if (content.value.length === 0) {
+                    options?.onBeforeContent?.()
+                }
+
                 isReasoning.value = false
                 isContenting.value = true
                 content.value += str

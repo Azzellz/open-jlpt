@@ -103,10 +103,6 @@ export default defineComponent({
             petals.value = []
         })
 
-        return () => (
-            <div ref={containerRef} class="app-content">
-                {slots.default?.()}
-            </div>
-        )
+        return () => <div ref={containerRef}>{slots.default?.()}</div>
     },
 })
