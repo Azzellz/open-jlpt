@@ -22,10 +22,11 @@ interface ChatRecord {
     }
 }
 export default defineComponent(() => {
-
     //#region 对话
 
-    const { generate, isGenerating, currentLLMID, currentLLM, llmOptions } = useLLM()
+    const { generate, isGenerating, currentLLMID, currentLLM, llmOptions } = useLLM({
+        extends: ['selection'],
+    })
     const chatRecords = ref<ChatRecord[]>([])
     const historyRecords = localStorage.getItem('chat-records')
     if (historyRecords) {

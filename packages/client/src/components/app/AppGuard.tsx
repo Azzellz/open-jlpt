@@ -271,7 +271,7 @@ export default defineComponent(() => {
                     <div class="md:flex-2/3 flex">
                         <AppIntroduction responsive />
                     </div>
-                    <div class="flex-1/3 w-full flex-y">
+                    <div class="flex-1/3 w-full flex-y items-center">
                         <NCard class="max-w-100 md:m-auto shadow-xl">
                             <NTabs
                                 class="card-tabs"

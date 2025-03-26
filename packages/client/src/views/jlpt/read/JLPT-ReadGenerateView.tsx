@@ -169,7 +169,8 @@ export default defineComponent(() => {
         currentLLMID,
         currentLLM,
         llmOptions,
-    } = useLLM()
+        json,
+    } = useLLM({ extends: ['selection', 'json'] })
     const isAllowGenerate = computed(() => {
         return theme.value && currentLLMID.value
     })
@@ -189,7 +190,6 @@ export default defineComponent(() => {
         // 重置状态
         originRead.value = null
         read.value = null
-        const jsonBrook = createJsonBrook()
         await generate(
             currentLLMID.value,
             [
@@ -205,19 +205,11 @@ export default defineComponent(() => {
             {
                 // 如果当前模型是本地模型，则使用本地设置
                 custom: currentLLM.value?.local ? currentLLM.value : void 0,
-                onContent(str) {
-                    isReasoning.value = false
-                    if (str === 'json' || str === '```') {
-                        return
-                    } else {
-                        content.value += str
-                        jsonBrook.write(str)
-                        originRead.value = jsonBrook.getCurrent()
-                    }
+                onJSON(jsonFragment: any) {
+                    originRead.value = jsonFragment
                 },
             },
         )
-        jsonBrook.end()
         await createRead()
     }
 
@@ -273,6 +265,7 @@ export default defineComponent(() => {
         originRead.value = JSON.parse(__testReadString)
         read.value = JSON.parse(__testReadString)
         content.value = __testReadString.toString()
+        json.value = JSON.parse(__testReadString)
     })
 
     //#endregion
