@@ -82,6 +82,7 @@ export default defineComponent(() => {
                 message.success('登录成功！')
                 userStore.user = result.data.user
                 userStore.saveToken(result.data.token)
+                userStore.loadLocalConfig()
                 loginAttempts.value = 0
             } else {
                 loginAttempts.value++
@@ -200,6 +201,7 @@ export default defineComponent(() => {
                 message.success('注册成功！')
                 userStore.user = result.data.user
                 userStore.saveToken(result.data.token)
+                userStore.loadLocalConfig()
                 registerAttempts.value = 0
             } else {
                 registerAttempts.value++
@@ -228,6 +230,7 @@ export default defineComponent(() => {
         message.destroyAll()
         if (isSuccessResponse(result)) {
             userStore.user = result.data
+            userStore.loadLocalConfig()
             message.success('自动登录成功！')
         } else {
             message.error('自动登录失败，请重新登录')

@@ -1,15 +1,15 @@
-import { defineComponent, type SetupContext } from 'vue'
-import type { LLM_Config } from '@root/models'
-import { NCard, NButton, NIcon, NDivider } from 'naive-ui'
+import { defineComponent } from 'vue'
+import type { ClientLLM_Config } from '@root/models'
+import { NCard, NButton, NIcon, NDivider, NTag } from 'naive-ui'
 import {
     CalendarEdit20Regular as CalendarEdit20RegularIcon,
     Delete20Regular as Delete20RegularIcon,
 } from '@vicons/fluent'
 
 interface Props {
-    llm: LLM_Config
-    onEdit?: (llm: LLM_Config) => void
-    onDelete?: (llm: LLM_Config) => void
+    llm: ClientLLM_Config
+    onEdit?: (llm: ClientLLM_Config) => void
+    onDelete?: (llm: ClientLLM_Config) => void
 }
 
 export default defineComponent((props: Props) => {
@@ -19,6 +19,16 @@ export default defineComponent((props: Props) => {
             hoverable
             headerExtra={() => (
                 <div class="flex items-center">
+                    {props.llm.local ? (
+                        <NTag size="small" type="success">
+                            本地
+                        </NTag>
+                    ) : (
+                        <NTag size="small" type="warning">
+                            远程
+                        </NTag>
+                    )}
+                    <NDivider vertical />
                     <NButton text onClick={() => props.onEdit?.(props.llm)}>
                         <NIcon size="24" component={CalendarEdit20RegularIcon} />
                     </NButton>

@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/home/HomeView'
 import UserView from '@/views/user/UserView'
-import UserProfileView from '@/views/user/UserProfileView'
+import UserProfileView from '@/views/user/profile/UserProfileView'
 import JLPT_ReadView from '@/views/jlpt/read/JLPT-ReadView'
 
 const router = createRouter({
@@ -19,7 +19,7 @@ const router = createRouter({
             redirect: '/user/profile',
             children: [
                 { path: 'profile', component: UserProfileView },
-                { path: 'setting', component: () => import('@/views/user/UserSettingView') },
+                { path: 'setting', component: () => import('@/views/user/setting/UserSettingView') },
                 {
                     path: 'history',
                     component: () => import('@/views/user/history/UserHistoryView'),

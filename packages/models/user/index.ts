@@ -1,5 +1,12 @@
 import type { JLPT_PracticeMap } from '../jlpt'
 import type { UserHistory } from './history'
+
+export interface LLM_CreateParams extends Omit<LLM_Config, 'id'> {
+    local: boolean
+}
+export interface ClientLLM_Config extends LLM_Config {
+    local: boolean
+}
 export interface LLM_Config {
     id: string
     name: string

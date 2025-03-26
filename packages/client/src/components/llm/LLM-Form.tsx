@@ -1,21 +1,32 @@
 import { defineComponent, ref } from 'vue'
-import type { LLM_Config } from '@root/models'
-import { NGrid, NFormItemGi, NInput, NForm, type FormInst, NButton, type FormRules } from 'naive-ui'
+import type { LLM_CreateParams } from '@root/models'
+import {
+    NGrid,
+    NFormItemGi,
+    NInput,
+    NForm,
+    type FormInst,
+    NButton,
+    type FormRules,
+    NSwitch,
+} from 'naive-ui'
+
 
 interface Props {
-    model?: Omit<LLM_Config, 'id'>
-    onSubmit?: (model: Omit<LLM_Config, 'id'>, complete: () => void) => void
+    model?: LLM_CreateParams
+    onSubmit?: (model: LLM_CreateParams, complete: () => void) => void
 }
 export default defineComponent((props: Props) => {
-    const _emptyLLMModel = {
+    const _emptyLLMModel: LLM_CreateParams = {
         name: '',
         apiKey: '',
         baseURL: '',
         modelID: '',
+        local: true,
     }
 
     const isLoading = ref(false)
-    const formModel = ref<Omit<LLM_Config, 'id'>>({
+    const formModel = ref({
         ..._emptyLLMModel,
         ...props.model,
     })
@@ -42,9 +53,13 @@ export default defineComponent((props: Props) => {
             trigger: 'blur',
             message: 'ModelID 不能为空',
         },
+        local: {
+            required: true,
+            trigger: 'blur',
+            type: 'boolean',
+        },
     }
     async function handleSubmitForm(e: MouseEvent) {
-        console.log(1)
         e.preventDefault()
         formRef.value?.validate(async (errors) => {
             if (errors) {
@@ -61,20 +76,23 @@ export default defineComponent((props: Props) => {
     }
     return () => (
         <NForm ref={formRef} model={formModel.value} rules={rules}>
-            <NGrid cols="24" xGap="24" yGap="12">
-                <NFormItemGi required span="8" label="Name" path="name">
+            <NGrid responsive="screen" cols="4 s:6 m:8" x-gap={24} yGap="12">
+                <NFormItemGi required span="4 s:2 m:3" label="Name" path="name">
                     <NInput v-model:value={formModel.value.name} />
                 </NFormItemGi>
-                <NFormItemGi required span="16" label="ApiKey" path="apiKey">
+                <NFormItemGi required span="4 s:4 m:5" label="ApiKey" path="apiKey">
                     <NInput v-model:value={formModel.value.apiKey} />
                 </NFormItemGi>
-                <NFormItemGi required span="14" label="BaseURL" path="baseURL">
+                <NFormItemGi required span="8" label="BaseURL" path="baseURL">
                     <NInput v-model:value={formModel.value.baseURL} />
                 </NFormItemGi>
-                <NFormItemGi required span="10" label="ID" path="modelID">
+                <NFormItemGi required span="3 s:4 m:6" label="ID" path="modelID">
                     <NInput v-model:value={formModel.value.modelID} />
                 </NFormItemGi>
-                <NFormItemGi class="px-10" span="12">
+                <NFormItemGi required span="1 s:2" label="本地设置" path="local">
+                    <NSwitch round={false} v-model:value={formModel.value.local} />
+                </NFormItemGi>
+                <NFormItemGi span="2 s:3 m:4">
                     <NButton
                         class="w-full"
                         type="primary"
@@ -84,7 +102,7 @@ export default defineComponent((props: Props) => {
                         提交
                     </NButton>
                 </NFormItemGi>
-                <NFormItemGi class="px-10" span="12">
+                <NFormItemGi span="2 s:3 m:4">
                     <NButton class="w-full" type="warning" onClick={handleResetForm}>
                         重置
                     </NButton>

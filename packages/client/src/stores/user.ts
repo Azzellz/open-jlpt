@@ -1,11 +1,14 @@
 import API, { API_INSTANCE } from '@/api'
-import type { User } from '@root/models/user'
+import type { User, UserConfig } from '@root/models/user'
 import { isSuccessResponse } from '@root/shared'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 export const useUserStore = defineStore('user-store', () => {
     const user = ref<Omit<User, 'password'> | null>(null)
+
+    //#region 令牌
+
     const token = ref(localStorage.getItem('token') || '')
     function saveToken(value: string) {
         localStorage.setItem('token', value)
@@ -62,10 +65,46 @@ export const useUserStore = defineStore('user-store', () => {
         },
     )
 
+    //#endregion
+
+    //#region 用户配置
+    const remoteConfig = computed(() => user.value?.config)
+    const localConfig = ref<UserConfig | null>(null)
+    const mergedConfig = computed(() => {
+        return {
+            llm: {
+                default: localConfig.value!.llm.default || remoteConfig.value!.llm.default,
+                items: [...localConfig.value!.llm.items, ...remoteConfig.value!.llm.items],
+            },
+        }
+    })
+    function loadLocalConfig() {
+        const local = localStorage.getItem('user-config')
+        if (local) {
+            localConfig.value = JSON.parse(local)
+        } else {
+            localConfig.value = {
+                llm: {
+                    items: [],
+                    default: '',
+                },
+            }
+        }
+    }
+    function saveLocalConfig() {
+        localStorage.setItem('user-config', JSON.stringify(localConfig.value))
+    }
+    //#endregion
+
     return {
         user,
         token,
         saveToken,
         removeToken,
+        remoteConfig,
+        localConfig,
+        mergedConfig,
+        loadLocalConfig,
+        saveLocalConfig,
     }
 })
