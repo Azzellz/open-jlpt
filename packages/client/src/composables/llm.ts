@@ -1,8 +1,10 @@
 import API from '@/api'
 import type { LLM_ChatParams } from '@root/models'
-import { ref } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { computed, ref } from 'vue'
 
 interface LLM_GenerateOptions {
+    custom?: LLM_ChatParams['custom']
     onReasoning?: (str: string) => void
     onContent?: (str: string) => void
     onFinish?: () => void
@@ -10,6 +12,7 @@ interface LLM_GenerateOptions {
 }
 
 export function useLLM() {
+    const userStore = useUserStore()
     const isGenerating = ref(false)
 
     const isReasoning = ref(false)
@@ -29,6 +32,7 @@ export function useLLM() {
 
         await API.User.chatWithLLM(llmID, {
             messages,
+            custom: options?.custom,
             onReasoning(str) {
                 isReasoning.value = true
                 reasoning.value += str
@@ -50,6 +54,25 @@ export function useLLM() {
         options?.onFinish?.()
     }
 
+    //#region 模型选择拓展
+
+    const currentLLM = computed(() => {
+        return userStore.mergedConfig.llm.items.find((llm) => llm.id === currentLLMID.value)
+    })
+    const currentLLMID = ref(userStore.mergedConfig.llm.default)
+    const llmOptions = computed(() => {
+        const options = userStore.mergedConfig!.llm.items.map((llm) => {
+            return { label: llm.name, value: llm.id }
+        })
+        if (currentLLMID.value) {
+            return options
+        } else {
+            return [...options, { label: '请选择模型', value: '' }]
+        }
+    })
+
+    //#endregion
+
     return {
         generate,
         content,
@@ -57,5 +80,9 @@ export function useLLM() {
         isGenerating,
         isContenting,
         isReasoning,
+        // 模型选择拓展
+        currentLLMID,
+        currentLLM,
+        llmOptions,
     }
 }

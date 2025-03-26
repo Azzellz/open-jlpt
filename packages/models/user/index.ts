@@ -22,6 +22,13 @@ export interface UserConfig {
     }
 }
 
+export interface UserClientConfig extends UserConfig {
+    llm: {
+        items: ClientLLM_Config[]
+        default: string
+    }
+}
+
 export interface User {
     id: string
     name: string

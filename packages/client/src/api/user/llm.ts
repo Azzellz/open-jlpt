@@ -1,23 +1,22 @@
-import type { LLM_ChatParams } from "@root/models"
-import { API_INSTANCE } from ".."
-
+import type { LLM_ChatParams } from '@root/models'
+import { API_INSTANCE } from '..'
 
 export async function chatWithLLM(
     llmID: string,
     params: {
-        messages: LLM_ChatParams['messages']
         onContent?: (content: string) => void
         onReasoning?: (reasoning: string) => void
         onChunk?: (chunk: string) => void
-    },
+    } & LLM_ChatParams,
 ) {
     const _mark = 'e7d974c7436c9a369b93fe49e405364b9bd3060a'
-    const { messages, onChunk, onContent, onReasoning } = params
+    const { messages, custom, onChunk, onContent, onReasoning } = params
     const response = await API_INSTANCE.post(
         `/users/{{user.id}}/llms/${llmID}/chat`,
         {
             isStream: true,
             messages,
+            custom,
         },
         {
             responseType: 'stream',

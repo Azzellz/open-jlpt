@@ -1,8 +1,7 @@
-import { computed, defineComponent, ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 import AppIntroduction from '@/components/app/AppIntroduction'
 import { useLLM } from '@/composables/llm'
 import { NButton, NDivider, NIcon, NInput, NSelect } from 'naive-ui'
-import { useUserStore } from '@/stores/user'
 import SakuraIcon from '@/components/icon/SakuraIcon'
 import { marked } from 'marked'
 import dayjs from 'dayjs'
@@ -23,34 +22,10 @@ interface ChatRecord {
     }
 }
 export default defineComponent(() => {
-    const userStore = useUserStore()
-
-    //#region 模型选择
-
-    const currentLLM = computed(() => {
-        return userStore.user!.config.llm.items.find((llm) => llm.id === currentLLMID.value)
-    })
-    const currentLLMID = ref(userStore.user!.config.llm.default)
-    const llmOptions = computed(() => {
-        if (userStore.user!.config) {
-            const options = userStore.user!.config.llm.items.map((llm) => {
-                return { label: llm.name, value: llm.id }
-            })
-            if (currentLLMID.value) {
-                return options
-            } else {
-                return [...options, { label: '请选择模型', value: '' }]
-            }
-        } else {
-            return []
-        }
-    })
-
-    //#endregion
 
     //#region 对话
 
-    const { generate, isGenerating, isContenting, isReasoning } = useLLM()
+    const { generate, isGenerating, currentLLMID, currentLLM, llmOptions } = useLLM()
     const chatRecords = ref<ChatRecord[]>([])
     const historyRecords = localStorage.getItem('chat-records')
     if (historyRecords) {
@@ -104,6 +79,7 @@ export default defineComponent(() => {
                 },
             ],
             {
+                custom: currentLLM.value?.local ? currentLLM.value : void 0,
                 onContent(str) {
                     currentRecord.value!.content.value += str
                     scrollToBottom() // 每次内容更新时滚动到底部

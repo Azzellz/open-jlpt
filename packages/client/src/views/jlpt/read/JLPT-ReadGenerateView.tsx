@@ -20,7 +20,6 @@ import {
     NIcon,
 } from 'naive-ui'
 import JLPT_ReadBody from '@/components/jlpt/read/JLPT-ReadBody'
-import { useUserStore } from '@/stores/user'
 import { Json as JsonIcon } from '@vicons/carbon'
 import { useLLM } from '@/composables/llm'
 import { isSuccessResponse } from '@root/shared'
@@ -119,31 +118,12 @@ export interface JLPT_ReadOrigin {
 //#endregion
 
 export default defineComponent(() => {
-    const userStore = useUserStore()
     const message = useMessage()
 
     //#region 配置栏
 
     //#region 阅读相关
     const wordCount = ref()
-    const currentLLMID = ref(userStore.user!.config.llm.default)
-    const currentLLM = computed(() => {
-        return userStore.user!.config.llm.items.find((llm) => llm.id === currentLLMID.value)
-    })
-    const llmOptions = computed(() => {
-        if (userStore.user!.config) {
-            const options = userStore.user!.config.llm.items.map((llm) => {
-                return { label: llm.name, value: llm.id }
-            })
-            if (currentLLMID.value) {
-                return options
-            } else {
-                return [...options, { label: '请选择模型', value: '' }]
-            }
-        } else {
-            return []
-        }
-    })
     const level = ref<JLPT_ReadOrigin['difficulty']>('N1')
     const levelOptions = [
         {
@@ -180,7 +160,16 @@ export default defineComponent(() => {
 
     //#endregion
 
-    const { isReasoning, isGenerating, reasoning, content, generate } = useLLM()
+    const {
+        isReasoning,
+        isGenerating,
+        reasoning,
+        content,
+        generate,
+        currentLLMID,
+        currentLLM,
+        llmOptions,
+    } = useLLM()
     const isAllowGenerate = computed(() => {
         return theme.value && currentLLMID.value
     })
@@ -205,7 +194,6 @@ export default defineComponent(() => {
             currentLLMID.value,
             [
                 {
-                    // prompt
                     role: 'system',
                     content: `根据用户给出的主题，生成一篇字数在 ${wordCount.value || '任意'} 字左右的 JLPT ${level.value} 难度的阅读题，只回复 JSON 格式的数据，JSON 格式为 ${template}`,
                 },
@@ -215,6 +203,8 @@ export default defineComponent(() => {
                 },
             ],
             {
+                // 如果当前模型是本地模型，则使用本地设置
+                custom: currentLLM.value?.local ? currentLLM.value : void 0,
                 onContent(str) {
                     isReasoning.value = false
                     if (str === 'json' || str === '```') {

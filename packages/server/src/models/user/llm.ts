@@ -8,4 +8,11 @@ export const UserModelLLMChatBody = t.Object({
             content: t.String(),
         })
     ),
+    custom: t.Optional(
+        t.Object({
+            apiKey: t.String(),
+            baseURL: t.String(),
+            modelID: t.String(),
+        })
+    ),
 })

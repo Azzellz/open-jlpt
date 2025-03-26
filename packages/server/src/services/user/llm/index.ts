@@ -1,6 +1,8 @@
 import { DB_UserModel } from '@/db'
 import { UserModel } from '@/models/user'
 import { verifyPluginReference } from '@/plugins'
+import { checkUserAvailablePlugin } from '@/plugins/user'
+import { LLM_Config } from '@root/models'
 import { ERROR_RESPONSE, Log } from '@root/shared'
 import Elysia from 'elysia'
 import { isValidObjectId } from 'mongoose'
@@ -42,23 +44,22 @@ export const UserLLMService = new Elysia({
     prefix: '/:userID/llms/:llmID',
 })
     .use(verifyPluginReference)
+    .use(checkUserAvailablePlugin())
     .use(UserModel)
 
 UserLLMService.post(
     '/chat',
-    async function* ({ params: { userID, llmID }, body: { messages } }) {
-        if (!isValidObjectId(userID)) {
-            return ERROR_RESPONSE.SYSTEM.INVALID_OBJECTID
-        }
+    async function* ({ params: { llmID }, store: { user }, body: { messages, custom } }) {
         try {
-            const user = await DB_UserModel.findById(userID)
-            if (!user) {
-                return ERROR_RESPONSE.SYSTEM.NOT_FOUND
-            }
-
-            const llm = user.config.llm.items.find((item) => item.id === llmID)
-            if (!llm) {
-                return ERROR_RESPONSE.SYSTEM.NOT_FOUND
+            let llm: Omit<LLM_Config, 'id' | 'name'> | undefined
+            // 如果 custom 存在，则使用 custom 的配置
+            if (custom) {
+                llm = custom
+            } else {
+                llm = user.config.llm.items.find((item) => item.id === llmID)
+                if (!llm) {
+                    return ERROR_RESPONSE.SYSTEM.NOT_FOUND
+                }
             }
 
             const client = new OpenAI(llm)

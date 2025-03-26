@@ -9,6 +9,11 @@ export interface LLM_ChatMessage {
 }
 
 export interface LLM_ChatParams {
-    isStream: boolean
+    isStream?: boolean
     messages: LLM_ChatMessage[]
+    custom?: {
+        apiKey: string
+        baseURL: string
+        modelID: string
+    }
 }

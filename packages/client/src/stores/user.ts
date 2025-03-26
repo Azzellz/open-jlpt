@@ -1,5 +1,5 @@
 import API, { API_INSTANCE } from '@/api'
-import type { User, UserConfig } from '@root/models/user'
+import type { User, UserClientConfig, UserConfig } from '@root/models/user'
 import { isSuccessResponse } from '@root/shared'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
@@ -70,11 +70,20 @@ export const useUserStore = defineStore('user-store', () => {
     //#region 用户配置
     const remoteConfig = computed(() => user.value?.config)
     const localConfig = ref<UserConfig | null>(null)
-    const mergedConfig = computed(() => {
+    const mergedConfig = computed<UserClientConfig>(() => {
         return {
             llm: {
                 default: localConfig.value!.llm.default || remoteConfig.value!.llm.default,
-                items: [...localConfig.value!.llm.items, ...remoteConfig.value!.llm.items],
+                items: [
+                    ...(localConfig.value?.llm.items || []).map((item) => ({
+                        ...item,
+                        local: true,
+                    })),
+                    ...(remoteConfig.value?.llm.items || []).map((item) => ({
+                        ...item,
+                        local: false,
+                    })),
+                ],
             },
         }
     })
