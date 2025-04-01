@@ -1,3 +1,4 @@
+import { getClientType } from '@/utils'
 import { ref, onMounted, onUnmounted, defineComponent } from 'vue'
 import type { VNode } from 'vue'
 
@@ -22,12 +23,6 @@ export default defineComponent({
         const containerRef = ref<HTMLElement | null>(null)
         const selectedText = ref('')
         const menuPosition = ref<Position>({ top: '0px', left: '0px' })
-        const isMobile = ref(false)
-
-        // 检测是否为移动设备
-        const checkIfMobile = () => {
-            isMobile.value = 'ontouchstart' in window
-        }
 
         // 获取选中位置
         const getSelectionPosition = (): DOMRect | null => {
@@ -120,9 +115,7 @@ export default defineComponent({
 
         // 事件监听
         onMounted(() => {
-            checkIfMobile()
-
-            if (isMobile.value) {
+            if (getClientType() === 'mobile') {
                 // 移动端
                 document.addEventListener('touchend', handleTouchEnd)
                 document.addEventListener('touchstart', handleTouchOutside)
@@ -131,21 +124,19 @@ export default defineComponent({
                 document.addEventListener('mouseup', handleMouseUp)
                 document.addEventListener('mousedown', handleClickOutside)
             }
-
-            // 监听窗口大小变化，重新检测设备类型
-            window.addEventListener('resize', checkIfMobile)
         })
 
+        // 卸载事件监听
         onUnmounted(() => {
-            if (isMobile.value) {
+            if (getClientType() === 'mobile') {
+                // 移动端
                 document.removeEventListener('touchend', handleTouchEnd)
                 document.removeEventListener('touchstart', handleTouchOutside)
             } else {
+                // PC端
                 document.removeEventListener('mouseup', handleMouseUp)
                 document.removeEventListener('mousedown', handleClickOutside)
             }
-
-            window.removeEventListener('resize', checkIfMobile)
         })
 
         return () => (

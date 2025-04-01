@@ -6,6 +6,8 @@ import SakuraIcon from '@/components/icon/SakuraIcon'
 import { marked } from 'marked'
 import dayjs from 'dayjs'
 import { Delete20Regular as DeleteIcon } from '@vicons/fluent'
+import { useGlobalStore } from '@/stores/global'
+import ClientSwitch from '../tools/ClientSwitch'
 
 interface ChatRecord {
     question: {
@@ -22,6 +24,8 @@ interface ChatRecord {
     }
 }
 export default defineComponent(() => {
+    const globalStore = useGlobalStore()
+
     //#region 对话
 
     const { generate, isGenerating, currentLLMID, currentLLM, llmOptions } = useLLM({
@@ -116,6 +120,7 @@ export default defineComponent(() => {
     return () => (
         <div class="flex-y gap-5">
             <div ref={chatContainerRef} class="flex-y flex-1 overflow-auto gap-10 p-5">
+                {/* 介绍 */}
                 <AppIntroduction />
                 {/* 对话记录 */}
                 <div class="flex-y gap-10">
@@ -181,42 +186,61 @@ export default defineComponent(() => {
                 </div>
             </div>
             {/* 对话栏 */}
-            <div class="flex-x gap-2 p-2 rounded-lg oj-shadow">
-                <NSelect
-                    v-model:value={currentLLMID.value}
-                    class="max-w-50"
-                    options={llmOptions.value}
+            <div class="flex-y rounded-lg oj-shadow">
+                <ClientSwitch
+                    mobile={() => (
+                        <div class="flex-x gap-2 p-2">
+                            <NSelect
+                                v-model:value={currentLLMID.value}
+                                class="max-w-30"
+                                options={llmOptions.value}
+                            />
+                        </div>
+                    )}
                 />
-                <NInput
-                    v-model:value={question.value}
-                    type="textarea"
-                    clearable
-                    autosize={{
-                        minRows: 1,
-                        maxRows: 5,
-                    }}
-                    onKeydown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            handleSend()
-                            e.preventDefault()
-                        }
-                    }}
-                />
-                <NButton
-                    type="primary"
-                    onClick={handleSend}
-                    loading={isGenerating.value}
-                    disabled={question.value.trim() === '' || currentLLMID.value === ''}
-                >
-                    发送
-                </NButton>
-                <NButton
-                    type="warning"
-                    onClick={handleResetRecords}
-                    disabled={chatRecords.value.length === 0}
-                >
-                    重置记录
-                </NButton>
+                <div class="flex-x gap-2 p-2">
+                    <ClientSwitch
+                        desktop={() => (
+                            <NSelect
+                                v-model:value={currentLLMID.value}
+                                class="max-w-50"
+                                options={llmOptions.value}
+                            />
+                        )}
+                    />
+                    <NInput
+                        v-model:value={question.value}
+                        type="textarea"
+                        clearable
+                        autosize={{
+                            minRows: 1,
+                            maxRows: 5,
+                        }}
+                        onKeydown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                handleSend()
+                                e.preventDefault()
+                            }
+                        }}
+                    />
+                    <NButton
+                        type="primary"
+                        ghost
+                        onClick={handleSend}
+                        loading={isGenerating.value}
+                        disabled={question.value.trim() === '' || currentLLMID.value === ''}
+                    >
+                        发送
+                    </NButton>
+                    <NButton
+                        type="warning"
+                        ghost
+                        onClick={handleResetRecords}
+                        disabled={chatRecords.value.length === 0}
+                    >
+                        重置
+                    </NButton>
+                </div>
             </div>
         </div>
     )
