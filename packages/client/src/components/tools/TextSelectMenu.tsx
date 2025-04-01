@@ -10,12 +10,24 @@ interface Position {
     left: string
 }
 
+interface Props {
+    menu: (selectedText: string) => VNode
+    showMenu: boolean
+    onShow: (showMenu: boolean) => void
+    onClose: () => void
+}
+
 export default defineComponent({
-    setup(props: { menu: (selectedText: string) => VNode }, { slots }) {
+    setup(props: Props, { slots }) {
         const containerRef = ref<HTMLElement | null>(null)
-        const showMenu = ref(false)
         const selectedText = ref('')
         const menuPosition = ref<Position>({ top: '0px', left: '0px' })
+        const isMobile = ref(false)
+
+        // 检测是否为移动设备
+        const checkIfMobile = () => {
+            isMobile.value = 'ontouchstart' in window
+        }
 
         // 获取选中位置
         const getSelectionPosition = (): DOMRect | null => {
@@ -51,7 +63,7 @@ export default defineComponent({
                 left: rectLeft + rect.width / 2 + 'px',
             }
 
-            showMenu.value = true
+            props.onShow(true)
         }
 
         // 处理触摸结束事件
@@ -67,55 +79,44 @@ export default defineComponent({
             // 获取父元素的 Rect
             const containerRect = containerRef.value!.getBoundingClientRect()
 
-            const rectLeft = rect.x - containerRect.x
             const rectBottom = rect.y + rect.height
             const relativeY = rectBottom - containerRect.y + 5
 
+            // 移动端菜单居中显示
             menuPosition.value = {
                 top: relativeY + 'px',
-                left: rectLeft + rect.width / 2 + 'px',
+                left: '50%', // 在移动端始终居中显示
             }
 
-            showMenu.value = true
+            props.onShow(true)
         }
 
         // 点击外部关闭菜单
         const handleClickOutside = (e: MouseEvent) => {
-            console.log(e)
             // 如果有_vts字段则为特殊情况，不关闭
-            if (!showMenu.value || (e as any)._vts) {
+            if (!props.showMenu || (e as any)._vts) {
                 return
             }
             if (!(e.target as HTMLElement).closest('.floating-menu')) {
-                showMenu.value = false
+                props.onClose()
             }
         }
 
-        // 点击外部关闭菜单
+        // 点击外部关闭菜单，移动端有点特殊，需要点击右上角关闭
         const handleTouchOutside = (e: TouchEvent) => {
-            if (!showMenu.value || (e as any)._vts) {
+            if (!props.showMenu || (e as any)._vts) {
                 return
             }
             if (!(e.target as HTMLElement).closest('.floating-menu')) {
-                // showMenu.value = false
+                // props.onClose()
             }
-        }
-
-        // 复制功能
-        const copyText = () => {
-            navigator.clipboard.writeText(selectedText.value)
-            showMenu.value = false
-        }
-
-        // 分享功能
-        const shareText = () => {
-            // 实现分享逻辑
-            showMenu.value = false
         }
 
         // 事件监听
         onMounted(() => {
-            if ('ontouchstart' in window) {
+            checkIfMobile()
+
+            if (isMobile.value) {
                 // 移动端
                 document.addEventListener('touchend', handleTouchEnd)
                 document.addEventListener('touchstart', handleTouchOutside)
@@ -124,34 +125,29 @@ export default defineComponent({
                 document.addEventListener('mouseup', handleMouseUp)
                 document.addEventListener('mousedown', handleClickOutside)
             }
+
+            // 监听窗口大小变化，重新检测设备类型
+            window.addEventListener('resize', checkIfMobile)
         })
 
         onUnmounted(() => {
-            if ('ontouchstart' in window) {
+            if (isMobile.value) {
                 document.removeEventListener('touchend', handleTouchEnd)
                 document.removeEventListener('touchstart', handleTouchOutside)
             } else {
                 document.removeEventListener('mouseup', handleMouseUp)
                 document.removeEventListener('mousedown', handleClickOutside)
             }
+
+            window.removeEventListener('resize', checkIfMobile)
         })
 
-        const defaultMenu = (
-            <>
-                <div class={menuItemClass} onClick={copyText}>
-                    复制
-                </div>
-                <div class={menuItemClass} onClick={shareText}>
-                    分享
-                </div>
-            </>
-        )
         return () => (
             <div class="relative" ref={containerRef}>
                 {slots.default?.()}
-                {showMenu.value && (
-                    <div class={menuClass} style={menuPosition.value}>
-                        {props.menu ? props.menu?.(selectedText.value) : defaultMenu}
+                {props.showMenu && (
+                    <div class={`${menuClass} floating-menu`} style={menuPosition.value}>
+                        {props.menu ? props.menu?.(selectedText.value) : <div>Default</div>}
                     </div>
                 )}
             </div>

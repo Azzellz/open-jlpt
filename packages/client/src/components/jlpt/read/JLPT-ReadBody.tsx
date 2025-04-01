@@ -155,9 +155,7 @@ export default defineComponent((props: Props) => {
             )}
         >
             {/* 内容部分 */}
-            <TextSelectMenu
-                menu={(selectedText: string) => <AppTextSelectMenu selectedText={selectedText} />}
-            >
+            <AppTextSelectMenu>
                 {/* 正文部分 */}
                 {TextContainer.value}
 
@@ -166,7 +164,7 @@ export default defineComponent((props: Props) => {
 
                 {/* 问题部分 */}
                 {QuestionsContainer.value}
-            </TextSelectMenu>
+            </AppTextSelectMenu>
 
             {/* 交互栏 */}
             {props.read ? (

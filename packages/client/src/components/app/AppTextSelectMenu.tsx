@@ -11,15 +11,19 @@ import {
     BookQuestionMark20Regular as AnalysisIcon,
 } from '@vicons/fluent'
 import { GTranslateOutlined as TranslateIcon } from '@vicons/material'
+import { Close as CloseIcon } from '@vicons/carbon'
 import { computed, ref } from 'vue'
 import { useLLM } from '@/composables/llm'
 import { useI18n } from 'vue-i18n'
 import { marked } from 'marked'
+import TextSelectMenu from '../tools/TextSelectMenu'
 
 export default defineComponent({
-    setup(props: { selectedText: string }) {
+    setup(_, { slots }) {
         const userStore = useUserStore()
         const message = useMessage()
+        const selectedText = ref('')
+        const showMenu = ref(false)
 
         //#region TTS服务
 
@@ -34,8 +38,7 @@ export default defineComponent({
         } = useEdgeTTS()
 
         async function handleGenerateTTS() {
-            console.log(props)
-            const result = await generateTTS(props.selectedText)
+            const result = await generateTTS(selectedText.value)
             if (isSuccessResponse(result)) {
                 isSpeaking.value = true
                 audio.value?.play()
@@ -76,7 +79,7 @@ export default defineComponent({
                 },
                 {
                     role: 'user',
-                    content: props.selectedText,
+                    content: selectedText.value,
                 },
             ])
             isTranslating.value = false
@@ -92,15 +95,13 @@ export default defineComponent({
                 },
                 {
                     role: 'user',
-                    content: props.selectedText,
+                    content: selectedText.value,
                 },
             ])
             isAnalysising.value = false
         }
 
-        //#endregion
-
-        return () => (
+        const Menu = () => (
             <div class="flex-y gap-2 max-h-40 max-w-100 flex-y gap-2">
                 {/*  交互栏  */}
                 <div class="flex-x items-center p-2">
@@ -159,6 +160,15 @@ export default defineComponent({
                         v-model:value={llmID.value}
                         options={llmOptions.value}
                     />
+                    <NButton
+                        class="ml-1"
+                        text
+                        onClick={() => {
+                            showMenu.value = false
+                        }}
+                    >
+                        <NIcon size={24} component={CloseIcon} />
+                    </NButton>
                 </div>
                 {/* LLM交互文本(markdown) */}
                 {content.value && (
@@ -185,6 +195,21 @@ export default defineComponent({
                     />
                 )}
             </div>
+        )
+
+        //#endregion
+        return () => (
+            <TextSelectMenu
+                showMenu={showMenu.value}
+                onShow={() => (showMenu.value = true)}
+                onClose={() => (showMenu.value = false)}
+                menu={(text) => {
+                    selectedText.value = text
+                    return <Menu />
+                }}
+            >
+                {slots.default?.()}
+            </TextSelectMenu>
         )
     },
 })
