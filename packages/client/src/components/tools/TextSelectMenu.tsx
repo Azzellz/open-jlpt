@@ -63,7 +63,10 @@ export default defineComponent({
                 left: rectLeft + rect.width / 2 + 'px',
             }
 
-            props.onShow(true)
+            // 如果选中内容不为空，则显示菜单
+            if (selectedText.value) {
+                props.onShow(true)
+            }
         }
 
         // 处理触摸结束事件
@@ -88,7 +91,10 @@ export default defineComponent({
                 left: '50%', // 在移动端始终居中显示
             }
 
-            props.onShow(true)
+            // 如果选中内容不为空，则显示菜单
+            if (selectedText.value) {
+                props.onShow(true)
+            }
         }
 
         // 点击外部关闭菜单
