@@ -206,7 +206,7 @@ export default defineComponent(() => {
                     type="primary"
                     onClick={handleSend}
                     loading={isGenerating.value}
-                    disabled={question.value.trim() === ''}
+                    disabled={question.value.trim() === '' || currentLLMID.value === ''}
                 >
                     发送
                 </NButton>

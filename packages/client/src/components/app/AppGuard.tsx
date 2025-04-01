@@ -260,7 +260,7 @@ export default defineComponent(() => {
     //#endregion
 
     return () => (
-        <SakuraRain class="h-full">
+        <SakuraRain class="flex-1 overflow-hidden">
             {/* 如果有token则展示加载界面，此时为自动登录，如果自动登录失败则重新展示登录框 */}
             {userStore.token ? (
                 <div class="h-full flex">

@@ -1,9 +1,9 @@
 import { ref, onMounted, onUnmounted, defineComponent } from 'vue'
-import type { SetupContext, SlotsType, VNode } from 'vue'
+import type { VNode } from 'vue'
 
 const menuItemClass = 'py-2 px-4 cursor-pointer transition hover:bg-white'
 const menuClass =
-    'absolute overflow-auto bg-white border border-gray-300 rounded shadow-md transform -translate-x-1/2 z-10'
+    'absolute overflow-auto bg-white border border-gray-300 rounded oj-shadow transform -translate-x-1/2 z-10'
 
 interface Position {
     top: string
@@ -54,14 +54,50 @@ export default defineComponent({
             showMenu.value = true
         }
 
+        // 处理触摸结束事件
+        const handleTouchEnd = (e: TouchEvent) => {
+            const selection = window.getSelection()
+            if (!selection?.toString()) return
+
+            const rect = getSelectionPosition()
+            if (!rect) return
+
+            selectedText.value = selection.toString()
+
+            // 获取父元素的 Rect
+            const containerRect = containerRef.value!.getBoundingClientRect()
+
+            const rectLeft = rect.x - containerRect.x
+            const rectBottom = rect.y + rect.height
+            const relativeY = rectBottom - containerRect.y + 5
+
+            menuPosition.value = {
+                top: relativeY + 'px',
+                left: rectLeft + rect.width / 2 + 'px',
+            }
+
+            showMenu.value = true
+        }
+
         // 点击外部关闭菜单
         const handleClickOutside = (e: MouseEvent) => {
+            console.log(e)
             // 如果有_vts字段则为特殊情况，不关闭
             if (!showMenu.value || (e as any)._vts) {
                 return
             }
             if (!(e.target as HTMLElement).closest('.floating-menu')) {
                 showMenu.value = false
+            }
+        }
+
+        // 点击外部关闭菜单
+        const handleTouchOutside = (e: TouchEvent) => {
+            if (!showMenu.value || (e as any)._vts) {
+                return
+            }
+            if (!(e.target as HTMLElement).closest('.floating-menu')) {
+                // showMenu.value = false
             }
         }
 
@@ -79,13 +115,25 @@ export default defineComponent({
 
         // 事件监听
         onMounted(() => {
-            document.addEventListener('mouseup', handleMouseUp)
-            document.addEventListener('mousedown', handleClickOutside)
+            if ('ontouchstart' in window) {
+                // 移动端
+                document.addEventListener('touchend', handleTouchEnd)
+                document.addEventListener('touchstart', handleTouchOutside)
+            } else {
+                // PC端
+                document.addEventListener('mouseup', handleMouseUp)
+                document.addEventListener('mousedown', handleClickOutside)
+            }
         })
 
         onUnmounted(() => {
-            document.removeEventListener('mouseup', handleMouseUp)
-            document.removeEventListener('mousedown', handleClickOutside)
+            if ('ontouchstart' in window) {
+                document.removeEventListener('touchend', handleTouchEnd)
+                document.removeEventListener('touchstart', handleTouchOutside)
+            } else {
+                document.removeEventListener('mouseup', handleMouseUp)
+                document.removeEventListener('mousedown', handleClickOutside)
+            }
         })
 
         const defaultMenu = (
@@ -99,7 +147,7 @@ export default defineComponent({
             </>
         )
         return () => (
-            <div class="relative w-full" ref={containerRef}>
+            <div class="relative" ref={containerRef}>
                 {slots.default?.()}
                 {showMenu.value && (
                     <div class={menuClass} style={menuPosition.value}>

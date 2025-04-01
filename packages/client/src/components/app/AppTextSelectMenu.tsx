@@ -155,7 +155,7 @@ export default defineComponent({
                     <NSelect
                         size="tiny"
                         placeholder="推荐使用非推理模型"
-                        class="w-75"
+                        class="max-w-50 min-w-30"
                         v-model:value={llmID.value}
                         options={llmOptions.value}
                     />

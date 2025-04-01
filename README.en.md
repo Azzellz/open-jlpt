@@ -1,11 +1,5 @@
 # Open JLPT
 
-<p align="center">
-  <a href="#简体中文">简体中文</a> |
-  <a href="#日本語">日本語</a> |
-  <a href="#english">English</a>
-</p>
-
 Open JLPT is an open-source platform for learning and practicing for the Japanese Language Proficiency Test (JLPT). This project aims to help learners prepare for JLPT exams by providing comprehensive learning resources and practice tools.
 
 ## Features
