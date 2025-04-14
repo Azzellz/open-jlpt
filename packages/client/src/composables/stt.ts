@@ -1,30 +1,35 @@
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 export function useSTT() {
     // 定义语音识别对象
     const SpeechRecognition =
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    const recognition = new SpeechRecognition()
+    let recognition = new SpeechRecognition()
     const isSpeaking = ref(false)
 
-    if (SpeechRecognition) {
-        // 配置参数
-        // recognition.continuous = false
-        // recognition.interimResults = false
-        // recognition.maxAlternatives = 1
-        recognition.lang = 'ja-JP'
-        // 默认错误处理
-        recognition.onerror = (event: any) => {
-            console.error('识别错误:', event.error)
-            isSpeaking.value = false
+    function init() {
+        if (SpeechRecognition) {
+            // 配置参数
+            recognition = new SpeechRecognition()
+            // recognition.continuous = false
+            // recognition.interimResults = false
+            // recognition.maxAlternatives = 1
+            recognition.lang = 'ja-JP'
+
+            // 默认错误处理
+            recognition.onerror = (event: any) => {
+                alert('识别错误:' + event.error)
+                isSpeaking.value = false
+            }
+            recognition.onend = () => {
+                isSpeaking.value = false
+            }
+        } else {
+            alert('当前浏览器不支持语音识别')
         }
-        recognition.onend = () => {
-            isSpeaking.value = false
-        }
-    } else {
-        alert('当前浏览器不支持语音识别')
     }
 
+    // 检查浏览器是否支持语音识别
     function checkSupport() {
         const result = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
         if (!result) {
@@ -55,6 +60,14 @@ export function useSTT() {
         }
         isSpeaking.value = false
         recognition.abort()
+    }
+
+    function reset() {
+        if (!checkSupport()) {
+            return
+        } else {
+            init()
+        }
     }
 
     function onError(callback: (error: any) => void) {
@@ -95,6 +108,10 @@ export function useSTT() {
         }
         recognition.lang = language
     }
+
+    onMounted(() => {
+        init()
+    })
     return {
         start,
         stop,
@@ -104,5 +121,6 @@ export function useSTT() {
         onEnd,
         setLanguage,
         isSpeaking,
+        reset,
     }
 }

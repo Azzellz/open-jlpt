@@ -35,13 +35,15 @@ export default defineComponent({
             generate: generateTTS,
             replay,
             progress,
+            play,
+            hasAudio,
         } = useEdgeTTS()
 
         async function handleGenerateTTS() {
             const result = await generateTTS(selectedText.value)
             if (isSuccessResponse(result)) {
                 isSpeaking.value = true
-                audio.value?.play()
+                play()
             } else {
                 message.error('生成失败')
                 console.error(result)
@@ -111,7 +113,7 @@ export default defineComponent({
                     </NButton>
                     <NDivider vertical />
                     {/*  Audio  */}
-                    {audio.value ? (
+                    {hasAudio.value ? (
                         <div class="flex-x gap-2">
                             <NButton text onClick={toggleTTS}>
                                 <NIcon

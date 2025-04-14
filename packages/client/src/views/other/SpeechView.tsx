@@ -1,11 +1,27 @@
 import { useEdgeTTS, useLLM, useSTT } from '@/composables'
 import { isSuccessResponse } from '@root/shared'
-import { NButton, NSelect, useMessage } from 'naive-ui'
-import { defineComponent, ref } from 'vue'
+import { NButton, NDivider, NSelect, useMessage } from 'naive-ui'
+import { defineComponent, onDeactivated, onMounted, onUnmounted, ref } from 'vue'
 
 export default defineComponent(() => {
     const speechText = ref('请开始说话...')
+    const replyText = ref('')
     const message = useMessage()
+    const audioContext = ref<AudioContext | null>(null)
+    const isSafari = ref(false)
+
+    // 检查浏览器类型和音频上下文状态
+    onMounted(() => {
+        // 检测是否是Safari浏览器
+        isSafari.value = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+
+        // 创建音频上下文
+        try {
+            audioContext.value = new (window.AudioContext || (window as any).webkitAudioContext)()
+        } catch (e) {
+            console.error('AudioContext not supported', e)
+        }
+    })
 
     //#region LLM
 
@@ -41,7 +57,7 @@ export default defineComponent(() => {
     async function handleToTTS(text: string) {
         const result = await tts.generate(text)
         if (isSuccessResponse(result)) {
-            tts.toggle()
+            tts.play()
         } else {
             message.error(result.error)
         }
@@ -52,31 +68,35 @@ export default defineComponent(() => {
     //#region STT
 
     const stt = useSTT()
-    function handleSpeech() {
-        speechText.value = ''
-        stt.start()
-        stt.onResult(async (text) => {
-            // 重置上一次的说话结果
-            tts.free()
-            speechText.value = text
+    async function handleSST() {
+        // 重置一下音频上下文
+        if (audioContext.value?.state !== 'closed') {
+            await audioContext.value?.resume()
+        }
 
-            // console.log(text)
-            // if (!speechText.value) {
-            //     speechText.value = text
-            // } else {
-            //     speechText.value += '、' + text
-            // }
+        let text = ''
+        stt.start()
+        stt.onResult(async (_text) => {
+            speechText.value = _text
+            text += _text + ' '
         })
         stt.onEnd(async () => {
-            console.log('end')
-            const content = await handleToLLM()
+            speechText.value += '。'
+            if (!text) {
+                return
+            }
+            const content = await handleToLLM(text)
+            replyText.value = content
             await handleToTTS(content)
 
-            stt.start()
-            stt.isSpeaking.value = true
+            tts.onEnd(async () => {
+                if (audioContext.value?.state !== 'closed') {
+                    await audioContext.value?.suspend()
+                }
+                handleSST()
+            })
         })
     }
-
     function handleStop() {
         speechText.value += '。'
         stt.stop()
@@ -84,6 +104,19 @@ export default defineComponent(() => {
             stt.isSpeaking.value = false
         })
     }
+
+    onUnmounted(() => {
+        stt.stop()
+        if (audioContext.value?.state !== 'closed') {
+            audioContext.value?.close()
+        }
+    })
+    onDeactivated(() => {
+        stt.stop()
+        if (audioContext.value?.state !== 'closed') {
+            audioContext.value?.close()
+        }
+    })
 
     //#endregion
 
@@ -96,18 +129,15 @@ export default defineComponent(() => {
                 </div>
             </div>
             <div class="h-16 p-2 flex-x gap-2 mx-auto">
-                <NButton onClick={handleSpeech} loading={stt.isSpeaking.value}>
-                    开始讲话
+                <NButton
+                    onClick={handleSST}
+                    loading={stt.isSpeaking.value}
+                    disabled={stt.isSpeaking.value}
+                >
+                    说话
                 </NButton>
                 <NButton onClick={handleStop} disabled={!stt.isSpeaking.value}>
                     停止
-                </NButton>
-                <NButton
-                    onClick={() => {
-                        tts.toggle()
-                    }}
-                >
-                    说话
                 </NButton>
                 <NSelect
                     value="ja-JP"
