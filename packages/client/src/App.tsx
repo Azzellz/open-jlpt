@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted } from 'vue'
 import AppHeader from '@/components/app/AppHeader'
 import AppContent from '@/components/app/AppContent'
 import AppProvider from '@/components/app/AppProvider'

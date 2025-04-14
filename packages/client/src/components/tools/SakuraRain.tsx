@@ -94,6 +94,20 @@ export default defineComponent({
         onMounted(() => {
             intervalId = setInterval(createPetal, interval)
             animate()
+
+            // const viewport = window.visualViewport
+            // viewport?.addEventListener('resize', (e) => {
+            //     if (viewport.height < window.innerHeight) {
+            //         clearInterval(intervalId)
+            //         cancelAnimationFrame(animationFrameId)
+            //         petals.value.forEach((petal) => petal.element.remove())
+            //         petals.value = []
+            //     } else {
+            //         clearInterval(intervalId)
+            //         intervalId = setInterval(createPetal, interval)
+            //         animate()
+            //     }
+            // })
         })
 
         onUnmounted(() => {

@@ -19,7 +19,10 @@ const router = createRouter({
             redirect: '/user/profile',
             children: [
                 { path: 'profile', component: UserProfileView },
-                { path: 'setting', component: () => import('@/views/user/setting/UserSettingView') },
+                {
+                    path: 'setting',
+                    component: () => import('@/views/user/setting/UserSettingView'),
+                },
                 {
                     path: 'history',
                     component: () => import('@/views/user/history/UserHistoryView'),
@@ -67,6 +70,10 @@ const router = createRouter({
         {
             path: '/jlpt/hearing',
             component: () => import('@/views/jlpt/JLPT-HearingView'),
+        },
+        {
+            path: '/other/speech',
+            component: () => import('@/views/other/SpeechView'),
         },
     ],
 })

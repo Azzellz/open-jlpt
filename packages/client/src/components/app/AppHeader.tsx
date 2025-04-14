@@ -104,6 +104,9 @@ export default defineComponent(() => {
                 <RouterLink to="/jlpt/hearing" class={itemClass} active-class={activeNavItemClass}>
                     {t('jlpt.hearing')}
                 </RouterLink>
+                <RouterLink to="/other/speech" class={itemClass} active-class={activeNavItemClass}>
+                    口语
+                </RouterLink>
                 {type === 'mobile' && <NDivider style="margin-top:0px;margin-bottom:0px" />}
                 {/*  i18n  */}
                 <NPopselect

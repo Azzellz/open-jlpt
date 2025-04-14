@@ -5,7 +5,7 @@ import * as TTS from './tts'
 import * as JLPT from './jlpt'
 
 export const API_INSTANCE = axios.create({
-    baseURL: 'http://192.168.1.3:3000',
+    baseURL: 'http://192.168.1.7:3000',
 })
 
 // type ResponseInterceptor = (error: any) => AxiosResponse | Promise<any>

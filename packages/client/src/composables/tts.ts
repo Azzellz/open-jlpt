@@ -1,6 +1,6 @@
 import API from '@/api'
 import { createErrorResponse, createSuccessResponse, isSuccessResponse } from '@root/shared'
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { ref, computed, watch, onUnmounted, onMounted, onDeactivated, onActivated } from 'vue'
 
 interface Params {
     text?: string
@@ -31,7 +31,8 @@ export function useEdgeTTS(params?: Params) {
         isLoading.value = false
         if (isSuccessResponse(result)) {
             isError.value = false
-            url.value = URL.createObjectURL(result.data)
+            const newBlob = new Blob([result.data], { type: 'audio/mpeg' })
+            url.value = URL.createObjectURL(newBlob)
             return createSuccessResponse(200, 'OK', url.value)
         } else {
             isError.value = true
@@ -74,11 +75,27 @@ export function useEdgeTTS(params?: Params) {
     function _updateProgress() {
         progress.value = Math.floor((audio.value!.currentTime / audio.value!.duration) * 100)
     }
+
+    function _autoPlay() {
+        if (audio.value) {
+            audio.value.play()
+        }
+    }
     watch(audio, () => {
         audio.value?.addEventListener('timeupdate', _updateProgress)
     })
+    onMounted(() => {
+        document.addEventListener('touchstart', _autoPlay)
+    })
+    onActivated(() => {
+        document.addEventListener('touchstart', _autoPlay)
+    })
     onUnmounted(() => {
         audio.value?.removeEventListener('timeupdate', _updateProgress)
+        document.removeEventListener('touchstart', _autoPlay)
+    })
+    onDeactivated(() => {
+        document.removeEventListener('touchstart', _autoPlay)
     })
 
     params?.immediate && generate()

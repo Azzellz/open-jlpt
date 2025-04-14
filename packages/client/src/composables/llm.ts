@@ -17,6 +17,11 @@ interface Options {
     extends?: LLM_GenerateOptions_Extends[]
 }
 
+interface LLM_GenerateResult {
+    content: string
+    reasoning: string
+}
+
 // 定义基础返回类型
 interface BaseLLMReturn {
     isReasoning: Ref<boolean>
@@ -28,7 +33,7 @@ interface BaseLLMReturn {
         llmID: string,
         messages: LLM_ChatParams['messages'],
         options?: LLM_GenerateOptions,
-    ) => Promise<void>
+    ) => Promise<LLM_GenerateResult>
 }
 
 // 定义各个扩展的返回类型
@@ -44,7 +49,7 @@ interface JsonExtension {
         llmID: string,
         messages: LLM_ChatParams['messages'],
         options?: LLM_GenerateOptions & { onJSON?: (jsonFragment: any) => void },
-    ) => Promise<void>
+    ) => Promise<LLM_GenerateResult>
 }
 
 // 组合类型，根据扩展选项生成最终类型
@@ -75,12 +80,16 @@ export function useLLM<T extends LLM_GenerateOptions_Extends[] = []>(
         reasoning.value = ''
         content.value = ''
 
+        let _content = ''
+        let _reasoning = ''
+
         await API.User.chatWithLLM(llmID, {
             messages,
             custom: options?.custom,
             onReasoning(str) {
                 isReasoning.value = true
                 reasoning.value += str
+                _reasoning += str
                 options?.onReasoning?.(str)
             },
             onContent(str) {
@@ -91,12 +100,18 @@ export function useLLM<T extends LLM_GenerateOptions_Extends[] = []>(
                 isReasoning.value = false
                 isContenting.value = true
                 content.value += str
+                _content += str
                 options?.onContent?.(str)
             },
         })
 
         isGenerating.value = false
         options?.onFinish?.()
+
+        return {
+            content: _content,
+            reasoning: _reasoning,
+        }
     }
 
     const base = {
