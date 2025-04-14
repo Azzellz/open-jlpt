@@ -1,6 +1,6 @@
 import API from '@/api'
 import { createErrorResponse, createSuccessResponse, isSuccessResponse } from '@root/shared'
-import { ref, watch, onUnmounted, onMounted, onDeactivated, onActivated } from 'vue'
+import { ref, onUnmounted, onMounted, onDeactivated, onActivated } from 'vue'
 
 interface Params {
     text?: string
@@ -12,6 +12,8 @@ export function useEdgeTTS(params?: Params) {
     const isError = ref(false)
     const isSpeaking = ref(false)
     const audio = ref<HTMLAudioElement>(new Audio())
+    audio.value.addEventListener('timeupdate', _updateProgress)
+
     const hasAudio = ref(false)
     const progress = ref(0)
 
@@ -69,6 +71,8 @@ export function useEdgeTTS(params?: Params) {
     function free() {
         URL.revokeObjectURL(audio.value.src)
         audio.value.src = ''
+        hasAudio.value = false
+        progress.value = 0
     }
 
     function onEnd(callback: () => void) {
@@ -84,18 +88,24 @@ export function useEdgeTTS(params?: Params) {
         progress.value = Math.floor((audio.value!.currentTime / audio.value!.duration) * 100)
     }
 
+    function _autoPlay() {
+        play()
+        document.removeEventListener('touchstart', _autoPlay)
+    }
     onMounted(() => {
-        document.addEventListener('touchstart', play)
+        document.addEventListener('touchstart', _autoPlay)
     })
     onActivated(() => {
-        document.addEventListener('touchstart', play)
+        document.addEventListener('touchstart', _autoPlay)
     })
     onUnmounted(() => {
         audio.value.removeEventListener('timeupdate', _updateProgress)
+        document.removeEventListener('touchstart', _autoPlay)
         free()
     })
     onDeactivated(() => {
         audio.value.removeEventListener('timeupdate', _updateProgress)
+        document.removeEventListener('touchstart', _autoPlay)
         free()
     })
 

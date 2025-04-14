@@ -27,23 +27,13 @@ export default defineComponent({
 
         //#region TTS服务
 
-        const {
-            isLoading,
-            isSpeaking,
-            toggle: toggleTTS,
-            audio,
-            generate: generateTTS,
-            replay,
-            progress,
-            play,
-            hasAudio,
-        } = useEdgeTTS()
+        const tts = useEdgeTTS()
 
         async function handleGenerateTTS() {
-            const result = await generateTTS(selectedText.value)
+            const result = await tts.generate(selectedText.value)
             if (isSuccessResponse(result)) {
-                isSpeaking.value = true
-                play()
+                tts.isSpeaking.value = true
+                tts.play()
             } else {
                 message.error('生成失败')
                 console.error(result)
@@ -103,8 +93,18 @@ export default defineComponent({
             isAnalysising.value = false
         }
 
+        function handleClose() {
+            showMenu.value = false
+            selectedText.value = ''
+            tts.free()
+        }
+
+        function handleShow() {
+            showMenu.value = true
+        }
+
         const Menu = () => (
-            <div class="flex-y gap-2 max-h-40 max-w-100 flex-y gap-2">
+            <div class="flex-y gap-2 max-h-100 max-w-100 flex-y gap-2">
                 {/*  交互栏  */}
                 <div class="flex-x items-center p-2">
                     {/*  TTS  */}
@@ -113,22 +113,22 @@ export default defineComponent({
                     </NButton>
                     <NDivider vertical />
                     {/*  Audio  */}
-                    {hasAudio.value ? (
+                    {tts.hasAudio.value ? (
                         <div class="flex-x gap-2">
-                            <NButton text onClick={toggleTTS}>
+                            <NButton text onClick={tts.toggle}>
                                 <NIcon
                                     size={22}
-                                    component={isSpeaking.value ? StopIcon : SpeakerIcon}
+                                    component={tts.isSpeaking.value ? StopIcon : SpeakerIcon}
                                 />
                             </NButton>
                             <span class="text-gray">/</span>
-                            <NButton text onClick={replay}>
+                            <NButton text onClick={tts.replay}>
                                 <NIcon size="21" component={RetryIcon} />
                             </NButton>
                         </div>
                     ) : (
                         <NButton text onClick={handleGenerateTTS}>
-                            {isLoading.value ? (
+                            {tts.isLoading.value ? (
                                 <NSpin size={22} />
                             ) : (
                                 <NIcon size={22} component={SpeakerIcon} />
@@ -162,13 +162,7 @@ export default defineComponent({
                         v-model:value={llmID.value}
                         options={llmOptions.value}
                     />
-                    <NButton
-                        class="ml-1"
-                        text
-                        onClick={() => {
-                            showMenu.value = false
-                        }}
-                    >
+                    <NButton class="ml-1" text onClick={handleClose}>
                         <NIcon size={24} component={CloseIcon} />
                     </NButton>
                 </div>
@@ -185,13 +179,13 @@ export default defineComponent({
                     </>
                 )}
                 {/* tts进度条 */}
-                {audio.value && (
+                {tts.audio.value && (
                     <NProgress
                         type="line"
                         class="mt-auto"
                         height={5}
                         border-radius={0}
-                        percentage={progress.value}
+                        percentage={tts.progress.value}
                         color={{ stops: ['white', 'pink'] }}
                         show-indicator={false}
                     />
@@ -203,8 +197,8 @@ export default defineComponent({
         return () => (
             <TextSelectMenu
                 showMenu={showMenu.value}
-                onShow={() => (showMenu.value = true)}
-                onClose={() => (showMenu.value = false)}
+                onShow={handleShow}
+                onClose={handleClose}
                 menu={(text) => {
                     selectedText.value = text
                     return <Menu />
