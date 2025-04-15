@@ -106,7 +106,7 @@ export default defineComponent({
         }
 
         const Menu = () => (
-            <div class="flex-y gap-2 max-h-100 max-w-100 flex-y gap-2">
+            <div class="flex-y gap-2 max-h-75 max-w-100 flex-y gap-2">
                 {/*  交互栏  */}
                 <div class="flex-x items-center p-2">
                     {/*  TTS  */}

@@ -1,10 +1,12 @@
+import AppTextSelectMenu from '@/components/app/AppTextSelectMenu'
 import { useEdgeTTS, useLLM, useSTT } from '@/composables'
 import { isSuccessResponse } from '@root/shared'
 import { NButton, NDivider, NSelect, useMessage } from 'naive-ui'
 import { defineComponent, ref } from 'vue'
 
 export default defineComponent(() => {
-    const speechText = ref('请开始说话...')
+    const tip = '请开始说话...'
+    const speechText = ref(tip)
     const replyText = ref('')
     const message = useMessage()
 
@@ -64,7 +66,7 @@ export default defineComponent(() => {
             if (
                 !speechText.value.endsWith('。') &&
                 !speechText.value.endsWith('，') &&
-                speechText.value !== '请开始说话...'
+                speechText.value !== tip
             ) {
                 speechText.value += '。'
             }
@@ -78,7 +80,7 @@ export default defineComponent(() => {
         })
     }
     function handleStop() {
-        speechText.value = ''
+        speechText.value = tip
         replyText.value = ''
         stt.abort()
         tts.free()
@@ -88,12 +90,12 @@ export default defineComponent(() => {
 
     return () => (
         <main class="h-full flex-y">
-            <div class="flex-1 flex">
-                <div class="m-auto max-w-1/2  flex-y gap-2">
+            <div class="flex-1 flex p-2">
+                <AppTextSelectMenu class="m-auto md:max-w-1/2 flex-y gap-2">
                     <div class="text-4xl font-bold px-10">{speechText.value}</div>
                     <NDivider />
                     <div class="text-2xl font-bold  px-10 text-gray-400">{replyText.value}</div>
-                </div>
+                </AppTextSelectMenu>
             </div>
             <div class="h-16 p-2 flex-x gap-2 mx-auto">
                 <NButton
