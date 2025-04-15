@@ -1,6 +1,7 @@
 import API from '@/api'
 import { createErrorResponse, createSuccessResponse, isSuccessResponse } from '@root/shared'
 import { ref, onUnmounted, onMounted, onDeactivated, onActivated } from 'vue'
+import { useAudioContext } from '.'
 
 interface Params {
     text?: string
@@ -11,11 +12,17 @@ export function useEdgeTTS(params?: Params) {
     const isLoading = ref(false)
     const isError = ref(false)
     const isSpeaking = ref(false)
-    const audio = ref<HTMLAudioElement>(new Audio())
-    audio.value.addEventListener('timeupdate', _updateProgress)
-
     const hasAudio = ref(false)
     const progress = ref(0)
+    const audioContext = useAudioContext()
+
+    // 音频对象
+    const audio = ref<HTMLAudioElement>(new Audio())
+    // 更新进度
+    function _updateProgress() {
+        progress.value = Math.floor((audio.value!.currentTime / audio.value!.duration) * 100)
+    }
+    audio.value.ontimeupdate = _updateProgress
 
     async function generate(
         text: string = params?.text ||
@@ -41,6 +48,7 @@ export function useEdgeTTS(params?: Params) {
             return createErrorResponse(400, '生成失败')
         }
     }
+
     function toggle() {
         if (audio.value.paused) {
             isSpeaking.value = true
@@ -50,24 +58,29 @@ export function useEdgeTTS(params?: Params) {
             pause()
         }
     }
+
     function play() {
         audio.value.play().catch((error) => {
             console.error('播放失败: ' + error)
         })
     }
+
     function pause() {
         audio.value.pause()
     }
-    function replay() {
+
+    function replay(delay: number = 1000) {
         const url = audio.value.src
         audio.value.src = ''
+        progress.value = 0
         setTimeout(() => {
             if (audio.value && url) {
                 audio.value.src = url
                 audio.value.play()
             }
-        }, 1000)
+        }, delay)
     }
+
     function free() {
         URL.revokeObjectURL(audio.value.src)
         audio.value.src = ''
@@ -76,38 +89,36 @@ export function useEdgeTTS(params?: Params) {
     }
 
     function onEnd(callback: () => void) {
-        audio.value.onended = callback
+        audio.value.onended = () => {
+            audioContext.suspend()
+            callback()
+        }
     }
 
     function onPlay(callback: () => void) {
-        audio.value.onplay = callback
+        audio.value.onplay = () => {
+            audioContext.resume()
+            callback()
+        }
     }
 
-    // 监听进度
-    function _updateProgress() {
-        progress.value = Math.floor((audio.value!.currentTime / audio.value!.duration) * 100)
-    }
-
-    function _autoPlay() {
+    // 处理移动端浏览器首次交互播放
+    function _firstInteraction() {
         play()
-        document.removeEventListener('touchstart', _autoPlay)
+        document.removeEventListener('touchstart', _firstInteraction)
     }
-    onMounted(() => {
-        document.addEventListener('touchstart', _autoPlay)
-    })
-    onActivated(() => {
-        document.addEventListener('touchstart', _autoPlay)
-    })
-    onUnmounted(() => {
-        audio.value.removeEventListener('timeupdate', _updateProgress)
-        document.removeEventListener('touchstart', _autoPlay)
+
+    function _init() {
+        document.addEventListener('touchstart', _firstInteraction)
+    }
+    function _destroy() {
+        document.removeEventListener('touchstart', _firstInteraction)
         free()
-    })
-    onDeactivated(() => {
-        audio.value.removeEventListener('timeupdate', _updateProgress)
-        document.removeEventListener('touchstart', _autoPlay)
-        free()
-    })
+    }
+    onMounted(_init)
+    onActivated(_init)
+    onUnmounted(_destroy)
+    onDeactivated(_destroy)
 
     params?.immediate && generate()
 

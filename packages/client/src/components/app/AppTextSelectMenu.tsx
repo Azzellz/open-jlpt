@@ -100,7 +100,9 @@ export default defineComponent({
         }
 
         function handleShow() {
-            showMenu.value = true
+            // if (selectedText.value) {
+                showMenu.value = true
+            // }
         }
 
         const Menu = () => (
@@ -122,7 +124,7 @@ export default defineComponent({
                                 />
                             </NButton>
                             <span class="text-gray">/</span>
-                            <NButton text onClick={tts.replay}>
+                            <NButton text onClick={() => tts.replay()}>
                                 <NIcon size="21" component={RetryIcon} />
                             </NButton>
                         </div>
@@ -194,6 +196,7 @@ export default defineComponent({
         )
 
         //#endregion
+
         return () => (
             <TextSelectMenu
                 showMenu={showMenu.value}

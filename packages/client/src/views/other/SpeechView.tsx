@@ -1,27 +1,12 @@
 import { useEdgeTTS, useLLM, useSTT } from '@/composables'
 import { isSuccessResponse } from '@root/shared'
 import { NButton, NDivider, NSelect, useMessage } from 'naive-ui'
-import { defineComponent, onDeactivated, onMounted, onUnmounted, ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 export default defineComponent(() => {
     const speechText = ref('请开始说话...')
     const replyText = ref('')
     const message = useMessage()
-    const audioContext = ref<AudioContext | null>(null)
-    const isSafari = ref(false)
-
-    // 检查浏览器类型和音频上下文状态
-    onMounted(() => {
-        // 检测是否是Safari浏览器
-        isSafari.value = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
-
-        // 创建音频上下文
-        try {
-            audioContext.value = new (window.AudioContext || (window as any).webkitAudioContext)()
-        } catch (e) {
-            console.error('AudioContext not supported', e)
-        }
-    })
 
     //#region LLM
 
@@ -68,86 +53,71 @@ export default defineComponent(() => {
     //#region STT
 
     const stt = useSTT()
-    async function handleSST() {
-        // 重置一下音频上下文
-        if (audioContext.value?.state !== 'closed') {
-            await audioContext.value?.resume()
-        }
-
+    async function handleSpeech() {
         let text = ''
         stt.start()
         stt.onResult(async (_text) => {
             speechText.value = _text
-            text += _text + ' '
+            text += _text + '、'
         })
         stt.onEnd(async () => {
-            speechText.value += '。'
+            if (
+                !speechText.value.endsWith('。') &&
+                !speechText.value.endsWith('，') &&
+                speechText.value !== '请开始说话...'
+            ) {
+                speechText.value += '。'
+            }
+
             if (!text) {
                 return
             }
-            const content = await handleToLLM(text)
-            replyText.value = content
-            await handleToTTS(content)
-
-            tts.onEnd(async () => {
-                if (audioContext.value?.state !== 'closed') {
-                    await audioContext.value?.suspend()
-                }
-                handleSST()
-            })
+            replyText.value = await handleToLLM(text)
+            await handleToTTS(replyText.value)
+            tts.onEnd(handleSpeech)
         })
     }
     function handleStop() {
-        speechText.value += '。'
-        stt.stop()
-        stt.onEnd(() => {
-            stt.isSpeaking.value = false
-        })
+        speechText.value = ''
+        replyText.value = ''
+        stt.abort()
+        tts.free()
     }
-
-    onUnmounted(() => {
-        stt.stop()
-        if (audioContext.value?.state !== 'closed') {
-            audioContext.value?.close()
-        }
-    })
-    onDeactivated(() => {
-        stt.stop()
-        if (audioContext.value?.state !== 'closed') {
-            audioContext.value?.close()
-        }
-    })
 
     //#endregion
 
     return () => (
         <main class="h-full flex-y">
             <div class="flex-1 flex">
-                <div class="m-auto flex-y gap-2">
-                    <div class="text-4xl font-bold">Speech 口语练习</div>
-                    <div class="text-2xl">{speechText.value}</div>
+                <div class="m-auto max-w-1/2  flex-y gap-2">
+                    <div class="text-4xl font-bold px-10">{speechText.value}</div>
+                    <NDivider />
+                    <div class="text-2xl font-bold  px-10 text-gray-400">{replyText.value}</div>
                 </div>
             </div>
             <div class="h-16 p-2 flex-x gap-2 mx-auto">
                 <NButton
-                    onClick={handleSST}
-                    loading={stt.isSpeaking.value}
-                    disabled={stt.isSpeaking.value}
+                    onClick={handleSpeech}
+                    loading={stt.isSpeeching.value}
+                    disabled={stt.isSpeeching.value}
+                    ghost
+                    type="success"
                 >
                     说话
                 </NButton>
-                <NButton onClick={handleStop} disabled={!stt.isSpeaking.value}>
+                <NButton onClick={handleStop} ghost type="error">
                     停止
                 </NButton>
+                {/* 语言选择 */}
                 <NSelect
                     value="ja-JP"
-                    class="max-w-50"
                     options={[
                         { label: '日语', value: 'ja-JP' },
                         { label: '中文', value: 'zh-CN' },
                     ]}
                     onUpdateValue={(value) => stt.setLanguage(value)}
                 />
+                {/* LLM选择 */}
                 <NSelect
                     value={llm.currentLLMID.value}
                     class="max-w-50"

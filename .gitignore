@@ -40,7 +40,8 @@ coverage
 .env.production.example
 .env.test.example
 
-/packages/client/dev-dist/*
-/packages/client/dev-dist-ssr/*
-/packages/client/dev-coverage/*
-/packages/client/dev-*.local
+sw.js
+packages/client/dev-dist/*
+packages/client/dev-dist-ssr/*
+packages/client/dev-coverage/*
+packages/client/dev-*.local

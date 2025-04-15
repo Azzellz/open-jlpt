@@ -1,13 +1,18 @@
-import { onMounted, ref } from 'vue'
+import { onDeactivated, onMounted, onUnmounted, ref } from 'vue'
+import { useAudioContext } from './client/audio'
 
 export function useSTT() {
     // 定义语音识别对象
     const SpeechRecognition =
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     let recognition = new SpeechRecognition()
-    const isSpeaking = ref(false)
+    const isSpeeching = ref(false)
+    const speechText = ref('')
 
-    function init() {
+    // 集成音频上下文模块
+    const audioContext = useAudioContext()
+
+    function _init() {
         if (SpeechRecognition) {
             // 配置参数
             recognition = new SpeechRecognition()
@@ -18,11 +23,13 @@ export function useSTT() {
 
             // 默认错误处理
             recognition.onerror = (event: any) => {
-                alert('识别错误:' + event.error)
-                isSpeaking.value = false
+                if (event.error !== 'aborted') {
+                    alert('识别错误:' + event.error)
+                }
+                isSpeeching.value = false
             }
             recognition.onend = () => {
-                isSpeaking.value = false
+                isSpeeching.value = false
             }
         } else {
             alert('当前浏览器不支持语音识别')
@@ -30,7 +37,7 @@ export function useSTT() {
     }
 
     // 检查浏览器是否支持语音识别
-    function checkSupport() {
+    function _checkSupport() {
         const result = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
         if (!result) {
             alert('当前浏览器不支持语音识别')
@@ -39,79 +46,87 @@ export function useSTT() {
     }
 
     function start() {
-        if (!checkSupport()) {
+        if (!_checkSupport()) {
             return
         }
-        isSpeaking.value = true
+        audioContext.resume()
+        isSpeeching.value = true
         recognition.start()
     }
 
     function stop() {
-        if (!checkSupport()) {
+        if (!_checkSupport()) {
             return
         }
-        isSpeaking.value = false
+        audioContext.suspend()
+        isSpeeching.value = false
         recognition.stop()
     }
 
     function abort() {
-        if (!checkSupport()) {
+        if (!_checkSupport()) {
             return
         }
-        isSpeaking.value = false
+        audioContext.close()
+        isSpeeching.value = false
         recognition.abort()
     }
 
     function reset() {
-        if (!checkSupport()) {
+        if (!_checkSupport()) {
             return
-        } else {
-            init()
         }
+        _init()
     }
 
     function onError(callback: (error: any) => void) {
-        if (!checkSupport()) {
+        if (!_checkSupport()) {
             return
         }
         recognition.onerror = (event: any) => {
-            isSpeaking.value = false
+            isSpeeching.value = false
+            audioContext.suspend()
             callback(event.error)
         }
     }
 
     function onResult(callback: (result: string) => void) {
-        if (!checkSupport()) {
+        if (!_checkSupport()) {
             return
         }
         recognition.onresult = (event: any) => {
             const result: SpeechRecognitionResult = event.results[0]
             const transcript: string = result[0].transcript
-            isSpeaking.value = false
+            speechText.value = transcript
+            isSpeeching.value = false
             callback(transcript)
         }
     }
 
     function onEnd(callback: () => void) {
-        if (!checkSupport()) {
+        if (!_checkSupport()) {
             return
         }
         recognition.onend = () => {
-            isSpeaking.value = false
+            isSpeeching.value = false
+            audioContext.suspend()
             callback()
         }
     }
 
     function setLanguage(language: 'zh-CN' | 'ja-JP') {
-        if (!checkSupport()) {
+        if (!_checkSupport()) {
             return
         }
         recognition.lang = language
     }
 
     onMounted(() => {
-        init()
+        _init()
     })
+
+    onUnmounted(abort)
+    onDeactivated(abort)
     return {
         start,
         stop,
@@ -120,7 +135,8 @@ export function useSTT() {
         abort,
         onEnd,
         setLanguage,
-        isSpeaking,
+        isSpeeching,
         reset,
+        speechText,
     }
 }
