@@ -52,6 +52,7 @@ export const DB_JLPT_ReadBaseSchema = new Schema(
             paragraphFocus: [{ type: String, required: true }],
         },
         questions: [DB_JLPT_ReadQuestionSchema],
+        kanaMap: { type: Object, required: true },
     },
     {
         versionKey: false,

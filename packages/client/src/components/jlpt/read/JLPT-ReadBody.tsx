@@ -9,9 +9,9 @@ import { computed, defineComponent, ref } from 'vue'
 import JLPT_ReadVocabCard from './JLPT-ReadVocabCard'
 import ErrorIcon from '@/components/icon/ErrorIcon'
 import SuccessIcon from '@/components/icon/SuccessIcon'
-import TextSelectMenu from '@/components/tools/TextSelectMenu'
 import AppTextSelectMenu from '@/components/app/AppTextSelectMenu'
 import { JLPT_DifficultyTag } from '../JLPT-DiffucultyTag'
+import JLPT_KanaTagContainer from '../JLPT-KanaTagContainer'
 
 interface Props {
     originRead: Partial<JLPT_ReadOrigin>
@@ -39,16 +39,14 @@ export default defineComponent((props: Props) => {
         answerCount.value = 0
     }
 
-    //#region 动态UI
-
     const TextContainer = computed(() => {
-        if (props.originRead.article?.contents?.length) {
+        const kanaMap = props.originRead.kanaMap
+        if (props.originRead.article?.contents?.length && kanaMap) {
             return (
-                <div class="flex flex-col gap-5">
-                    {props.originRead.article.contents.map((content) => {
-                        return <div>{content}</div>
-                    })}
-                </div>
+                <JLPT_KanaTagContainer
+                    contents={props.originRead.article.contents}
+                    kanaMap={kanaMap}
+                />
             )
         } else {
             return void 0
@@ -68,6 +66,7 @@ export default defineComponent((props: Props) => {
                                     <JLPT_ReadVocabCard
                                         class="min-w-50 max-w-75 flex-1"
                                         vocab={vocab}
+                                        originRead={props.originRead}
                                     />
                                 )
                             })}
@@ -84,10 +83,10 @@ export default defineComponent((props: Props) => {
         return optionIndex === question.answer ? <SuccessIcon size={16} /> : <ErrorIcon size={16} />
     }
     const createQuestionOptions = (question: JLPT_ReadQuestion, questionIndex: number) => {
-        if (question.options?.length) {
+        if (question.options?.length && props.originRead.kanaMap) {
             return question.options.map((option, optionIndex) => {
                 return (
-                    <div class="ml-2.5 flex gap-2 items-center">
+                    <div class="ml-2.5 flex-x gap-2 items-center">
                         <NRadio
                             checked={answers.value[questionIndex] === optionIndex + 1}
                             value={optionIndex + 1}
@@ -96,8 +95,12 @@ export default defineComponent((props: Props) => {
                                 answers.value[questionIndex] = optionIndex + 1
                                 answerCount.value++
                             }}
+                            class="flex-x items-end"
                         >
-                            {option}
+                            <JLPT_KanaTagContainer
+                                contents={[option]}
+                                kanaMap={props.originRead.kanaMap!}
+                            />
                         </NRadio>
 
                         {isSubmitted.value && createQuestionOptionResult(question, optionIndex)}
@@ -111,16 +114,19 @@ export default defineComponent((props: Props) => {
             return (
                 <>
                     <NDivider />
-                    <div class="flex flex-col gap-5">
+                    <div class="flex-y gap-5">
                         {props.originRead.questions.map((question, questionIndex) => {
                             return (
-                                <div class="flex flex-col gap-5">
+                                <div class="flex-y gap-5">
                                     {/* 题干 */}
-                                    <div class="flex items-center font-bold gap-2">
+                                    <div class="flex-x items-end font-bold gap-2">
                                         <NTag type="primary" size="small">
                                             {question.type}
                                         </NTag>
-                                        <div>{question.question}</div>
+                                        <JLPT_KanaTagContainer
+                                            contents={[question.question]}
+                                            kanaMap={props.originRead.kanaMap!}
+                                        />
                                     </div>
                                     {/* 选项 */}
                                     {createQuestionOptions(question, questionIndex)}

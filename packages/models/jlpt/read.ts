@@ -1,5 +1,5 @@
 import type { PaginationQueryParams } from '../common'
-import type { JLPT_Difficulty } from './common'
+import type { JLPT_Difficulty, JLPT_KanaMap } from './common'
 import type { JLPT_PracticeBase } from './practice'
 
 export interface JLPT_ReadVocab {
@@ -32,6 +32,7 @@ export interface JLPT_ReadOrigin {
     vocabList: JLPT_ReadVocab[] // 词汇表
     structure: JLPT_ReadStructure // 文章结构
     questions: JLPT_ReadQuestion[] // 问题
+    kanaMap: JLPT_KanaMap // 汉字->假名映射表
 }
 
 export interface JLPT_Read extends JLPT_ReadOrigin, JLPT_PracticeBase {

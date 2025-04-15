@@ -41,6 +41,7 @@ const JLPT_ReadOrigin = t.Object({
     vocabList: t.Array(JLPT_ReadVocab),
     structure: JLPT_ReadStructure,
     questions: t.Array(JLPT_ReadQuestion),
+    kanaMap: t.Record(t.String(), t.String()),
 })
 
 // 用户信息类型

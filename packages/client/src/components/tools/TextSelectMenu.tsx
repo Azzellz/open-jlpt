@@ -1,4 +1,4 @@
-import { getClientType } from '@/utils'
+import { getClientType, removeLineBreak } from '@/utils'
 import { ref, onMounted, onUnmounted, defineComponent } from 'vue'
 import type { VNode } from 'vue'
 
@@ -43,7 +43,7 @@ export default defineComponent({
             const rect = getSelectionPosition()
             if (!rect) return
 
-            selectedText.value = selection.toString()
+            selectedText.value = removeLineBreak(selection.toString())
 
             //获取父元素的 Rect
             const containerRect = containerRef.value!.getBoundingClientRect()
@@ -72,7 +72,7 @@ export default defineComponent({
             const rect = getSelectionPosition()
             if (!rect) return
 
-            selectedText.value = selection.toString()
+            selectedText.value = removeLineBreak(selection.toString())
 
             // 获取父元素的 Rect
             const containerRect = containerRef.value!.getBoundingClientRect()
