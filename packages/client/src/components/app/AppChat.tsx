@@ -96,11 +96,11 @@ export default defineComponent(() => {
 
     return () => (
         <div class="flex-y gap-5">
-            <div ref={chatContainerRef} class="flex-y flex-1 overflow-auto gap-10 p-5">
+            <div ref={chatContainerRef} class="flex-y flex-1 gap-10 p-5 overflow-auto">
                 {/* 介绍 */}
                 <AppIntroduction />
                 {/* 对话记录 */}
-                <div class="flex-y gap-10">
+                <div class="flex-y md:px-10% lg:px-15% xl:px-20% gap-10">
                     {userStore.localState!.chatRecords.map((history, index) => {
                         return (
                             <div class="flex-y gap-2">
@@ -163,7 +163,7 @@ export default defineComponent(() => {
                 </div>
             </div>
             {/* 对话栏 */}
-            <div class="flex-y rounded-lg oj-shadow">
+            <div class="flex-y rounded-lg mx-auto max-md:mx-5 md:min-w-60% mb-5 oj-shadow">
                 <ClientSwitch
                     mobile={() => (
                         <div class="flex-x gap-2 p-2">

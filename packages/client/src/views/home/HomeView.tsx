@@ -5,7 +5,7 @@ import AppChat from '@/components/app/AppChat'
 export default defineComponent(() => {
     return () => (
         <SakuraRain class="flex-1 flex-y overflow-auto">
-            <AppChat class="app-content" />
+            <AppChat class="flex-1 overflow-auto" />
         </SakuraRain>
     )
 })
