@@ -1,26 +1,72 @@
 import API, { API_INSTANCE } from '@/api'
-import type { User, UserClientConfig, UserConfig } from '@root/models/user'
+import type { SafeUser, UserClientConfig, UserLocalState } from '@root/models/user'
 import { isSuccessResponse } from '@root/shared'
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { cloneDeep } from 'lodash-es'
 
+const _emptyLocalState: UserLocalState = {
+    config: {
+        llm: {
+            items: [],
+            default: '',
+        },
+    },
+    chatRecords: [],
+}
 export const useUserStore = defineStore('user-store', () => {
-    const user = ref<Omit<User, 'password'> | null>(null)
+    const user = ref<SafeUser | null>(null)
+
+    //#region 本地状态
+
+    const localState = ref<UserLocalState | null>(null)
+    function loadLocalState() {
+        if (user.value) {
+            const local = localStorage.getItem(user.value.id)
+            if (local) {
+                localState.value = JSON.parse(local)
+                return
+            }
+        }
+        // 如果本地没有保存状态，则初始化
+        localState.value = cloneDeep(_emptyLocalState)
+    }
+
+    function saveLocalState() {
+        if (user.value) {
+            localStorage.setItem(user.value.id, JSON.stringify(localState.value))
+        }
+    }
+
+    function removeLocalState() {
+        if (user.value) {
+            localStorage.removeItem(user.value.id)
+        }
+    }
+
+    watch(localState, saveLocalState, { deep: true })
+
+    //#endregion
 
     //#region 令牌
 
     const token = ref(localStorage.getItem('token') || '')
-    function saveState(value: string) {
+    function saveToken(value: string) {
         localStorage.setItem('token', value)
         localStorage.setItem('user-id', user.value?.id || '')
         token.value = value
     }
-    function removeState() {
+    function removeToken() {
         localStorage.removeItem('token')
         localStorage.removeItem('user-id')
         token.value = ''
     }
 
+    //#endregion
+
+    //#region 请求响应拦截器
+
+    // 自动注入
     API_INSTANCE.interceptors.request.use((config) => {
         // 自动注入令牌
         if (token.value) {
@@ -71,12 +117,13 @@ export const useUserStore = defineStore('user-store', () => {
     //#endregion
 
     //#region 用户配置
+
     const remoteConfig = computed(() => user.value?.config)
-    const localConfig = ref<UserConfig | null>(null)
+    const localConfig = computed(() => localState.value?.config)
     const mergedConfig = computed<UserClientConfig>(() => {
         return {
             llm: {
-                default: localConfig.value!.llm.default || remoteConfig.value!.llm.default,
+                default: localConfig.value?.llm.default || remoteConfig.value!.llm.default || '',
                 items: [
                     ...(localConfig.value?.llm.items || []).map((item) => ({
                         ...item,
@@ -90,33 +137,20 @@ export const useUserStore = defineStore('user-store', () => {
             },
         }
     })
-    function loadLocalConfig() {
-        const local = localStorage.getItem('user-config')
-        if (local) {
-            localConfig.value = JSON.parse(local)
-        } else {
-            localConfig.value = {
-                llm: {
-                    items: [],
-                    default: '',
-                },
-            }
-        }
-    }
-    function saveLocalConfig() {
-        localStorage.setItem('user-config', JSON.stringify(localConfig.value))
-    }
+
     //#endregion
 
     return {
         user,
         token,
-        saveState,
-        removeState,
         remoteConfig,
-        localConfig,
         mergedConfig,
-        loadLocalConfig,
-        saveLocalConfig,
+        localConfig,
+        localState,
+        loadLocalState,
+        saveLocalState,
+        removeLocalState,
+        saveToken,
+        removeToken,
     }
 })

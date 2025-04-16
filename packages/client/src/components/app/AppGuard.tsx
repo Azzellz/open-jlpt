@@ -81,8 +81,8 @@ export default defineComponent(() => {
             if (isSuccessResponse(result)) {
                 message.success('登录成功！')
                 userStore.user = result.data.user
-                userStore.saveState(result.data.token)
-                userStore.loadLocalConfig()
+                userStore.saveToken(result.data.token)
+                userStore.loadLocalState()
                 loginAttempts.value = 0
             } else {
                 loginAttempts.value++
@@ -199,8 +199,8 @@ export default defineComponent(() => {
             if (isSuccessResponse(result)) {
                 message.success('注册成功！')
                 userStore.user = result.data.user
-                userStore.saveState(result.data.token)
-                userStore.loadLocalConfig()
+                userStore.saveToken(result.data.token)
+                userStore.loadLocalState()
                 registerAttempts.value = 0
             } else {
                 registerAttempts.value++
@@ -229,11 +229,11 @@ export default defineComponent(() => {
         message.destroyAll()
         if (isSuccessResponse(result)) {
             userStore.user = result.data
-            userStore.loadLocalConfig()
+            userStore.loadLocalState()
             message.success('自动登录成功！')
         } else {
             message.error('自动登录失败，请重新登录')
-            userStore.removeState()
+            userStore.removeToken()
             console.error(result)
         }
     })

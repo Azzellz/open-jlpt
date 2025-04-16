@@ -6,36 +6,17 @@ import SakuraIcon from '@/components/icon/SakuraIcon'
 import { marked } from 'marked'
 import dayjs from 'dayjs'
 import { Delete20Regular as DeleteIcon } from '@vicons/fluent'
-import { useGlobalStore } from '@/stores/global'
 import ClientSwitch from '../tools/ClientSwitch'
+import type { ChatRecord } from '@root/models'
+import { useUserStore } from '@/stores/user'
 
-interface ChatRecord {
-    question: {
-        value: string
-        timeStamp: number
-    }
-    content: {
-        value: string
-        timeStamp: number
-    }
-    reasoning: {
-        value: string
-        timeStamp: number
-    }
-}
 export default defineComponent(() => {
-    const globalStore = useGlobalStore()
-
     //#region 对话
-
     const { generate, isGenerating, currentLLMID, currentLLM, llmOptions } = useLLM({
         extends: ['selection'],
     })
-    const chatRecords = ref<ChatRecord[]>([])
-    const historyRecords = localStorage.getItem('chat-records')
-    if (historyRecords) {
-        chatRecords.value = JSON.parse(historyRecords)
-    }
+    const userStore = useUserStore()
+
     const question = ref('')
     const currentRecord = ref<ChatRecord | null>(null)
     const chatContainerRef = ref<HTMLElement | null>(null)
@@ -69,7 +50,7 @@ export default defineComponent(() => {
                 timeStamp: 0,
             },
         }
-        chatRecords.value.push(currentRecord.value)
+        userStore.localState!.chatRecords.push(currentRecord.value)
 
         // 发送后先滚动到底部
         scrollToBottom()
@@ -101,18 +82,14 @@ export default defineComponent(() => {
                 },
             },
         )
-
-        // 保存对话记录
-        localStorage.setItem('chat-records', JSON.stringify(chatRecords.value))
     }
 
     function handleResetRecords() {
-        localStorage.removeItem('chat-records')
-        chatRecords.value = []
+        userStore.localState!.chatRecords = []
     }
 
     function handleDeleteRecord(index: number) {
-        chatRecords.value.splice(index, 1)
+        userStore.localState!.chatRecords.splice(index, 1)
     }
 
     //#endregion
@@ -124,7 +101,7 @@ export default defineComponent(() => {
                 <AppIntroduction />
                 {/* 对话记录 */}
                 <div class="flex-y gap-10">
-                    {chatRecords.value.map((history, index) => {
+                    {userStore.localState!.chatRecords.map((history, index) => {
                         return (
                             <div class="flex-y gap-2">
                                 {/* 用户提问 */}
@@ -236,7 +213,7 @@ export default defineComponent(() => {
                         type="warning"
                         ghost
                         onClick={handleResetRecords}
-                        disabled={chatRecords.value.length === 0}
+                        disabled={userStore.localState!.chatRecords.length === 0}
                     >
                         重置
                     </NButton>

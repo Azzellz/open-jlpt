@@ -1,3 +1,4 @@
+import type { ChatRecord } from '../common'
 import type { JLPT_PracticeMap } from '../jlpt'
 import type { UserHistory } from './history'
 
@@ -40,6 +41,13 @@ export interface User {
     publishes: JLPT_PracticeMap
     config: UserConfig
 }
+
+export interface UserLocalState {
+    config: UserConfig
+    chatRecords: ChatRecord[]
+}
+
+export interface SafeUser extends Omit<User, 'password'> {}
 
 export interface UserInfo extends Pick<User, 'id' | 'account' | 'name' | 'avatar'> {}
 

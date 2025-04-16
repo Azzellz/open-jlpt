@@ -40,7 +40,7 @@ const AiSetting = defineComponent(() => {
 
     const llms = computed<ClientLLM_Config[]>(() => {
         return [
-            ...userStore.localConfig!.llm.items.map((item) => ({
+            ...userStore.localState!.config.llm.items.map((item) => ({
                 ...item,
                 local: true,
             })),
@@ -75,14 +75,13 @@ const AiSetting = defineComponent(() => {
 
                 // 删除本地设置中的模型
                 if (llm.local) {
-                    userStore.localConfig!.llm.items = userStore.localConfig!.llm.items.filter(
+                    userStore.localState!.config.llm.items = userStore.localState!.config.llm.items.filter(
                         (item) => item.id !== llm.id,
                     )
                     // 如果本地设置的默认模型是当前模型，则清空默认模型
-                    if (userStore.localConfig!.llm.default === llm.id) {
-                        userStore.localConfig!.llm.default = ''
+                    if (userStore.localState!.config.llm.default === llm.id) {
+                        userStore.localState!.config.llm.default = ''
                     }
-                    userStore.saveLocalConfig()
                     message.success('删除成功')
                 } else {
                     // 删除远程设置中的模型
@@ -121,14 +120,14 @@ const AiSetting = defineComponent(() => {
         const remoteLLM = userStore.remoteConfig!.llm.items.find(
             (llm) => llm.id === currentEditingLLM.value?.id,
         )
-        const localLLM = userStore.localConfig!.llm.items.find(
+        const localLLM = userStore.localState!.config.llm.items.find(
             (llm) => llm.id === currentEditingLLM.value?.id,
         )
         // 更新为本地设置
         if (model.local) {
             // 本地设置不存在，则创建
             if (!localLLM) {
-                userStore.localConfig!.llm.items.push({
+                userStore.localState!.config.llm.items.push({
                     id: nanoid(),
                     ...updater,
                 })
@@ -138,7 +137,6 @@ const AiSetting = defineComponent(() => {
                     return [k, v]
                 })
             }
-            userStore.saveLocalConfig()
 
             // 如果远程设置存在目标模型，则删除
             if (remoteLLM) {
@@ -177,10 +175,9 @@ const AiSetting = defineComponent(() => {
 
             // 如果本地设置存在目标模型，则删除
             if (localLLM) {
-                userStore.localConfig!.llm.items = userStore.localConfig!.llm.items.filter(
+                userStore.localState!.config.llm.items = userStore.localState!.config.llm.items.filter(
                     (llm) => llm.id !== currentEditingLLM.value?.id,
                 )
-                userStore.saveLocalConfig()
             }
 
             const result = await API.User.updateUser({
@@ -211,8 +208,7 @@ const AiSetting = defineComponent(() => {
 
         // 添加到本地设置
         if (model.local) {
-            userStore.localConfig!.llm.items.push(newLLM)
-            userStore.saveLocalConfig()
+            userStore.localState!.config.llm.items.push(newLLM)
         } else {
             // 添加到远程设置
             const result = await API.User.updateUser({
@@ -235,7 +231,6 @@ const AiSetting = defineComponent(() => {
         showLLMAddModal.value = false
         complete()
     }
-    
 
     //#endregion
 
@@ -271,16 +266,16 @@ const AiSetting = defineComponent(() => {
                 message.success('更新成功')
                 userStore.user!.config.llm.default = llmID
                 // 本地设置的默认模型清空
-                userStore.localConfig!.llm.default = ''
-                userStore.saveLocalConfig()
+                userStore.localState!.config.llm.default = ''
+                // userStore.saveLocalConfig()
             } else {
                 message.error('更新失败')
                 console.error(result)
             }
         } else {
             // 将本地模型设置为默认模型
-            userStore.localConfig!.llm.default = llmID
-            userStore.saveLocalConfig()
+            userStore.localState!.config.llm.default = llmID
+            // userStore.saveLocalConfig()
             // 远程设置的默认模型清空
             userStore.user!.config.llm.default = ''
             const result = await API.User.updateUser({
@@ -330,7 +325,7 @@ const AiSetting = defineComponent(() => {
                     {llms.value.length && (
                         <div class="flex-x flex-wrap gap-5">
                             {llms.value.map((llm) => {
-                                const local = !!userStore.localConfig!.llm.items.find(
+                                const local = !!userStore.localState!.config.llm.items.find(
                                     (item) => item.id === llm.id,
                                 )
                                 return (
