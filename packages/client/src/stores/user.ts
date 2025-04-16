@@ -1,9 +1,15 @@
 import API, { API_INSTANCE } from '@/api'
-import type { SafeUser, UserClientConfig, UserLocalState } from '@root/models/user'
+import type {
+    SafeUser,
+    UserClientConfig,
+    UserCreateParams,
+    UserLocalState,
+} from '@root/models/user'
 import { isSuccessResponse } from '@root/shared'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { cloneDeep } from 'lodash-es'
+import type { AuthParams } from '@root/models'
 
 const _emptyLocalState: UserLocalState = {
     config: {
@@ -140,6 +146,51 @@ export const useUserStore = defineStore('user-store', () => {
 
     //#endregion
 
+    //#region 用户逻辑
+
+    async function login(params: AuthParams) {
+        const result = await API.Auth.createAuthSession(params)
+        if (isSuccessResponse(result)) {
+            user.value = result.data.user
+            saveToken(result.data.token)
+            loadLocalState()
+        }
+        return result
+    }
+
+    async function register(params: UserCreateParams) {
+        const result = await API.User.createUser(params)
+
+        if (isSuccessResponse(result)) {
+            user.value = result.data.user
+            saveToken(result.data.token)
+            loadLocalState()
+        }
+        return result
+    }
+
+    async function logout() {
+        const result = await API.Auth.deleteAuthSession(user.value!.id)
+        if (isSuccessResponse(result)) {
+            user.value = null
+            removeToken()
+        }
+        return result
+    }
+
+    async function getUser() {
+        const result = await API.User.getUser()
+        if (isSuccessResponse(result)) {
+            user.value = result.data
+            loadLocalState()
+        } else {
+            removeToken()
+        }
+
+        return result
+    }
+
+    //#endregion
     return {
         user,
         token,
@@ -152,5 +203,9 @@ export const useUserStore = defineStore('user-store', () => {
         removeLocalState,
         saveToken,
         removeToken,
+        login,
+        register,
+        logout,
+        getUser,
     }
 })

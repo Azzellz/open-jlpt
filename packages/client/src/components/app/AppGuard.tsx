@@ -14,8 +14,7 @@ import {
 import SakuraRain from '../tools/SakuraRain'
 import { defineComponent, onMounted, ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user'
-import API from '@/api'
-import { isSuccessResponse } from '@root/shared'
+import { ERROR_RESPONSE, isSuccessResponse } from '@root/shared'
 import AppLoader from './loader/AppLoader'
 import AppIntroduction from './AppIntroduction'
 import { useI18n } from 'vue-i18n'
@@ -76,21 +75,18 @@ export default defineComponent(() => {
             }
 
             isLoading.value = true
-            const result = await API.Auth.createAuthSession(loginFormValue.value)
+            const result = await userStore.login(loginFormValue.value)
 
             if (isSuccessResponse(result)) {
                 message.success('登录成功！')
-                userStore.user = result.data.user
-                userStore.saveToken(result.data.token)
-                userStore.loadLocalState()
                 loginAttempts.value = 0
             } else {
                 loginAttempts.value++
 
                 // 根据错误代码显示不同的错误信息
-                if (result.code === 404) {
+                if (result.code === ERROR_RESPONSE.USER.NOT_FOUND.code) {
                     loginErrorMessage.value = '账号不存在'
-                } else if (result.code === 401) {
+                } else if (result.code === ERROR_RESPONSE.USER.INVALID_PASSWORD.code) {
                     loginErrorMessage.value = '密码错误'
                 } else {
                     loginErrorMessage.value = `登录失败: ${result.error || '未知错误'}`
@@ -194,18 +190,15 @@ export default defineComponent(() => {
             }
 
             isLoading.value = true
-            const result = await API.User.createUser(registerFormValue.value)
+            const result = await userStore.register(registerFormValue.value)
 
             if (isSuccessResponse(result)) {
                 message.success('注册成功！')
-                userStore.user = result.data.user
-                userStore.saveToken(result.data.token)
-                userStore.loadLocalState()
                 registerAttempts.value = 0
             } else {
                 registerAttempts.value++
                 // 根据错误代码显示不同的错误信息
-                if (result.code === 409) {
+                if (result.code === ERROR_RESPONSE.USER.DUPLICATE_NAME.code) {
                     registerErrorMessage.value = '账号已存在'
                 } else {
                     registerErrorMessage.value = `注册失败: ${result.error || '未知错误'}`
@@ -225,15 +218,12 @@ export default defineComponent(() => {
         }
 
         message.info('自动登录中...')
-        const result = await API.User.getUser()
+        const result = await userStore.getUser()
         message.destroyAll()
         if (isSuccessResponse(result)) {
-            userStore.user = result.data
-            userStore.loadLocalState()
             message.success('自动登录成功！')
         } else {
             message.error('自动登录失败，请重新登录')
-            userStore.removeToken()
             console.error(result)
         }
     })

@@ -9,7 +9,6 @@ import { Translate20Regular as TranslateIcon } from '@vicons/fluent'
 import { useUserStore } from '@/stores/user'
 import { isSuccessResponse } from '@root/shared'
 import { ref } from 'vue'
-import API from '@/api'
 
 const desktopNavItemClass =
     'cursor-pointer px-5 block whitespace-nowrap h-16 line-height-16 hover:text-red-300 transition'
@@ -41,12 +40,9 @@ export default defineComponent(() => {
     const isLoading = ref(false)
     async function handleLoginout() {
         isLoading.value = true
-        const result = await API.Auth.deleteAuthSession(userStore.user!.id)
+        const result = await userStore.logout()
         isLoading.value = false
         if (isSuccessResponse(result)) {
-            userStore.user = null
-            userStore.token = ''
-            localStorage.removeItem('token')
             message.success('注销成功')
         } else {
             console.error(result)
