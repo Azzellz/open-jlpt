@@ -103,6 +103,10 @@ export const ERROR_RESPONSE = {
             code: 404,
             error: '用户不存在',
         },
+        INVALID_PASSWORD: {
+            code: 401,
+            error: '密码错误',
+        },
     },
 
     AUTH: {
@@ -121,6 +125,10 @@ export const ERROR_RESPONSE = {
         REFRESH_FAILED: {
             code: 1003,
             error: '刷新令牌失败',
+        },
+        TOKEN_EXPIRED: {
+            code: 1004,
+            error: '令牌已过期',
         },
     },
 }

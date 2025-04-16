@@ -4,37 +4,34 @@ import { jwt } from '@elysiajs/jwt'
 import { createErrorResponse, ERROR_RESPONSE } from '@root/shared'
 import Elysia, { t } from 'elysia'
 
-export interface AccessJwtPayload {
+export interface JwtPayload {
     id: string
     name: string
     account: string
     _random: string
+    expiresAt: number
 }
+
+const JWT_Schema = t.Object({
+    id: t.String(),
+    name: t.String(),
+    account: t.String(),
+    _random: t.String(),
+    expiresAt: t.Number(),
+})
 
 export const accessJwtPlugin = jwt({
     name: 'accessJwt',
     secret: 'YuzuTea_Access',
     alg: 'HS256',
-    exp: '2h',
-    schema: t.Object({
-        id: t.String(),
-        name: t.String(),
-        account: t.String(),
-        _random: t.String(),
-    }),
+    schema: JWT_Schema,
 })
 
 export const refreshJwtPlugin = jwt({
     name: 'refreshJwt',
     secret: 'YuzuTea_Refresh',
     alg: 'HS256',
-    exp: '7d',
-    schema: t.Object({
-        id: t.String(),
-        name: t.String(),
-        account: t.String(),
-        _random: t.String(),
-    }),
+    schema: JWT_Schema,
 })
 
 export const bearerPlugin = bearer()
@@ -42,9 +39,7 @@ export const bearerPlugin = bearer()
 /**
  * 认证插件的类型引用
  */
-export const verifyPluginReference = new Elysia()
-    .state('user', {} as AccessJwtPayload)
-    .state('token', '')
+export const verifyPluginReference = new Elysia().state('user', {} as JwtPayload).state('token', '')
 
 /**
  * 认证bearer的插件
@@ -85,6 +80,11 @@ export function verifyCommonUserPlugin(app: Elysia) {
         const payload = await accessJwt.verify(bearer)
         if (!payload) {
             return ERROR_RESPONSE.AUTH.INVALID_TOKEN
+        }
+
+        // 检查令牌是否过期
+        if (payload.expiresAt < Date.now()) {
+            return ERROR_RESPONSE.AUTH.TOKEN_EXPIRED
         }
 
         // 检查会话是否有效
