@@ -14,7 +14,7 @@ const DB_LLM_Schema = new Schema<UserConfig['llm']>(
         ],
         default: {
             type: String,
-            required: true,
+            default: '',
         },
     },
     {

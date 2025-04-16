@@ -99,6 +99,10 @@ export const ERROR_RESPONSE = {
         },
     },
     USER: {
+        DUPLICATE_NAME: {
+            code: 409,
+            error: '存在重复用户名',
+        },
         NOT_FOUND: {
             code: 404,
             error: '用户不存在',

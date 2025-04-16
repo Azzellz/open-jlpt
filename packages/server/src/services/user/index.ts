@@ -8,6 +8,12 @@ import { accessJwtPlugin, refreshJwtPlugin, verifyCommonUserPlugin } from '@/plu
 import { nanoid } from 'nanoid'
 import { UserLLMService } from './llm'
 import { UserHistoryService } from './history'
+import {
+    createTemplateUser,
+    generateAccessTokenPayload,
+    generateRefreshTokenPayload,
+} from '@/tools'
+import { AUTH_CONSTANTS } from '@/constants/auth'
 
 export const UserService = new Elysia({ prefix: '/users' })
     .use(accessJwtPlugin)
@@ -80,7 +86,7 @@ UserService.post(
         try {
             // 检查是否有重复用户
             if (await DB_UserModel.findOne({ name: body.name })) {
-                return createErrorResponse(409, '存在重复用户名')
+                return ERROR_RESPONSE.USER.DUPLICATE_NAME
             }
 
             // 对密码加密
@@ -88,36 +94,29 @@ UserService.post(
             body.password = await bcrypt.hash(body.password, salt)
 
             // 创建新用户
-            const newUser = await DB_UserModel.create({
-                ...body,
-                avatar: 'default',
-                histories: { reads: [] },
-                favorites: { reads: [] },
-                publishes: { reads: [] },
-                config: {
-                    llms: [],
-                },
-            })
+            const newUser = await DB_UserModel.create(createTemplateUser(body))
 
             const userJson = newUser.toJSON()
             const userPayload = pick(userJson, ['id', 'name', 'account'])
 
             // 生成访问令牌
-            const accessToken = await accessJwt.sign({
-                ...userPayload,
-                _random: nanoid(),
-            })
-
+            const accessToken = await accessJwt.sign(generateAccessTokenPayload(userPayload))
+            
             // 记录 refreshToken(刷新令牌) 到 Redis，7天过期
-            const refreshToken = await refreshJwt.sign({ ...userPayload, _random: nanoid() })
-            RedisClient.setEx(`sessions:${userJson.id}`, 3600 * 24 * 7, refreshToken)
+            const refreshToken = await refreshJwt.sign(generateRefreshTokenPayload(userPayload))
+            RedisClient.setEx(
+                `sessions:${userJson.id}`,
+                AUTH_CONSTANTS.JWT.EXPIRES_AT.REFRESH / 1000,
+                refreshToken
+            )
 
             return createSuccessResponse(200, '注册成功', {
                 user: userJson,
                 token: accessToken,
             })
         } catch (error) {
-            return createErrorResponse(500, error)
+            Log.error(error)
+            return ERROR_RESPONSE.SYSTEM.INTERNAL_ERROR
         }
     },
     {
